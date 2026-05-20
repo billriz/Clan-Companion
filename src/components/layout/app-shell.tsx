@@ -8,18 +8,25 @@ type AppShellProps = {
   children: React.ReactNode;
   userEmail: string;
   userName: string | null;
+  activeItem?: "dashboard" | "recipes" | "planner" | "list";
 };
 
 const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: Home, active: true },
-  { label: "Recipes", href: "/dashboard", icon: BookOpen, active: false },
-  { label: "Planner", href: "/dashboard", icon: CalendarDays, active: false },
-  { label: "List", href: "/dashboard", icon: ShoppingBasket, active: false },
+  { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: Home },
+  { id: "recipes", label: "Recipes", href: "/recipes", icon: BookOpen },
+  { id: "planner", label: "Planner", href: "/dashboard", icon: CalendarDays },
+  { id: "list", label: "List", href: "/dashboard", icon: ShoppingBasket },
 ] as const;
 
-export function AppShell({ children, userEmail, userName }: AppShellProps) {
+export function AppShell({
+  children,
+  userEmail,
+  userName,
+  activeItem = "dashboard",
+}: AppShellProps) {
   const displayName = userName || userEmail;
   const initials = getUserInitials(displayName);
+  const activeLabel = navItems.find((item) => item.id === activeItem)?.label ?? "Dashboard";
 
   return (
     <div className="min-h-screen bg-plate-cream text-plate-charcoal">
@@ -39,7 +46,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
             <Link
               key={item.label}
               className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
-                item.active
+                item.id === activeItem
                   ? "bg-primary text-primary-foreground shadow-subtle"
                   : "text-muted-foreground hover:bg-secondary hover:text-plate-charcoal"
               }`}
@@ -74,7 +81,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
               </div>
               <div>
                 <p className="font-semibold">Clan Companion</p>
-                <p className="text-xs text-muted-foreground">Dashboard</p>
+                <p className="text-xs text-muted-foreground">{activeLabel}</p>
               </div>
             </div>
             <div className="hidden lg:block">
@@ -84,7 +91,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
             <div className="flex items-center gap-3">
               <div className="hidden items-center gap-2 rounded-md border bg-plate-paper px-3 py-2 text-sm text-muted-foreground sm:flex">
                 <ListChecks className="h-4 w-4 text-primary" aria-hidden="true" />
-                Phase 1
+                Phase 2
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-plate-terracotta/15 text-sm font-semibold text-plate-terracotta lg:hidden">
                 {initials}
@@ -106,7 +113,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
             <Link
               key={item.label}
               className={`flex flex-col items-center gap-1 rounded-md px-2 py-2 text-xs font-medium ${
-                item.active ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                item.id === activeItem ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               }`}
               href={item.href}
             >

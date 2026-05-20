@@ -9,6 +9,8 @@ const dashboardCards = [
     description: "A home for saved meals, family favorites, and cooking notes.",
     icon: BookOpen,
     tone: "sage",
+    href: "/recipes",
+    actionLabel: "Open recipes",
   },
   {
     title: "Meal Planner",
@@ -63,6 +65,8 @@ export default function DashboardPage() {
             description={card.description}
             icon={card.icon}
             tone={card.tone}
+            href={"href" in card ? card.href : undefined}
+            actionLabel={"actionLabel" in card ? card.actionLabel : undefined}
           />
         ))}
       </section>

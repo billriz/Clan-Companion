@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function DashboardLayout({
+export default async function RecipesLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -21,7 +21,7 @@ export default async function DashboardLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="dashboard" userEmail={user.email ?? "Clan Companion user"} userName={fullName}>
+    <AppShell activeItem="recipes" userEmail={user.email ?? "Clan Companion user"} userName={fullName}>
       {children}
     </AppShell>
   );

@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,8 @@ type FeatureCardProps = {
   description: string;
   icon: LucideIcon;
   tone: FeatureTone;
+  href?: string;
+  actionLabel?: string;
 };
 
 const toneClasses: Record<FeatureTone, string> = {
@@ -19,7 +22,14 @@ const toneClasses: Record<FeatureTone, string> = {
   blue: "bg-plate-blue/15 text-plate-blue",
 };
 
-export function FeatureCard({ title, description, icon: Icon, tone }: FeatureCardProps) {
+export function FeatureCard({
+  title,
+  description,
+  icon: Icon,
+  tone,
+  href,
+  actionLabel = "Coming soon",
+}: FeatureCardProps) {
   return (
     <Card className="h-full shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
       <CardHeader>
@@ -35,9 +45,15 @@ export function FeatureCard({ title, description, icon: Icon, tone }: FeatureCar
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button className="w-full" type="button" variant="secondary" disabled>
-          Coming soon
-        </Button>
+        {href ? (
+          <Link className={cn(buttonVariants({ variant: "secondary" }), "w-full")} href={href}>
+            {actionLabel}
+          </Link>
+        ) : (
+          <Button className="w-full" type="button" variant="secondary" disabled>
+            {actionLabel}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
