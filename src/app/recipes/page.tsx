@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 
 import { RecipeLibrary } from "@/components/recipes/recipe-library";
@@ -9,10 +10,19 @@ import { cn } from "@/lib/utils";
 
 export default async function RecipesPage() {
   const supabase = await createClient();
-  const { data: recipes, error } = await supabase
-    .from("recipes")
-    .select("*")
-    .order("updated_at", { ascending: false });
+  const [userResponse, recipesResponse] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("recipes").select("*").order("updated_at", { ascending: false }),
+  ]);
+  const {
+    data: { user },
+  } = userResponse;
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: recipes, error } = recipesResponse;
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -37,7 +47,7 @@ export default async function RecipesPage() {
           Recipes could not be loaded. {error.message}
         </div>
       ) : (
-        <RecipeLibrary recipes={recipes ?? []} />
+        <RecipeLibrary recipes={recipes ?? []} userId={user.id} />
       )}
     </div>
   );

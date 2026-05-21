@@ -14,8 +14,8 @@ type AppShellProps = {
 const navItems = [
   { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: Home },
   { id: "recipes", label: "Recipes", href: "/recipes", icon: BookOpen },
-  { id: "planner", label: "Planner", href: "/dashboard", icon: CalendarDays },
-  { id: "list", label: "List", href: "/dashboard", icon: ShoppingBasket },
+  { id: "planner", label: "Meal Planner", href: "/meal-planner", icon: CalendarDays },
+  { id: "list", label: "Shopping List", href: "/shopping-list", icon: ShoppingBasket },
 ] as const;
 
 export function AppShell({
@@ -91,7 +91,7 @@ export function AppShell({
             <div className="flex items-center gap-3">
               <div className="hidden items-center gap-2 rounded-md border bg-plate-paper px-3 py-2 text-sm text-muted-foreground sm:flex">
                 <ListChecks className="h-4 w-4 text-primary" aria-hidden="true" />
-                Phase 2
+                Phase 3
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-plate-terracotta/15 text-sm font-semibold text-plate-terracotta lg:hidden">
                 {initials}

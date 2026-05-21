@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { BookOpen, CalendarDays, ChefHat, ListChecks, ShoppingBasket } from "lucide-react";
 
 import { FeatureCard } from "@/components/dashboard/feature-card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 const dashboardCards = [
   {
@@ -17,12 +18,16 @@ const dashboardCards = [
     description: "A weekly planning space for breakfast, lunch, dinner, and prep.",
     icon: CalendarDays,
     tone: "terracotta",
+    href: "/meal-planner",
+    actionLabel: "Plan week",
   },
   {
     title: "Shopping List",
     description: "A clean checklist for grocery runs and pantry restocks.",
     icon: ShoppingBasket,
     tone: "blue",
+    href: "/shopping-list",
+    actionLabel: "Preview list",
   },
 ] as const;
 
@@ -76,12 +81,12 @@ export default function DashboardPage() {
           <div>
             <h2 className="text-lg font-semibold text-plate-charcoal">Weekly plan</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Your first plan will appear here when meal planning is added.
+              Build this week around saved recipes, meal slots, and future grocery prep.
             </p>
           </div>
-          <Button type="button" disabled>
-            Coming soon
-          </Button>
+          <Link className={buttonVariants()} href="/meal-planner">
+            Open Planner
+          </Link>
         </div>
       </section>
     </div>

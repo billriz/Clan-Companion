@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 
+import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { RecipeCard } from "@/components/recipes/recipe-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import type { Recipe } from "@/types/recipes";
 
 type RecipeLibraryProps = {
   recipes: Recipe[];
+  userId: string;
 };
 
 type Filter = {
@@ -22,9 +24,10 @@ type Filter = {
   type: "all" | "difficulty" | "category";
 };
 
-export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
+export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [planningRecipe, setPlanningRecipe] = useState<Recipe | null>(null);
 
   const categoryFilters = useMemo(() => {
     return Array.from(
@@ -136,7 +139,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
       {filteredRecipes.length > 0 ? (
         <div className="grid auto-rows-fr grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} onAddToPlan={setPlanningRecipe} />
           ))}
         </div>
       ) : (
@@ -149,6 +152,19 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           </p>
         </div>
       )}
+
+      <AddMealDialog
+        key={planningRecipe?.id ?? "closed"}
+        initialRecipeId={planningRecipe?.id}
+        isOpen={Boolean(planningRecipe)}
+        recipes={recipes}
+        userId={userId}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setPlanningRecipe(null);
+          }
+        }}
+      />
     </div>
   );
 }

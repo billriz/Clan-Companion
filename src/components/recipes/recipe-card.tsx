@@ -4,7 +4,7 @@
 
 import { type KeyboardEvent, type MouseEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock3, Heart, Signal, UsersRound } from "lucide-react";
+import { CalendarPlus, Clock3, Heart, Signal, UsersRound } from "lucide-react";
 
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +14,12 @@ import type { Recipe } from "@/types/recipes";
 
 type RecipeCardProps = {
   recipe: Recipe;
+  onAddToPlan?: (recipe: Recipe) => void;
 };
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export function RecipeCard({ recipe, onAddToPlan }: RecipeCardProps) {
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
-  const [planLabel, setPlanLabel] = useState("Add to Plan");
   const totalTime = getTotalTime(recipe);
   const timeLabel = totalTime > 0 ? formatMinutes(totalTime) : formatMinutes(recipe.prep_time);
   const difficulty = normalizeDifficulty(recipe.difficulty);
@@ -43,8 +43,12 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
   function handleAddToPlan(event: MouseEvent<HTMLButtonElement>) {
     stopCardNavigation(event);
-    setPlanLabel("Soon");
-    window.setTimeout(() => setPlanLabel("Add to Plan"), 1200);
+    if (onAddToPlan) {
+      onAddToPlan(recipe);
+      return;
+    }
+
+    router.push("/meal-planner");
   }
 
   function handleFavorite(event: MouseEvent<HTMLButtonElement>) {
@@ -104,8 +108,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         </div>
 
         <div className="flex items-center gap-2 border-t pt-4">
-          <Button className="h-9 flex-1" type="button" onClick={handleAddToPlan}>
-            {planLabel}
+          <Button className="h-9 flex-1 gap-2" type="button" onClick={handleAddToPlan}>
+            <CalendarPlus className="h-4 w-4" aria-hidden="true" />
+            Add to Plan
           </Button>
           <Button
             aria-label={isFavorite ? "Remove favorite placeholder" : "Favorite placeholder"}

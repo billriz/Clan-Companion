@@ -86,6 +86,48 @@ export type Database = {
           },
         ];
       };
+      meal_plans: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          recipe_id: string | null;
+          planned_date: string;
+          meal_type: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          recipe_id?: string | null;
+          planned_date: string;
+          meal_type: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          recipe_id?: string | null;
+          planned_date?: string;
+          meal_type?: string;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "meal_plans_recipe_id_fkey";
+            columns: ["recipe_id"];
+            isOneToOne: false;
+            referencedRelation: "recipes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "meal_plans_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

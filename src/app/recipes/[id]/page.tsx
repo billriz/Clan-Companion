@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
@@ -34,11 +35,19 @@ type RecipeDetailPageProps = {
 export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: recipe, error } = await supabase
-    .from("recipes")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const [userResponse, recipeResponse] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("recipes").select("*").eq("id", id).maybeSingle(),
+  ]);
+  const {
+    data: { user },
+  } = userResponse;
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: recipe, error } = recipeResponse;
 
   if (error) {
     throw new Error(error.message);
@@ -101,7 +110,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           </div>
 
           <div className="mt-6 border-t pt-5">
-            <RecipeDetailActions recipeId={recipe.id} />
+            <RecipeDetailActions recipe={recipe} userId={user.id} />
           </div>
         </div>
       </section>
