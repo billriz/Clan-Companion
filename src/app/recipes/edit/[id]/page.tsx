@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
+
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { RecipeNotFound } from "@/components/recipes/recipe-not-found";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+  title: "Edit Recipe",
+};
 
 type EditRecipePageProps = {
   params: Promise<{ id: string }>;

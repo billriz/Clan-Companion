@@ -1,12 +1,13 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Plus, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { createClient } from "@/lib/supabase/client";
 import {
   SHOPPING_CATEGORIES,
@@ -35,27 +36,6 @@ export function AddShoppingItemForm({
   const [category, setCategory] = useState<ShoppingCategory>("Other");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onOpenChange(false);
-      }
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onOpenChange]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,27 +94,24 @@ export function AddShoppingItemForm({
     onOpenChange(false);
   }
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-plate-charcoal/35 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-      <button
-        aria-label="Close add item dialog"
-        className="absolute inset-0 cursor-default"
-        type="button"
-        onClick={closeDialog}
-      />
-
-      <form
-        className="relative w-full max-w-xl overflow-hidden rounded-t-2xl border bg-plate-paper shadow-soft sm:rounded-2xl"
-        onSubmit={handleSubmit}
-      >
+    <ModalShell
+      isOpen={isOpen}
+      labelledBy="add-shopping-item-title"
+      describedBy="add-shopping-item-description"
+      panelClassName="max-w-xl"
+      onClose={closeDialog}
+    >
+      <form onSubmit={handleSubmit}>
         <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
           <div>
             <Badge variant="default">Manual item</Badge>
-            <h2 className="mt-2 text-xl font-semibold text-plate-charcoal">Add Item</h2>
+            <h2 id="add-shopping-item-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+              Add Item
+            </h2>
+            <p id="add-shopping-item-description" className="mt-1 text-sm text-muted-foreground">
+              Add a grocery item for the selected week.
+            </p>
           </div>
           <Button
             aria-label="Close"
@@ -203,7 +180,10 @@ export function AddShoppingItemForm({
           </div>
 
           {error ? (
-            <div className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta">
+            <div
+              className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+              role="alert"
+            >
               {error}
             </div>
           ) : null}
@@ -225,6 +205,6 @@ export function AddShoppingItemForm({
           </Button>
         </footer>
       </form>
-    </div>
+    </ModalShell>
   );
 }

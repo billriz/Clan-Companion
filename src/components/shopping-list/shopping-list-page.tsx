@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Eraser,
   Plus,
+  RefreshCcw,
   ShoppingBasket,
 } from "lucide-react";
 
@@ -134,10 +135,24 @@ export function ShoppingListPage({
       addDays(parseDateKey(weekStartKey), direction === "next" ? 7 : -7),
     );
     setWeekStartKey(nextWeekStartKey);
+    setError(null);
+    setNotice(null);
   }
 
   function returnToCurrentWeek() {
     setWeekStartKey(getWeekStartKey(new Date()));
+    setError(null);
+    setNotice(null);
+  }
+
+  function reloadCurrentWeek() {
+    setError(null);
+    setNotice(null);
+    setWeekDataByWeek((currentData) => {
+      const nextData = { ...currentData };
+      delete nextData[weekStartKey];
+      return nextData;
+    });
   }
 
   function updateWeekItems(
@@ -228,6 +243,7 @@ export function ShoppingListPage({
     updateWeekItems(targetWeekStartKey, (currentItems) =>
       currentItems.filter((currentItem) => currentItem.id !== item.id),
     );
+    setNotice(`${item.name} was removed from the list.`);
     setItemBusy(item.id, false);
   }
 
@@ -364,7 +380,7 @@ export function ShoppingListPage({
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Badge variant="blue">Phase 4</Badge>
+          <Badge variant="blue">Weekly groceries</Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
             Shopping List
           </h1>
@@ -378,6 +394,25 @@ export function ShoppingListPage({
         </div>
       </section>
 
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Items total</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{totalCount}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Checked</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{checkedCount}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Planned meals</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{mealPlanCount}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Progress</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{progressPercent}%</p>
+        </div>
+      </section>
+
       <section className="grid gap-4 rounded-2xl border bg-white p-4 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center sm:p-5">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -387,7 +422,7 @@ export function ShoppingListPage({
             </span>
           </div>
           <div>
-            <div className="h-2 overflow-hidden rounded-full bg-secondary">
+            <div className="h-2 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
               <div
                 className="h-full rounded-full bg-primary transition-all"
                 style={{ width: `${progressPercent}%` }}
@@ -465,13 +500,23 @@ export function ShoppingListPage({
       </section>
 
       {error ? (
-        <div className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm leading-6 text-plate-terracotta shadow-subtle">
-          {error}
+        <div
+          className="flex flex-col gap-3 rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm leading-6 text-plate-terracotta shadow-subtle sm:flex-row sm:items-center sm:justify-between"
+          role="alert"
+        >
+          <span>{error}</span>
+          <Button className="h-9 gap-2 self-start" type="button" variant="secondary" onClick={reloadCurrentWeek}>
+            <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+            Retry
+          </Button>
         </div>
       ) : null}
 
       {notice ? (
-        <div className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm leading-6 text-plate-blue shadow-subtle">
+        <div
+          className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm leading-6 text-plate-blue shadow-subtle"
+          role="status"
+        >
           {notice}
         </div>
       ) : null}
@@ -479,7 +524,13 @@ export function ShoppingListPage({
       {isLoadingWeek && !weekData ? (
         <ShoppingListSkeleton />
       ) : totalCount === 0 ? (
-        <EmptyShoppingList mealPlanCount={mealPlanCount} onGenerate={handleGenerateFromMealPlan} isBusy={isBusy} />
+        <EmptyShoppingList
+          mealPlanCount={mealPlanCount}
+          onGenerate={handleGenerateFromMealPlan}
+          isGenerating={isGenerating}
+          isBusy={isBusy}
+          onAddManual={() => setIsAddItemOpen(true)}
+        />
       ) : (
         <div className={cn("space-y-7 transition", isBusy && "opacity-75")}>
           {visibleCategories.map((category) => (
@@ -545,11 +596,15 @@ async function fetchShoppingWeekData(
 function EmptyShoppingList({
   mealPlanCount,
   isBusy,
+  isGenerating,
   onGenerate,
+  onAddManual,
 }: {
   mealPlanCount: number;
   isBusy: boolean;
+  isGenerating: boolean;
   onGenerate: () => Promise<void>;
+  onAddManual: () => void;
 }) {
   if (mealPlanCount === 0) {
     return (
@@ -573,15 +628,21 @@ function EmptyShoppingList({
   return (
     <section className="rounded-2xl border border-dashed bg-white p-8 text-center shadow-subtle">
       <Badge variant="default">Ready to build</Badge>
-      <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">
-        Your shopping list is empty.
-      </h2>
+      <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">Your shopping list is empty.</h2>
       <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
         Generate a list from planned recipes for the current week, then add any household extras by
         hand.
       </p>
-      <div className="mt-6 flex justify-center">
-        <GenerateShoppingListButton disabled={isBusy} isGenerating={isBusy} onGenerate={onGenerate} />
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <GenerateShoppingListButton
+          disabled={isBusy}
+          isGenerating={isGenerating}
+          onGenerate={onGenerate}
+        />
+        <Button className="h-11 gap-2 rounded-xl" disabled={isBusy} type="button" variant="secondary" onClick={onAddManual}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Add Manual Item
+        </Button>
       </div>
     </section>
   );
@@ -599,13 +660,13 @@ function ShoppingListSkeleton() {
                 key={`${sectionIndex}-${itemIndex}`}
                 className="rounded-2xl border bg-white p-4 shadow-subtle"
               >
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] gap-3">
-                  <div className="h-11 w-11 animate-pulse rounded-xl bg-muted" />
+                <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] gap-3">
+                  <div className="h-12 w-12 animate-pulse rounded-xl bg-muted" />
                   <div className="space-y-3">
                     <div className="h-5 w-40 animate-pulse rounded-full bg-muted" />
                     <div className="h-4 w-28 animate-pulse rounded-full bg-muted" />
                   </div>
-                  <div className="h-11 w-11 animate-pulse rounded-xl bg-muted" />
+                  <div className="h-12 w-12 animate-pulse rounded-xl bg-muted" />
                 </div>
               </div>
             ))}

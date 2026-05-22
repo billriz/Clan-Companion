@@ -1,9 +1,33 @@
 import type { Metadata } from "next";
+import { Manrope, Newsreader } from "next/font/google";
+
 import "./globals.css";
 
+const bodyFont = Manrope({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-body",
+});
+
+const headingFont = Newsreader({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-heading",
+});
+
 export const metadata: Metadata = {
-  title: "Clan Companion",
-  description: "Recipe planning, meal prep, and shopping list organization.",
+  applicationName: "PlatePlan",
+  title: {
+    default: "PlatePlan",
+    template: "%s | PlatePlan",
+  },
+  description: "Recipe planning, meal planning, and shopping list app",
+  keywords: ["recipes", "meal planner", "shopping list", "supabase", "next.js"],
+  openGraph: {
+    title: "PlatePlan",
+    description: "Recipe planning, meal planning, and shopping list app",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${bodyFont.variable} ${headingFont.variable} antialiased`}>{children}</body>
     </html>
   );
 }

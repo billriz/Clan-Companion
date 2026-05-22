@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
-
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
@@ -27,6 +27,10 @@ import {
 } from "@/lib/recipes";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Recipe Details",
+};
 
 type RecipeDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -70,9 +74,16 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
       </Link>
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-start">
-        <div className="aspect-video overflow-hidden rounded-2xl border bg-secondary shadow-subtle">
+        <div className="relative aspect-video overflow-hidden rounded-2xl border bg-secondary shadow-subtle">
           {recipe.image_url ? (
-            <img src={recipe.image_url} alt={recipe.title} className="h-full w-full object-cover" />
+            <Image
+              fill
+              priority
+              alt={recipe.title}
+              className="object-cover"
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              src={recipe.image_url}
+            />
           ) : (
             <RecipeImagePlaceholder iconClassName="h-16 w-16" />
           )}
@@ -119,7 +130,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
         <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
           <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
           {ingredients.length > 0 ? (
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-5 space-y-3" aria-label="Ingredients list">
               {ingredients.map((ingredient, index) => (
                 <li
                   key={`${ingredient.name}-${index}`}
@@ -142,7 +153,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
         <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
           <h2 className="text-xl font-semibold text-plate-charcoal">Instructions</h2>
           {instructions.length > 0 ? (
-            <ol className="mt-5 space-y-4">
+            <ol className="mt-5 space-y-4" aria-label="Cooking steps">
               {instructions.map((instruction, index) => (
                 <li key={`${instruction}-${index}`} className="grid grid-cols-[40px_minmax(0,1fr)] gap-4">
                   <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">

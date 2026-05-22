@@ -1,4 +1,4 @@
--- Run this in the Supabase SQL editor for the Clan Companion project.
+-- Run this in the Supabase SQL editor for the PlatePlan project.
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

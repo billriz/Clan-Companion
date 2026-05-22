@@ -30,17 +30,19 @@ export function ShoppingListItem({
     <article
       className={cn(
         "rounded-2xl border bg-white p-4 shadow-subtle transition",
-        isChecked && "bg-plate-paper/70 opacity-70",
+        isChecked && "bg-plate-paper/70",
       )}
     >
-      <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-start gap-3">
+      <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-start gap-3">
         <button
+          aria-checked={isChecked}
           aria-label={isChecked ? `Mark ${item.name} unchecked` : `Mark ${item.name} checked`}
           className={cn(
-            "flex h-11 w-11 items-center justify-center rounded-xl border text-primary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "flex h-12 w-12 items-center justify-center rounded-xl border text-primary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             isChecked ? "border-primary bg-primary text-primary-foreground" : "border-primary/30 bg-primary/10",
           )}
           disabled={isBusy}
+          role="checkbox"
           type="button"
           onClick={() => onCheckedChange(item, !isChecked)}
         >
@@ -58,18 +60,17 @@ export function ShoppingListItem({
               {item.name}
             </h3>
             <Badge variant="blue">{category}</Badge>
+            {isChecked ? <Badge variant="neutral">Checked</Badge> : null}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {amount ? <span className={cn(isChecked && "line-through")}>{amount}</span> : null}
-            <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium">
-              {sourceLabel}
-            </span>
+            <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium">{sourceLabel}</span>
           </div>
         </div>
 
         <Button
           aria-label={`Delete ${item.name}`}
-          className="h-11 w-11 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+          className="h-12 w-12 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
           disabled={isBusy}
           type="button"
           variant="ghost"

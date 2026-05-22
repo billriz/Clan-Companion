@@ -1,12 +1,11 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
-
+import Image from "next/image";
 import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { Camera, GripVertical, ImagePlus, Plus, Save, Trash2, X } from "lucide-react";
+import { Camera, ImagePlus, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
 import { Badge } from "@/components/ui/badge";
@@ -241,6 +240,8 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
 
       router.push(`/recipes/${data.id}`);
       router.refresh();
+    } catch {
+      setError("Recipe could not be saved. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -252,9 +253,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Badge variant="terracotta">{mode === "create" ? "New" : "Editing"}</Badge>
-            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-plate-charcoal">
-              {title}
-            </h1>
+            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-plate-charcoal">{title}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{subtitle}</p>
           </div>
           <Link className={cn(buttonVariants({ variant: "secondary" }))} href="/recipes">
@@ -264,13 +263,19 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
       </div>
 
       {error ? (
-        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div
+          className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}
 
       {warning ? (
-        <div className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta">
+        <div
+          className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+          role="status"
+        >
           {warning}
         </div>
       ) : null}
@@ -380,7 +385,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
                 <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Quantity, unit, and ingredient name.</p>
               </div>
-              <Button className="gap-2" type="button" variant="secondary" onClick={addIngredient}>
+              <Button className="gap-2" type="button" variant="secondary" disabled={isSaving} onClick={addIngredient}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
                 Add
               </Button>
@@ -434,7 +439,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
                 <h2 className="text-xl font-semibold text-plate-charcoal">Instructions</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Add the ordered cooking steps.</p>
               </div>
-              <Button className="gap-2" type="button" variant="secondary" onClick={addInstruction}>
+              <Button className="gap-2" type="button" variant="secondary" disabled={isSaving} onClick={addInstruction}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
                 Step
               </Button>
@@ -480,9 +485,16 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
               <h2 className="text-lg font-semibold text-plate-charcoal">Recipe image</h2>
             </div>
 
-            <div className="mt-4 aspect-video overflow-hidden rounded-2xl border bg-secondary">
+            <div className="relative mt-4 aspect-video overflow-hidden rounded-2xl border bg-secondary">
               {imagePreview ? (
-                <img src={imagePreview} alt="Recipe preview" className="h-full w-full object-cover" />
+                <Image
+                  fill
+                  unoptimized
+                  alt="Recipe preview"
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 340px, 100vw"
+                  src={imagePreview}
+                />
               ) : (
                 <RecipeImagePlaceholder iconClassName="h-12 w-12" />
               )}
@@ -510,16 +522,14 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
                   Remove image
                 </Button>
               ) : null}
-              <p className="text-xs leading-5 text-muted-foreground">
-                JPG, PNG, and WebP images are supported.
-              </p>
+              <p className="text-xs leading-5 text-muted-foreground">JPG, PNG, and WebP are supported.</p>
             </div>
 
             <div className="mt-6 border-t pt-5">
               <Button className="w-full gap-2" type="submit" disabled={isSaving}>
                 {isSaving ? (
                   <>
-                    <GripVertical className="h-4 w-4 animate-pulse" aria-hidden="true" />
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                     Saving...
                   </>
                 ) : (

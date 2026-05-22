@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
+  ListChecks,
+  RefreshCcw,
+} from "lucide-react";
 
 import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { MealSlot } from "@/components/meal-planner/meal-slot";
@@ -57,6 +64,7 @@ export function MealPlannerClient({
   const [isLoadingWeek, setIsLoadingWeek] = useState(false);
   const [removingPlanId, setRemovingPlanId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const inFlightWeeks = useRef(new Set<string>());
 
   const weekDays = useMemo(() => getWeekDays(weekStartKey), [weekStartKey]);
@@ -64,6 +72,10 @@ export function MealPlannerClient({
   const groupedPlans = useMemo(() => groupMealPlansBySlot(plans), [plans]);
   const activeDay = weekDays.find((day) => formatDateKey(day) === activeDateKey) ?? weekDays[0];
   const activeDayKey = formatDateKey(activeDay);
+
+  const plannedCount = plans.length;
+  const totalSlots = MEAL_TYPES.length * 7;
+  const openSlots = Math.max(totalSlots - plannedCount, 0);
 
   useEffect(() => {
     if (plansByWeek[weekStartKey] || inFlightWeeks.current.has(weekStartKey)) {
@@ -113,19 +125,37 @@ export function MealPlannerClient({
   }, [plansByWeek, weekStartKey]);
 
   function moveWeek(direction: "previous" | "next") {
-    const nextWeekStartKey = formatDateKey(addDays(parseDateKey(weekStartKey), direction === "next" ? 7 : -7));
+    const nextWeekStartKey = formatDateKey(
+      addDays(parseDateKey(weekStartKey), direction === "next" ? 7 : -7),
+    );
     setWeekStartKey(nextWeekStartKey);
     setActiveDateKey(getDefaultActiveDate(nextWeekStartKey));
+    setError(null);
+    setNotice(null);
   }
 
   function returnToCurrentWeek() {
     const currentWeekStartKey = getWeekStartKey(new Date());
     setWeekStartKey(currentWeekStartKey);
     setActiveDateKey(getDefaultActiveDate(currentWeekStartKey));
+    setError(null);
+    setNotice(null);
+  }
+
+  function retryCurrentWeek() {
+    setError(null);
+    setNotice(null);
+    setPlansByWeek((currentPlans) => {
+      const nextPlans = { ...currentPlans };
+      delete nextPlans[weekStartKey];
+      return nextPlans;
+    });
   }
 
   function openAddMeal(dateKey: string, mealType: MealType) {
     setDialogState({ dateKey, mealType });
+    setError(null);
+    setNotice(null);
   }
 
   function handleMealAdded(plan: MealPlanWithRecipe) {
@@ -160,6 +190,7 @@ export function MealPlannerClient({
 
     setWeekStartKey(planWeekKey);
     setActiveDateKey(plan.planned_date);
+    setNotice(`${plan.recipe?.title ?? "Meal"} added to ${plan.meal_type}.`);
   }
 
   async function handleRemoveMeal(plan: MealPlanWithRecipe) {
@@ -171,6 +202,7 @@ export function MealPlannerClient({
 
     setRemovingPlanId(plan.id);
     setError(null);
+    setNotice(null);
 
     const supabase = createClient();
     const { error: deleteError } = await supabase
@@ -193,6 +225,7 @@ export function MealPlannerClient({
       ),
     }));
     setRemovingPlanId(null);
+    setNotice(`${plan.recipe?.title ?? "Meal"} was removed from ${plan.meal_type}.`);
   }
 
   return (
@@ -204,7 +237,7 @@ export function MealPlannerClient({
             {formatWeekRange(weekStartKey)}
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Breakfast, lunch, and dinner in one calm weekly view.
+            Breakfast, lunch, and dinner in one lightweight weekly view.
           </p>
         </div>
 
@@ -250,9 +283,44 @@ export function MealPlannerClient({
         </div>
       </section>
 
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Planned meals</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{plannedCount}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Open slots</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{openSlots}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recipes ready</p>
+          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{recipes.length}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Selected day</p>
+          <p className="mt-2 text-base font-semibold text-plate-charcoal">{formatLongDay(activeDay)}</p>
+        </div>
+      </section>
+
       {error ? (
-        <div className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta shadow-subtle">
-          {error}
+        <div
+          className="flex flex-col gap-3 rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta shadow-subtle sm:flex-row sm:items-center sm:justify-between"
+          role="alert"
+        >
+          <span>{error}</span>
+          <Button className="h-9 gap-2 self-start" type="button" variant="secondary" onClick={retryCurrentWeek}>
+            <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+            Retry
+          </Button>
+        </div>
+      ) : null}
+
+      {notice ? (
+        <div
+          className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm text-plate-blue shadow-subtle"
+          role="status"
+        >
+          {notice}
         </div>
       ) : null}
 
@@ -261,7 +329,8 @@ export function MealPlannerClient({
           <Badge variant="terracotta">Recipes needed</Badge>
           <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">Add recipes before planning</h2>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            Your weekly planner pulls from saved recipes so shopping lists can use the same ingredient data later.
+            Your planner pulls from saved recipes so the shopping list can use the same ingredient
+            data later.
           </p>
           <Link className={cn(buttonVariants(), "mt-6 gap-2 rounded-xl")} href="/recipes/new">
             <CalendarPlus className="h-4 w-4" aria-hidden="true" />
@@ -289,7 +358,10 @@ export function MealPlannerClient({
 
       <div className={cn("space-y-4 transition", isLoadingWeek && "opacity-60")}>
         {isLoadingWeek ? (
-          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm font-medium text-muted-foreground shadow-subtle">
+          <div
+            className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm font-medium text-muted-foreground shadow-subtle"
+            role="status"
+          >
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
             Loading week
           </div>
@@ -341,13 +413,14 @@ export function MealPlannerClient({
               const dateKey = formatDateKey(day);
               const isSelected = dateKey === activeDayKey;
               const dayPlans = groupedPlans[dateKey] ?? {};
-              const plannedCount = MEAL_TYPES.filter((mealType) => dayPlans[mealType]).length;
+              const plannedForDay = MEAL_TYPES.filter((mealType) => dayPlans[mealType]).length;
 
               return (
                 <button
                   key={dateKey}
+                  aria-pressed={isSelected}
                   className={cn(
-                    "min-w-[86px] rounded-2xl border px-3 py-3 text-left shadow-subtle transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "min-w-[92px] rounded-2xl border px-3 py-3 text-left shadow-subtle transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     isSelected
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
@@ -363,7 +436,7 @@ export function MealPlannerClient({
                       isSelected ? "bg-white/20 text-white" : "bg-plate-blue/10 text-plate-blue",
                     )}
                   >
-                    {plannedCount}/3
+                    {plannedForDay}/3 meals
                   </span>
                 </button>
               );
@@ -371,11 +444,6 @@ export function MealPlannerClient({
           </div>
 
           <section className="space-y-3">
-            <div className="rounded-2xl border bg-white px-4 py-3 shadow-subtle">
-              <p className="text-xs font-medium uppercase text-muted-foreground">Selected day</p>
-              <h3 className="mt-1 text-xl font-semibold text-plate-charcoal">{formatLongDay(activeDay)}</h3>
-            </div>
-
             {MEAL_TYPES.map((mealType) => (
               <MealSlot
                 key={`${activeDayKey}-${mealType}`}

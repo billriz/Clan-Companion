@@ -21,7 +21,7 @@ export default async function MealPlannerLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="planner" userEmail={user.email ?? "Clan Companion user"} userName={fullName}>
+    <AppShell activeItem="planner" userEmail={user.email ?? "PlatePlan user"} userName={fullName}>
       {children}
     </AppShell>
   );

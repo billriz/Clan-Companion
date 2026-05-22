@@ -21,6 +21,7 @@ export function RecipeDetailActions({ recipe, userId }: RecipeDetailActionsProps
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function handleDelete() {
     const shouldDelete = window.confirm("Delete this recipe? This cannot be undone.");
@@ -31,6 +32,7 @@ export function RecipeDetailActions({ recipe, userId }: RecipeDetailActionsProps
 
     setIsDeleting(true);
     setError(null);
+    setNotice(null);
 
     const supabase = createClient();
     const { error: deleteError } = await supabase.from("recipes").delete().eq("id", recipe.id);
@@ -71,8 +73,19 @@ export function RecipeDetailActions({ recipe, userId }: RecipeDetailActionsProps
         </Button>
       </div>
       {error ? (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <div
+          className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
           {error}
+        </div>
+      ) : null}
+      {notice ? (
+        <div
+          className="rounded-xl border border-plate-blue/25 bg-plate-blue/10 px-3 py-2 text-sm text-plate-blue"
+          role="status"
+        >
+          {notice}
         </div>
       ) : null}
 
@@ -82,6 +95,7 @@ export function RecipeDetailActions({ recipe, userId }: RecipeDetailActionsProps
         isOpen={isPlannerOpen}
         recipes={[recipe]}
         userId={userId}
+        onMealAdded={() => setNotice(`${recipe.title} was added to your meal plan.`)}
         onOpenChange={setIsPlannerOpen}
       />
     </div>

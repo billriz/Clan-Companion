@@ -21,7 +21,7 @@ export default async function ShoppingListLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="list" userEmail={user.email ?? "Clan Companion user"} userName={fullName}>
+    <AppShell activeItem="list" userEmail={user.email ?? "PlatePlan user"} userName={fullName}>
       {children}
     </AppShell>
   );

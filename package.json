@@ -1,7 +1,7 @@
 {
   "name": "clan-companion",
   "version": "1.0.0",
-  "description": "Recipe/Menu planner",
+  "description": "PlatePlan: recipe planning, meal planning, and shopping list app",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -5,14 +5,14 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { AuthShell } from "@/components/auth/auth-shell";
 
 export const metadata: Metadata = {
-  title: "Sign up | Clan Companion",
+  title: "Sign Up",
 };
 
 export default function SignupPage() {
   return (
     <AuthShell
       eyebrow="Start fresh"
-      title="Create your Clan Companion workspace."
+      title="Create your PlatePlan workspace."
       description="Set up a secure account for your recipe planning dashboard."
       footer={
         <>

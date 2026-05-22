@@ -19,7 +19,7 @@ export function AuthShell({ eyebrow, title, description, footer, children }: Aut
             <ChefHat className="h-6 w-6" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-lg font-semibold">Clan Companion</p>
+            <p className="text-lg font-semibold">PlatePlan</p>
             <p className="text-sm text-muted-foreground">Recipe planning workspace</p>
           </div>
         </div>
@@ -61,7 +61,7 @@ export function AuthShell({ eyebrow, title, description, footer, children }: Aut
                 <ChefHat className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold text-plate-charcoal">Clan Companion</p>
+                <p className="font-semibold text-plate-charcoal">PlatePlan</p>
                 <p className="text-sm text-muted-foreground">Recipe planning workspace</p>
               </div>
             </div>

@@ -1,7 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
-
+import Image from "next/image";
 import Link from "next/link";
 import { CalendarPlus, Clock3, Eye, Trash2, UsersRound } from "lucide-react";
 
@@ -58,7 +57,7 @@ export function MealSlot({
           <h3 className="text-sm font-semibold text-primary">{mealType}</h3>
           <Button
             aria-label={`Remove ${recipe?.title ?? "meal"} from ${mealType}`}
-            className="h-9 w-9 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+            className="h-10 w-10 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
             disabled={isRemoving}
             type="button"
             variant="ghost"
@@ -69,9 +68,15 @@ export function MealSlot({
         </div>
 
         <div className="grid grid-cols-[68px_minmax(0,1fr)] gap-3">
-          <div className="h-[68px] overflow-hidden rounded-xl bg-secondary">
+          <div className="relative h-[68px] overflow-hidden rounded-xl bg-secondary">
             {recipe?.image_url ? (
-              <img src={recipe.image_url} alt={recipe.title} className="h-full w-full object-cover" />
+              <Image
+                fill
+                alt={recipe.title}
+                className="object-cover"
+                sizes="68px"
+                src={recipe.image_url}
+              />
             ) : (
               <RecipeImagePlaceholder iconClassName="h-6 w-6" />
             )}
@@ -95,14 +100,11 @@ export function MealSlot({
 
         {recipe ? (
           <Link
-            className={cn(
-              buttonVariants({ variant: "secondary" }),
-              "mt-auto h-9 w-full gap-2 rounded-xl text-xs",
-            )}
+            className={cn(buttonVariants({ variant: "secondary" }), "mt-auto h-10 w-full gap-2 rounded-xl text-xs")}
             href={`/recipes/${recipe.id}`}
           >
             <Eye className="h-4 w-4" aria-hidden="true" />
-            Quick View
+            View Recipe
           </Link>
         ) : null}
       </div>

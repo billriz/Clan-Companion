@@ -1,4 +1,4 @@
--- Run this in the Supabase SQL editor for the Clan Companion project.
+-- Run this in the Supabase SQL editor for the PlatePlan project.
 -- This creates the Phase 2 recipe table, RLS policies, and public image bucket.
 
 create table if not exists public.recipes (

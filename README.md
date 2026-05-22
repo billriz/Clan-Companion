@@ -1,37 +1,123 @@
-# Clan Companion
+# PlatePlan
 
-Clan Companion is a recipe planning web app built with Next.js App Router, TypeScript,
-Tailwind CSS, shadcn/ui-style components, lucide-react, and Supabase Auth.
+PlatePlan is a full-stack meal planning app built with Next.js App Router and Supabase.
+It focuses on a clean MVP loop:
 
-Phase 1 includes:
+`Recipes -> Meal Planner -> Shopping List`
 
-- Email/password login and signup
-- Supabase SSR session persistence
-- Protected `/dashboard` routing
-- Auth-page redirects for signed-in users
-- Logout
-- A responsive dashboard shell with desktop sidebar and mobile bottom navigation
-- Placeholder cards for Recipes, Meal Planner, and Shopping List
+Phase 5 is focused on polish and production readiness: UX consistency, accessibility,
+mobile refinement, and deployment preparation.
 
-## Environment Variables
+## MVP Features
+
+- Authentication (email/password signup, login, logout)
+- Protected app routes
+- Recipe CRUD
+- Recipe image uploads
+- Weekly meal planner
+- Shopping list generation from planned meals
+- Manual shopping list items
+- Check/uncheck and clear checked shopping items
+- Responsive mobile + desktop layout
+
+## Tech Stack
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- Supabase (Auth, Postgres, Storage)
+- shadcn/ui-style components
+- lucide-react icons
+- Vercel deployment target
+
+## Design Palette
+
+- Primary Deep Sage: `#6D8B74`
+- Secondary Warm Cream: `#F6F3EE`
+- Accent Terracotta: `#D97B66`
+- Dark Text Charcoal: `#2E2E2E`
+- Optional Highlight Dusty Blue: `#7A9EBE`
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Create environment file
 
 Create `.env.local` in the project root:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-## Local Development
+Required variables for local and production:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 3. Start local development
 
 ```bash
-npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open `http://localhost:3000`.
 
-## Supabase SQL
+## Local Commands
 
-Run the SQL in `docs/supabase/profiles.sql` from the Supabase SQL editor to add
-the Phase 1 profiles table and row level security policies.
+```bash
+npm run dev
+npm run lint
+npm run build
+npm run start
+```
+
+## Supabase Setup Notes
+
+1. Create a Supabase project.
+2. Enable Email auth provider.
+3. Run SQL scripts in `docs/supabase/`:
+   - `profiles.sql`
+   - `recipes.sql`
+   - `meal_plans.sql`
+   - `shopping_list_items.sql`
+4. Create a storage bucket named `recipe-images` (public) for recipe images.
+
+## Deployment (Vercel)
+
+1. Import the repo into Vercel.
+2. Add production environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Deploy.
+4. In Supabase Auth settings, update URLs:
+   - **Site URL** should match your Vercel production domain.
+   - **Redirect URLs** must include your Vercel domain (and preview domains if used).
+
+Example production redirect host:
+
+- `https://your-project.vercel.app`
+
+## Production Readiness Checklist
+
+- `npm run lint` passes
+- `npm run build` passes
+- Environment variables set in Vercel
+- Supabase Auth redirect URLs updated with deployed domain
+- Core MVP flow manually verified
+
+See full QA coverage in [CHECKLIST.md](./CHECKLIST.md).
+
+## Phase Roadmap
+
+- Phase 1: Auth (complete)
+- Phase 2: Recipes (complete)
+- Phase 3: Meal Planner (complete)
+- Phase 4: Shopping List (complete)
+- Phase 5: UX polish, accessibility, responsiveness, and production readiness (complete)
+- Phase 6: Suggested next focus: meal-planning efficiency features (recurring meals, planner shortcuts, smarter defaults)

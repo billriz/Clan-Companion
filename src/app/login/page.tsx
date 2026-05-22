@@ -5,7 +5,7 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { AuthShell } from "@/components/auth/auth-shell";
 
 export const metadata: Metadata = {
-  title: "Log in | Clan Companion",
+  title: "Log In",
 };
 
 type LoginPageProps = {
@@ -21,10 +21,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <AuthShell
       eyebrow="Welcome back"
       title="Plan the week with less friction."
-      description="Log in to return to your Clan Companion dashboard."
+      description="Log in to return to your PlatePlan dashboard."
       footer={
         <>
-          New to Clan Companion?{" "}
+          New to PlatePlan?{" "}
           <Link className="font-medium text-primary hover:text-plate-olive" href="/signup">
             Create an account
           </Link>

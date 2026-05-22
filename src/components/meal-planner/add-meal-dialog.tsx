@@ -1,14 +1,14 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
-
-import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 import { CalendarPlus, Check, Clock3, Search, Utensils, X } from "lucide-react";
 
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ModalShell } from "@/components/ui/modal-shell";
 import {
   MEAL_TYPES,
   formatDateKey,
@@ -59,27 +59,6 @@ export function AddMealDialog({
   const [activeCategory, setActiveCategory] = useState("all");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onOpenChange(false);
-      }
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onOpenChange]);
 
   const weekDays = useMemo(() => {
     return getWeekDays(getWeekStartKey(parseDateKey(selectedDate)));
@@ -155,218 +134,231 @@ export function AddMealDialog({
     onOpenChange(false);
   }
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-plate-charcoal/35 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-      <button
-        aria-label="Close add meal dialog"
-        className="absolute inset-0 cursor-default"
-        type="button"
-        onClick={() => onOpenChange(false)}
-      />
+    <ModalShell
+      isOpen={isOpen}
+      labelledBy="add-meal-dialog-title"
+      describedBy="add-meal-dialog-description"
+      panelClassName="max-h-[92vh] max-w-4xl"
+      onClose={() => onOpenChange(false)}
+    >
+      <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+        <div>
+          <Badge variant="blue">Meal planner</Badge>
+          <h2 id="add-meal-dialog-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+            Add Meal
+          </h2>
+          <p id="add-meal-dialog-description" className="mt-1 text-sm text-muted-foreground">
+            Pick a day, meal type, and recipe.
+          </p>
+        </div>
+        <Button
+          aria-label="Close"
+          className="h-10 w-10 rounded-xl px-0"
+          type="button"
+          variant="secondary"
+          onClick={() => onOpenChange(false)}
+        >
+          <X className="h-4 w-4" aria-hidden="true" />
+        </Button>
+      </header>
 
-      <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-2xl border bg-plate-paper shadow-soft sm:rounded-2xl">
-        <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+      <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
+        <section className="grid gap-4 lg:grid-cols-[1fr_220px]">
           <div>
-            <Badge variant="blue">Meal planner</Badge>
-            <h2 className="mt-2 text-xl font-semibold text-plate-charcoal">Add Meal</h2>
-          </div>
-          <Button
-            aria-label="Close"
-            className="h-10 w-10 rounded-xl px-0"
-            type="button"
-            variant="secondary"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </Button>
-        </header>
-
-        <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
-          <section className="grid gap-4 lg:grid-cols-[1fr_220px]">
-            <div>
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-plate-charcoal">Day</h3>
-                <Input
-                  aria-label="Plan date"
-                  className="h-10 w-40 rounded-xl bg-white"
-                  type="date"
-                  value={selectedDate}
-                  onChange={(event) => setSelectedDate(event.target.value)}
-                />
-              </div>
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {weekDays.map((day) => {
-                  const dateKey = formatDateKey(day);
-                  const isSelected = dateKey === selectedDate;
-
-                  return (
-                    <button
-                      key={dateKey}
-                      className={cn(
-                        "min-w-20 rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        isSelected
-                          ? "border-primary bg-primary text-primary-foreground shadow-subtle"
-                          : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
-                      )}
-                      type="button"
-                      onClick={() => setSelectedDate(dateKey)}
-                    >
-                      <span className="block text-xs font-medium">{formatDayName(day)}</span>
-                      <span className="mt-1 block text-lg font-semibold">{formatDayNumber(day)}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-plate-charcoal">Meal</h3>
-              <div className="grid grid-cols-3 gap-2 lg:grid-cols-1">
-                {MEAL_TYPES.map((mealType) => {
-                  const isSelected = mealType === selectedMealType;
-
-                  return (
-                    <button
-                      key={mealType}
-                      className={cn(
-                        "rounded-2xl border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        isSelected
-                          ? "border-primary bg-primary text-primary-foreground shadow-subtle"
-                          : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
-                      )}
-                      type="button"
-                      onClick={() => setSelectedMealType(mealType)}
-                    >
-                      {mealType}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            <div className="relative">
-              <Search
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                aria-hidden="true"
-              />
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-plate-charcoal">Day</h3>
               <Input
-                className="h-12 rounded-xl bg-white pl-10"
-                placeholder="Search recipes..."
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                aria-label="Plan date"
+                className="h-10 w-40 rounded-xl bg-white"
+                type="date"
+                value={selectedDate}
+                onChange={(event) =>
+                  setSelectedDate(event.target.value || formatDateKey(new Date()))
+                }
               />
             </div>
+            <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Pick day">
+              {weekDays.map((day) => {
+                const dateKey = formatDateKey(day);
+                const isSelected = dateKey === selectedDate;
 
-            {categories.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Recipe categories">
-                {["all", ...categories].map((category) => {
-                  const isSelected = category === activeCategory;
+                return (
+                  <button
+                    key={dateKey}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "min-w-20 rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      isSelected
+                        ? "border-primary bg-primary text-primary-foreground shadow-subtle"
+                        : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
+                    )}
+                    type="button"
+                    onClick={() => setSelectedDate(dateKey)}
+                  >
+                    <span className="block text-xs font-medium">{formatDayName(day)}</span>
+                    <span className="mt-1 block text-lg font-semibold">{formatDayNumber(day)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                  return (
-                    <button
-                      key={category}
-                      className={cn(
-                        "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        isSelected
-                          ? "border-plate-blue bg-plate-blue text-white shadow-subtle"
-                          : "border-plate-blue/25 bg-plate-blue/10 text-plate-blue hover:bg-plate-blue/15",
-                      )}
-                      type="button"
-                      onClick={() => setActiveCategory(category)}
-                    >
-                      {category === "all" ? "All" : category}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
+          <div>
+            <h3 className="mb-2 text-sm font-semibold text-plate-charcoal">Meal</h3>
+            <div className="grid grid-cols-3 gap-2 lg:grid-cols-1" aria-label="Meal type">
+              {MEAL_TYPES.map((mealType) => {
+                const isSelected = mealType === selectedMealType;
 
-            {filteredRecipes.length > 0 ? (
-              <div className="grid max-h-[320px] gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
-                {filteredRecipes.map((recipe) => {
-                  const isSelected = recipe.id === selectedRecipeId;
+                return (
+                  <button
+                    key={mealType}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "rounded-2xl border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      isSelected
+                        ? "border-primary bg-primary text-primary-foreground shadow-subtle"
+                        : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
+                    )}
+                    type="button"
+                    onClick={() => setSelectedMealType(mealType)}
+                  >
+                    {mealType}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
 
-                  return (
-                    <button
-                      key={recipe.id}
-                      className={cn(
-                        "grid grid-cols-[76px_minmax(0,1fr)] gap-3 rounded-2xl border bg-white p-2 text-left shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        isSelected && "border-primary bg-primary/10 ring-1 ring-primary",
-                      )}
-                      type="button"
-                      onClick={() => setSelectedRecipeId(recipe.id)}
-                    >
-                      <div className="h-[76px] overflow-hidden rounded-xl bg-secondary">
-                        {recipe.image_url ? (
-                          <img
-                            src={recipe.image_url}
-                            alt={recipe.title}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <RecipeImagePlaceholder iconClassName="h-6 w-6" />
-                        )}
-                      </div>
-                      <div className="min-w-0 py-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-plate-charcoal">
-                            {recipe.title}
-                          </h4>
-                          {isSelected ? (
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-2 flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                          <Clock3 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                          {formatMinutes(recipe.prep_time)}
-                        </p>
-                        <span className="mt-2 inline-flex items-center rounded-full bg-secondary px-2 py-1 text-xs font-medium text-muted-foreground">
-                          {isSelected ? "Selected" : "Select"}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed bg-white p-6 text-center shadow-subtle">
-                <Utensils className="mx-auto h-8 w-8 text-primary" aria-hidden="true" />
-                <h3 className="mt-3 text-sm font-semibold text-plate-charcoal">No recipes found</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Try another search or category.</p>
-              </div>
-            )}
-          </section>
+        <section className="space-y-3">
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              aria-label="Search recipes"
+              className="h-12 rounded-xl bg-white pl-10"
+              placeholder="Search recipes..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
 
-          {error ? (
-            <div className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta">
-              {error}
+          {categories.length > 0 ? (
+            <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Recipe categories">
+              {["all", ...categories].map((category) => {
+                const isSelected = category === activeCategory;
+
+                return (
+                  <button
+                    key={category}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      isSelected
+                        ? "border-plate-blue bg-plate-blue text-white shadow-subtle"
+                        : "border-plate-blue/25 bg-plate-blue/10 text-plate-blue hover:bg-plate-blue/15",
+                    )}
+                    type="button"
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category === "all" ? "All" : category}
+                  </button>
+                );
+              })}
             </div>
           ) : null}
-        </div>
 
-        <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
-          <Button className="h-11 rounded-xl" type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            className="h-11 gap-2 rounded-xl"
-            disabled={isSaving || recipes.length === 0 || !selectedRecipeId}
-            type="button"
-            onClick={handleAddMeal}
+          {filteredRecipes.length > 0 ? (
+            <div className="grid max-h-[320px] gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
+              {filteredRecipes.map((recipe) => {
+                const isSelected = recipe.id === selectedRecipeId;
+
+                return (
+                  <button
+                    key={recipe.id}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "grid grid-cols-[76px_minmax(0,1fr)] gap-3 rounded-2xl border bg-white p-2 text-left shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      isSelected && "border-primary bg-primary/10 ring-1 ring-primary",
+                    )}
+                    type="button"
+                    onClick={() => setSelectedRecipeId(recipe.id)}
+                  >
+                    <div className="relative h-[76px] overflow-hidden rounded-xl bg-secondary">
+                      {recipe.image_url ? (
+                        <Image
+                          fill
+                          alt={recipe.title}
+                          className="object-cover"
+                          sizes="76px"
+                          src={recipe.image_url}
+                        />
+                      ) : (
+                        <RecipeImagePlaceholder iconClassName="h-6 w-6" />
+                      )}
+                    </div>
+                    <div className="min-w-0 py-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-plate-charcoal">
+                          {recipe.title}
+                        </h4>
+                        {isSelected ? (
+                          <span
+                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                            title="Selected"
+                          >
+                            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-2 flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        <Clock3 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                        {formatMinutes(recipe.prep_time)}
+                      </p>
+                      <span className="mt-2 inline-flex items-center rounded-full bg-secondary px-2 py-1 text-xs font-medium text-muted-foreground">
+                        {isSelected ? "Selected" : "Select"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed bg-white p-6 text-center shadow-subtle">
+              <Utensils className="mx-auto h-8 w-8 text-primary" aria-hidden="true" />
+              <h3 className="mt-3 text-sm font-semibold text-plate-charcoal">No recipes found</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Try another search or category.</p>
+            </div>
+          )}
+        </section>
+
+        {error ? (
+          <div
+            className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+            role="alert"
           >
-            <CalendarPlus className="h-4 w-4" aria-hidden="true" />
-            {isSaving ? "Adding..." : "Add to Plan"}
-          </Button>
-        </footer>
+            {error}
+          </div>
+        ) : null}
       </div>
-    </div>
+
+      <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <Button className="h-11 rounded-xl" type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+          Cancel
+        </Button>
+        <Button
+          className="h-11 gap-2 rounded-xl"
+          disabled={isSaving || recipes.length === 0 || !selectedRecipeId}
+          type="button"
+          onClick={handleAddMeal}
+        >
+          <CalendarPlus className="h-4 w-4" aria-hidden="true" />
+          {isSaving ? "Adding..." : "Add to Plan"}
+        </Button>
+      </footer>
+    </ModalShell>
   );
 }

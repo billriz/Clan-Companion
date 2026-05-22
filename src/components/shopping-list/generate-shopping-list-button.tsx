@@ -5,6 +5,7 @@ import { RefreshCcw, Sparkles, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ModalShell } from "@/components/ui/modal-shell";
 
 type GenerateShoppingListButtonProps = {
   disabled?: boolean;
@@ -36,73 +37,74 @@ export function GenerateShoppingListButton({
         {isGenerating ? "Generating..." : "Generate from Meal Plan"}
       </Button>
 
-      {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-plate-charcoal/35 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-          <button
-            aria-label="Close generate list dialog"
-            className="absolute inset-0 cursor-default"
+      <ModalShell
+        isOpen={isOpen}
+        labelledBy="generate-shopping-list-title"
+        describedBy="generate-shopping-list-description"
+        panelClassName="max-w-lg"
+        onClose={() => setIsOpen(false)}
+      >
+        <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+          <div>
+            <Badge variant="blue">Meal plan sync</Badge>
+            <h2
+              id="generate-shopping-list-title"
+              className="mt-2 text-xl font-semibold text-plate-charcoal"
+            >
+              Regenerate Shopping List
+            </h2>
+          </div>
+          <Button
+            aria-label="Close"
+            className="h-10 w-10 rounded-xl px-0"
+            disabled={isGenerating}
             type="button"
+            variant="secondary"
             onClick={() => setIsOpen(false)}
-          />
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </header>
 
-          <div className="relative w-full max-w-lg overflow-hidden rounded-t-2xl border bg-plate-paper shadow-soft sm:rounded-2xl">
-            <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
-              <div>
-                <Badge variant="blue">Meal plan sync</Badge>
-                <h2 className="mt-2 text-xl font-semibold text-plate-charcoal">
-                  Regenerate Shopping List
-                </h2>
-              </div>
-              <Button
-                aria-label="Close"
-                className="h-10 w-10 rounded-xl px-0"
-                disabled={isGenerating}
-                type="button"
-                variant="secondary"
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </Button>
-            </header>
-
-            <div className="space-y-4 px-4 py-5 sm:px-6">
-              <div className="flex gap-3 rounded-2xl border bg-white p-4 shadow-subtle">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Sparkles className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="font-semibold text-plate-charcoal">Replace Meal Plan items only</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Current generated items for this week will be replaced from planned recipes.
-                    Manual items stay on your list.
-                  </p>
-                </div>
-              </div>
+        <div className="space-y-4 px-4 py-5 sm:px-6">
+          <div className="flex gap-3 rounded-2xl border bg-white p-4 shadow-subtle">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sparkles className="h-5 w-5" aria-hidden="true" />
             </div>
-
-            <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
-              <Button
-                className="h-11 rounded-xl"
-                disabled={isGenerating}
-                type="button"
-                variant="secondary"
-                onClick={() => setIsOpen(false)}
+            <div>
+              <p className="font-semibold text-plate-charcoal">Replace meal-plan items only</p>
+              <p
+                id="generate-shopping-list-description"
+                className="mt-1 text-sm leading-6 text-muted-foreground"
               >
-                Cancel
-              </Button>
-              <Button
-                className="h-11 gap-2 rounded-xl"
-                disabled={isGenerating}
-                type="button"
-                onClick={handleGenerate}
-              >
-                <RefreshCcw className="h-4 w-4" aria-hidden="true" />
-                {isGenerating ? "Generating..." : "Replace Meal Plan Items"}
-              </Button>
-            </footer>
+                Existing generated items for this week will be rebuilt from planned recipes. Manual
+                items stay on the list.
+              </p>
+            </div>
           </div>
         </div>
-      ) : null}
+
+        <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+          <Button
+            className="h-11 rounded-xl"
+            disabled={isGenerating}
+            type="button"
+            variant="secondary"
+            onClick={() => setIsOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="h-11 gap-2 rounded-xl"
+            disabled={isGenerating}
+            type="button"
+            onClick={handleGenerate}
+          >
+            <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+            {isGenerating ? "Generating..." : "Replace Meal-Plan Items"}
+          </Button>
+        </footer>
+      </ModalShell>
     </>
   );
 }

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
+
 import { RecipeForm } from "@/components/recipes/recipe-form";
+
+export const metadata: Metadata = {
+  title: "Create Recipe",
+};
 
 export default function NewRecipePage() {
   return (

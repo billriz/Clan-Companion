@@ -122,13 +122,19 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
       </div>
 
       {error ? (
-        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <div
+          className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}
 
       {message ? (
-        <div className="rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-plate-olive">
+        <div
+          className="rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-plate-olive"
+          role="status"
+        >
           {message}
         </div>
       ) : null}

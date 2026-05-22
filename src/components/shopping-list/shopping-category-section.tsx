@@ -26,12 +26,15 @@ export function ShoppingCategorySection({
   }
 
   const checkedCount = items.filter((item) => item.checked).length;
+  const headingId = `shopping-category-${category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
   return (
-    <section className="space-y-3">
+    <section aria-labelledby={headingId} className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-plate-charcoal">{category}</h2>
+          <h2 id={headingId} className="text-lg font-semibold text-plate-charcoal">
+            {category}
+          </h2>
           <p className="text-sm text-muted-foreground">
             {checkedCount} of {items.length} checked
           </p>
