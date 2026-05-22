@@ -128,6 +128,53 @@ export type Database = {
           },
         ];
       };
+      shopping_list_items: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          name: string;
+          quantity: string | null;
+          unit: string | null;
+          category: string | null;
+          checked: boolean | null;
+          source: string | null;
+          week_start: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          name: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          checked?: boolean | null;
+          source?: string | null;
+          week_start?: string | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          name?: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          checked?: boolean | null;
+          source?: string | null;
+          week_start?: string | null;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_items_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

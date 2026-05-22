@@ -23,11 +23,11 @@ const dashboardCards = [
   },
   {
     title: "Shopping List",
-    description: "A clean checklist for grocery runs and pantry restocks.",
+    description: "Generate groceries from planned meals, then check off the run.",
     icon: ShoppingBasket,
     tone: "blue",
     href: "/shopping-list",
-    actionLabel: "Preview list",
+    actionLabel: "Open list",
   },
 ] as const;
 
@@ -81,7 +81,7 @@ export default function DashboardPage() {
           <div>
             <h2 className="text-lg font-semibold text-plate-charcoal">Weekly plan</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Build this week around saved recipes, meal slots, and future grocery prep.
+              Build this week around saved recipes, meal slots, and grocery prep.
             </p>
           </div>
           <Link className={buttonVariants()} href="/meal-planner">

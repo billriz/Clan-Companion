@@ -91,7 +91,7 @@ export function AppShell({
             <div className="flex items-center gap-3">
               <div className="hidden items-center gap-2 rounded-md border bg-plate-paper px-3 py-2 text-sm text-muted-foreground sm:flex">
                 <ListChecks className="h-4 w-4 text-primary" aria-hidden="true" />
-                Phase 3
+                Phase 4
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-plate-terracotta/15 text-sm font-semibold text-plate-terracotta lg:hidden">
                 {initials}
