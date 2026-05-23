@@ -31,6 +31,9 @@ export type Database = {
           title: string;
           description: string | null;
           image_url: string | null;
+          spoonacular_id: number | null;
+          source_url: string | null;
+          imported_from: string | null;
           prep_time: number | null;
           cook_time: number | null;
           servings: number | null;
@@ -39,6 +42,7 @@ export type Database = {
           tags: string[] | null;
           ingredients: Json;
           instructions: Json;
+          nutrition: Json | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -48,6 +52,9 @@ export type Database = {
           title: string;
           description?: string | null;
           image_url?: string | null;
+          spoonacular_id?: number | null;
+          source_url?: string | null;
+          imported_from?: string | null;
           prep_time?: number | null;
           cook_time?: number | null;
           servings?: number | null;
@@ -56,6 +63,7 @@ export type Database = {
           tags?: string[] | null;
           ingredients?: Json;
           instructions?: Json;
+          nutrition?: Json | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -65,6 +73,9 @@ export type Database = {
           title?: string;
           description?: string | null;
           image_url?: string | null;
+          spoonacular_id?: number | null;
+          source_url?: string | null;
+          imported_from?: string | null;
           prep_time?: number | null;
           cook_time?: number | null;
           servings?: number | null;
@@ -73,6 +84,7 @@ export type Database = {
           tags?: string[] | null;
           ingredients?: Json;
           instructions?: Json;
+          nutrition?: Json | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

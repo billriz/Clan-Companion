@@ -13,6 +13,7 @@ mobile refinement, and deployment preparation.
 - Authentication (email/password signup, login, logout)
 - Protected app routes
 - Recipe CRUD
+- Spoonacular recipe browse + import into your recipe library
 - Recipe image uploads
 - Weekly meal planner
 - Shopping list generation from planned meals
@@ -53,12 +54,16 @@ Create `.env.local` in the project root:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SPOONACULAR_API_KEY=your_spoonacular_api_key
 ```
 
 Required variables for local and production:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SPOONACULAR_API_KEY` (server-only, never `NEXT_PUBLIC_`)
+
+After adding new environment variables, restart the dev server.
 
 ### 3. Start local development
 
@@ -84,6 +89,7 @@ npm run start
 3. Run SQL scripts in `docs/supabase/`:
    - `profiles.sql`
    - `recipes.sql`
+   - `recipes_spoonacular_import.sql`
    - `meal_plans.sql`
    - `shopping_list_items.sql`
 4. Create a storage bucket named `recipe-images` (public) for recipe images.
@@ -94,6 +100,7 @@ npm run start
 2. Add production environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SPOONACULAR_API_KEY` (server-only, no `NEXT_PUBLIC_` prefix)
 3. Deploy.
 4. In Supabase Auth settings, update URLs:
    - **Site URL** should match your Vercel production domain.
@@ -108,6 +115,8 @@ Example production redirect host:
 - `npm run lint` passes
 - `npm run build` passes
 - Environment variables set in Vercel
+- `SPOONACULAR_API_KEY` is set in Vercel project settings
+- Supabase variables are set in Vercel project settings
 - Supabase Auth redirect URLs updated with deployed domain
 - Core MVP flow manually verified
 

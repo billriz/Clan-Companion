@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, CalendarDays, ChefHat, Home, ListChecks, ShoppingBasket } from "lucide-react";
+import { BookOpen, CalendarDays, Download, ChefHat, Home, ListChecks, ShoppingBasket } from "lucide-react";
 
 import { LogoutButton } from "@/components/layout/logout-button";
 import { cn } from "@/lib/utils";
@@ -89,6 +89,14 @@ export function AppShell({
             );
           })}
         </nav>
+
+        <Link
+          className="mt-4 flex min-h-11 items-center gap-3 rounded-xl border border-plate-blue/20 bg-plate-blue/10 px-3 py-2.5 text-sm font-medium text-plate-blue transition hover:bg-plate-blue/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-plate-paper"
+          href="/recipes/import"
+        >
+          <Download className="h-5 w-5" aria-hidden="true" />
+          Import Recipes
+        </Link>
 
         <div className="mt-auto rounded-2xl border border-border/80 bg-plate-cream p-4 shadow-subtle">
           <div className="flex items-center gap-3">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
 import { RecipeLibrary } from "@/components/recipes/recipe-library";
 import { Badge } from "@/components/ui/badge";
@@ -41,10 +41,19 @@ export default async function RecipesPage() {
             Keep favorites, quick dinners, and family staples in a calm library built for scanning.
           </p>
         </div>
-        <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Create Recipe
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            className={cn(buttonVariants({ variant: "secondary" }), "gap-2")}
+            href="/recipes/import"
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Import Recipes
+          </Link>
+          <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Create Recipe
+          </Link>
+        </div>
       </section>
 
       {error ? (
