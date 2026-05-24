@@ -27,6 +27,7 @@ import {
 } from "@/lib/recipes";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import type { Recipe } from "@/types/recipes";
 
 export const metadata: Metadata = {
   title: "Recipe Details",
@@ -61,10 +62,12 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     return <RecipeNotFound />;
   }
 
-  const ingredients = parseIngredients(recipe.ingredients);
-  const instructions = parseInstructions(recipe.instructions);
-  const totalTime = getTotalTime(recipe);
-  const difficulty = normalizeDifficulty(recipe.difficulty);
+  const recipeWithPreviewUrl = await addScanImagePreviewUrl(supabase, recipe);
+
+  const ingredients = parseIngredients(recipeWithPreviewUrl.ingredients);
+  const instructions = parseInstructions(recipeWithPreviewUrl.instructions);
+  const totalTime = getTotalTime(recipeWithPreviewUrl);
+  const difficulty = normalizeDifficulty(recipeWithPreviewUrl.difficulty);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -75,14 +78,14 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-start">
         <div className="relative aspect-video overflow-hidden rounded-2xl border bg-secondary shadow-subtle">
-          {recipe.image_url ? (
+          {recipeWithPreviewUrl.image_url ? (
             <Image
               fill
               priority
-              alt={recipe.title}
+              alt={recipeWithPreviewUrl.title}
               className="object-cover"
               sizes="(min-width: 1024px) 58vw, 100vw"
-              src={recipe.image_url}
+              src={recipeWithPreviewUrl.image_url}
             />
           ) : (
             <RecipeImagePlaceholder iconClassName="h-16 w-16" />
@@ -91,9 +94,11 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
 
         <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
           <div className="flex flex-wrap gap-2">
-            {recipe.category ? <Badge variant="blue">{recipe.category}</Badge> : null}
+            {recipeWithPreviewUrl.category ? (
+              <Badge variant="blue">{recipeWithPreviewUrl.category}</Badge>
+            ) : null}
             <Badge variant={difficulty === "Hard" ? "terracotta" : "default"}>{difficulty}</Badge>
-            {(recipe.tags ?? []).slice(0, 3).map((tag) => (
+            {(recipeWithPreviewUrl.tags ?? []).slice(0, 3).map((tag) => (
               <Badge key={tag} variant="neutral">
                 {tag}
               </Badge>
@@ -101,27 +106,27 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           </div>
 
           <h1 className="mt-5 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
-            {recipe.title}
+            {recipeWithPreviewUrl.title}
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
-            {recipe.description || "No description added yet."}
+            {recipeWithPreviewUrl.description || "No description added yet."}
           </p>
 
           <div className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-            <RecipeMeta icon={Timer} label="Prep" value={formatMinutes(recipe.prep_time)} />
-            <RecipeMeta icon={CookingPot} label="Cook" value={formatMinutes(recipe.cook_time)} />
+            <RecipeMeta icon={Timer} label="Prep" value={formatMinutes(recipeWithPreviewUrl.prep_time)} />
+            <RecipeMeta icon={CookingPot} label="Cook" value={formatMinutes(recipeWithPreviewUrl.cook_time)} />
             <RecipeMeta icon={Clock3} label="Total" value={formatMinutes(totalTime)} />
             <RecipeMeta
               icon={UsersRound}
               label="Servings"
-              value={recipe.servings ? String(recipe.servings) : "Flexible"}
+              value={recipeWithPreviewUrl.servings ? String(recipeWithPreviewUrl.servings) : "Flexible"}
             />
             <RecipeMeta icon={Signal} label="Difficulty" value={difficulty} />
             <RecipeMeta icon={ListChecks} label="Steps" value={String(instructions.length || 0)} />
           </div>
 
           <div className="mt-6 border-t pt-5">
-            <RecipeDetailActions recipe={recipe} userId={user.id} />
+            <RecipeDetailActions recipe={recipeWithPreviewUrl} userId={user.id} />
           </div>
         </div>
       </section>
@@ -172,6 +177,28 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
       </section>
     </div>
   );
+}
+
+async function addScanImagePreviewUrl(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  recipe: Recipe,
+) {
+  if (recipe.image_url || !recipe.original_image_path) {
+    return recipe;
+  }
+
+  const { data } = await supabase.storage
+    .from("recipe-scans")
+    .createSignedUrl(recipe.original_image_path, 60 * 60);
+
+  if (!data?.signedUrl) {
+    return recipe;
+  }
+
+  return {
+    ...recipe,
+    image_url: data.signedUrl,
+  };
 }
 
 type RecipeMetaProps = {

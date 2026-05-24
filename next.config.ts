@@ -19,15 +19,27 @@ const supabaseHostname = getSupabaseHostname();
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["localhost", "127.0.0.1"],
   images: {
-    remotePatterns: supabaseHostname
-      ? [
-          {
-            protocol: "https",
-            hostname: supabaseHostname,
-            pathname: "/**",
-          },
-        ]
-      : [],
+    remotePatterns: [
+      ...(supabaseHostname
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: supabaseHostname,
+              pathname: "/**",
+            },
+          ]
+        : []),
+      {
+        protocol: "https",
+        hostname: "img.spoonacular.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "spoonacular.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

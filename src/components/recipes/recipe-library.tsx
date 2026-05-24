@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Search, X } from "lucide-react";
+import { Camera, Download, Plus, Search, X } from "lucide-react";
 
 import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { RecipeCard } from "@/components/recipes/recipe-card";
@@ -212,10 +212,20 @@ function RecipeEmptyState() {
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
         Add family favorites, weeknight staples, and recipes you want ready when planning begins.
       </p>
-      <Link className={cn(buttonVariants(), "mt-6 gap-2")} href="/recipes/new">
-        <Plus className="h-4 w-4" aria-hidden="true" />
-        Create Recipe
-      </Link>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import">
+          <Download className="h-4 w-4" aria-hidden="true" />
+          Import Recipes
+        </Link>
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import/scan">
+          <Camera className="h-4 w-4" aria-hidden="true" />
+          Scan Recipe
+        </Link>
+        <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Create Recipe
+        </Link>
+      </div>
     </div>
   );
 }
