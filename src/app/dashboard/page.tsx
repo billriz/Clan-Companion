@@ -12,6 +12,7 @@ import {
 
 import { FeatureCard } from "@/components/dashboard/feature-card";
 import { OverviewStatCard } from "@/components/dashboard/overview-stat-card";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getWeekEndKey, getWeekStartKey } from "@/lib/meal-plans";
@@ -133,6 +134,8 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </section>
+
+      <InstallPrompt />
 
       {loadError ? (
         <section className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm leading-6 text-destructive shadow-subtle">

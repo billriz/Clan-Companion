@@ -113,7 +113,7 @@ export function AppShell({
       </aside>
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-border/80 bg-plate-cream/95 backdrop-blur">
+        <header className="sticky top-0 z-20 border-b border-border/80 bg-plate-cream/95 pt-[env(safe-area-inset-top)] backdrop-blur">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground lg:hidden">

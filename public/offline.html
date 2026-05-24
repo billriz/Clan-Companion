@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plate Plan | Offline</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --plate-sage: #6d8b74;
+        --plate-cream: #f6f3ee;
+        --plate-terracotta: #d97b66;
+        --plate-charcoal: #2e2e2e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 1.25rem;
+        font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(180deg, #fffaf4 0%, var(--plate-cream) 100%);
+        color: var(--plate-charcoal);
+      }
+
+      .card {
+        width: min(100%, 34rem);
+        background: #ffffff;
+        border: 1px solid rgba(109, 139, 116, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(46, 46, 46, 0.08);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .brand img {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.65rem;
+      }
+
+      h1 {
+        margin: 1rem 0 0.625rem;
+        font-size: clamp(1.4rem, 4vw, 1.8rem);
+        line-height: 1.2;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.6;
+        color: rgba(46, 46, 46, 0.86);
+      }
+
+      .actions {
+        margin-top: 1.25rem;
+      }
+
+      button {
+        border: 0;
+        border-radius: 0.75rem;
+        background: var(--plate-sage);
+        color: #ffffff;
+        font: inherit;
+        font-weight: 600;
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #5f7c67;
+      }
+
+      .hint {
+        margin-top: 0.75rem;
+        color: var(--plate-terracotta);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="brand">
+        <img src="/icon-192.png" alt="Plate Plan icon" />
+        <strong>Plate Plan</strong>
+      </div>
+      <h1>You’re offline</h1>
+      <p>
+        Plate Plan needs an internet connection for your recipes, meal planner, imports, and
+        shopping list data. Reconnect and try again.
+      </p>
+      <div class="actions">
+        <button type="button" onclick="window.location.reload()">Reconnect to continue</button>
+      </div>
+      <p class="hint">Your private recipe and planner data is not cached offline in this phase.</p>
+    </main>
+  </body>
+</html>

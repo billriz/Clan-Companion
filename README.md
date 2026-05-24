@@ -33,6 +33,64 @@ mobile refinement, and deployment preparation.
 - lucide-react icons
 - Vercel deployment target
 
+## Progressive Web App (PWA)
+
+Plate Plan now includes installable PWA support for:
+
+- iOS Safari (Add to Home Screen)
+- Android Chrome
+- Desktop Chrome
+- Microsoft Edge
+
+### PWA Files and Locations
+
+- Manifest: `src/app/manifest.ts` (served by Next.js at `/manifest.webmanifest`)
+- Service worker: `public/sw.js` (registered only in production)
+- Offline fallback: `public/offline.html`
+- PWA icons:
+  - `public/icon-192.png`
+  - `public/icon-512.png`
+  - `public/icon-maskable-192.png`
+  - `public/icon-maskable-512.png`
+  - `public/apple-touch-icon.png`
+
+### Install Prompt Behavior
+
+- A dashboard install card appears when install is supported (`beforeinstallprompt`).
+- Prompt is hidden when already running in standalone mode.
+- Dismissal is remembered in `localStorage` with a cooldown window.
+- iOS Safari shows manual guidance:
+  - "On iPhone or iPad, tap Share, then Add to Home Screen."
+
+### Offline Behavior
+
+- Navigation is network-first.
+- If offline during navigation, the app shows `offline.html`.
+- Offline page is explicit about limitations:
+  - recipes, planner, imports, and shopping data still require internet in this phase.
+
+### Cache Policy
+
+Cached:
+
+- Next.js static build assets (`/_next/static/*`)
+- Local static assets needed for install/offline UI:
+  - manifest
+  - app icons
+  - offline fallback page
+  - local script/style/font assets
+
+Intentionally **not** cached:
+
+- Supabase auth/session responses
+- Supabase database/REST responses
+- Any `/api/*` response
+- Recipe import/search/scan API routes
+- Requests with `Authorization` headers
+- Non-GET requests (`POST`, `PUT`, `PATCH`, `DELETE`)
+- Next image optimizer responses (`/_next/image`)
+- Cross-origin requests (including Supabase Storage and Spoonacular image hosts)
+
 ## Design Palette
 
 - Primary Deep Sage: `#6D8B74`
@@ -111,6 +169,29 @@ npm run lint
 npm run build
 npm run start
 ```
+
+## PWA Testing
+
+### Local production-mode test
+
+1. `npm run build`
+2. `npm run start`
+3. Open `http://localhost:3000` in Chrome
+4. Chrome DevTools -> Application -> Manifest
+5. Chrome DevTools -> Application -> Service Workers
+6. Toggle offline mode in DevTools and verify offline fallback appears on navigation
+7. Run Lighthouse PWA audit (optional)
+
+### Production test (Vercel)
+
+1. Deploy to Vercel
+2. Open production URL in Chrome/Edge and verify installability
+3. Verify Android Chrome install flow
+4. Verify iOS Safari Add to Home Screen flow
+5. Launch installed app and confirm standalone behavior
+6. Verify login and Supabase redirects still work
+
+PWA installability requires HTTPS in production. Vercel production deployments provide HTTPS by default.
 
 ## Supabase Setup Notes
 
