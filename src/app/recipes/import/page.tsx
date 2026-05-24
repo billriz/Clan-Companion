@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera, PenSquare, Sparkles } from "lucide-react";
 
-import { RecipeImportBrowser } from "@/components/recipes/recipe-import-browser";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,7 @@ export default function ImportRecipesPage() {
             Import Recipes
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-            Search online recipes and save them to your PlatePlan library.
+            Choose how you want to bring recipes into your PlatePlan library.
           </p>
         </div>
         <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes">
@@ -30,7 +29,46 @@ export default function ImportRecipesPage() {
         </Link>
       </section>
 
-      <RecipeImportBrowser />
+      <section className="grid gap-5 lg:grid-cols-3">
+        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-plate-terracotta/10 text-plate-terracotta">
+            <PenSquare className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Manual Entry</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Add your own recipe details by hand with full control over ingredients and steps.
+          </p>
+          <Link className={cn(buttonVariants(), "mt-6 inline-flex")} href="/recipes/new">
+            Create Manually
+          </Link>
+        </article>
+
+        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Sparkles className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Import from Spoonacular</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Browse online recipe ideas and import them with ingredients and instructions.
+          </p>
+          <Link className={cn(buttonVariants(), "mt-6 inline-flex")} href="/recipes/import/spoonacular">
+            Browse Spoonacular
+          </Link>
+        </article>
+
+        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-plate-blue/10 text-plate-blue">
+            <Camera className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Scan Recipe</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Upload or take a photo of a recipe card, cookbook snippet, or handwritten recipe.
+          </p>
+          <Link className={cn(buttonVariants(), "mt-6 inline-flex")} href="/recipes/import/scan">
+            Scan Recipe
+          </Link>
+        </article>
+      </section>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Download, Plus, Search, X } from "lucide-react";
+import { Camera, Download, Plus, Search, X } from "lucide-react";
 
 import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { RecipeCard } from "@/components/recipes/recipe-card";
@@ -216,6 +216,10 @@ function RecipeEmptyState() {
         <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import">
           <Download className="h-4 w-4" aria-hidden="true" />
           Import Recipes
+        </Link>
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import/scan">
+          <Camera className="h-4 w-4" aria-hidden="true" />
+          Scan Recipe
         </Link>
         <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
           <Plus className="h-4 w-4" aria-hidden="true" />

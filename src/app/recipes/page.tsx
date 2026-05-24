@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Download, Plus } from "lucide-react";
+import { Camera, Download, Plus } from "lucide-react";
 
 import { RecipeLibrary } from "@/components/recipes/recipe-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import type { Recipe } from "@/types/recipes";
 
 export const metadata: Metadata = {
   title: "Recipes",
@@ -28,6 +29,7 @@ export default async function RecipesPage() {
   }
 
   const { data: recipes, error } = recipesResponse;
+  const recipesWithPreviewUrls = recipes ? await addScanImagePreviewUrls(supabase, recipes) : [];
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -49,6 +51,13 @@ export default async function RecipesPage() {
             <Download className="h-4 w-4" aria-hidden="true" />
             Import Recipes
           </Link>
+          <Link
+            className={cn(buttonVariants({ variant: "secondary" }), "gap-2")}
+            href="/recipes/import/scan"
+          >
+            <Camera className="h-4 w-4" aria-hidden="true" />
+            Scan Recipe
+          </Link>
           <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
             <Plus className="h-4 w-4" aria-hidden="true" />
             Create Recipe
@@ -61,8 +70,36 @@ export default async function RecipesPage() {
           Recipes could not be loaded. {error.message}
         </div>
       ) : (
-        <RecipeLibrary recipes={recipes ?? []} userId={user.id} />
+        <RecipeLibrary recipes={recipesWithPreviewUrls} userId={user.id} />
       )}
     </div>
   );
+}
+
+async function addScanImagePreviewUrls(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  recipes: Recipe[],
+) {
+  const recipesWithImages = await Promise.all(
+    recipes.map(async (recipe) => {
+      if (recipe.image_url || !recipe.original_image_path) {
+        return recipe;
+      }
+
+      const { data } = await supabase.storage
+        .from("recipe-scans")
+        .createSignedUrl(recipe.original_image_path, 60 * 60);
+
+      if (!data?.signedUrl) {
+        return recipe;
+      }
+
+      return {
+        ...recipe,
+        image_url: data.signedUrl,
+      };
+    }),
+  );
+
+  return recipesWithImages;
 }

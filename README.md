@@ -14,6 +14,7 @@ mobile refinement, and deployment preparation.
 - Protected app routes
 - Recipe CRUD
 - Spoonacular recipe browse + import into your recipe library
+- Scan Recipe import (upload/take photo -> OpenAI Vision extraction -> review/edit -> save)
 - Recipe image uploads
 - Weekly meal planner
 - Shopping list generation from planned meals
@@ -27,6 +28,7 @@ mobile refinement, and deployment preparation.
 - TypeScript
 - Tailwind CSS
 - Supabase (Auth, Postgres, Storage)
+- OpenAI Responses API (vision extraction)
 - shadcn/ui-style components
 - lucide-react icons
 - Vercel deployment target
@@ -55,6 +57,8 @@ Create `.env.local` in the project root:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 SPOONACULAR_API_KEY=your_spoonacular_api_key
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_RECIPE_SCAN_MODEL=gpt-4.1-mini
 ```
 
 Required variables for local and production:
@@ -62,8 +66,18 @@ Required variables for local and production:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SPOONACULAR_API_KEY` (server-only, never `NEXT_PUBLIC_`)
+- `OPENAI_API_KEY` (server-only, never `NEXT_PUBLIC_`)
 
-After adding new environment variables, restart the dev server.
+Optional:
+
+- `OPENAI_RECIPE_SCAN_MODEL` (defaults to `gpt-4.1-mini`)
+
+Important:
+
+- Do not use `NEXT_PUBLIC_OPENAI_API_KEY`.
+- Add `OPENAI_API_KEY` in local `.env.local`.
+- Add `OPENAI_API_KEY` in Vercel Project Settings -> Environment Variables.
+- Restart the dev server after adding/changing environment variables.
 
 ### 3. Start local development
 
@@ -72,6 +86,22 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+## Scan Recipe Flow
+
+1. Go to `Recipes -> Import Recipes -> Scan Recipe`.
+2. Upload an image or take a photo of a recipe.
+3. Click `Extract Recipe`.
+4. The server calls OpenAI Vision and validates the structured JSON response.
+5. Review and edit extracted fields (title, ingredients, instructions, etc.).
+6. Save the reviewed recipe.
+
+Saved scan recipes behave like regular recipes:
+
+- appear in recipe library
+- open in recipe detail
+- can be added to meal planner
+- ingredients flow into shopping list generation
 
 ## Local Commands
 
@@ -90,9 +120,12 @@ npm run start
    - `profiles.sql`
    - `recipes.sql`
    - `recipes_spoonacular_import.sql`
+   - `recipes_vision_scan.sql`
    - `meal_plans.sql`
    - `shopping_list_items.sql`
-4. Create a storage bucket named `recipe-images` (public) for recipe images.
+4. Buckets:
+   - `recipe-images` (public)
+   - `recipe-scans` (private, created/configured in `recipes_vision_scan.sql`)
 
 ## Deployment (Vercel)
 
@@ -100,7 +133,9 @@ npm run start
 2. Add production environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SPOONACULAR_API_KEY` (server-only, no `NEXT_PUBLIC_` prefix)
+   - `SPOONACULAR_API_KEY` (server-only)
+   - `OPENAI_API_KEY` (server-only)
+   - `OPENAI_RECIPE_SCAN_MODEL` (optional)
 3. Deploy.
 4. In Supabase Auth settings, update URLs:
    - **Site URL** should match your Vercel production domain.
@@ -116,8 +151,12 @@ Example production redirect host:
 - `npm run build` passes
 - Environment variables set in Vercel
 - `SPOONACULAR_API_KEY` is set in Vercel project settings
+- `OPENAI_API_KEY` is set in Vercel project settings
+- `OPENAI_RECIPE_SCAN_MODEL` set in Vercel if overriding default model
 - Supabase variables are set in Vercel project settings
 - Supabase Auth redirect URLs updated with deployed domain
+- Supabase storage bucket `recipe-scans` exists and policies are configured
+- Existing Spoonacular import still works after deploy
 - Core MVP flow manually verified
 
 See full QA coverage in [CHECKLIST.md](./CHECKLIST.md).
