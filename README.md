@@ -3,7 +3,7 @@
 PlatePlan is a full-stack meal planning app built with Next.js App Router and Supabase.
 It focuses on a clean MVP loop:
 
-`Recipes -> Meal Planner -> Shopping List`
+`Recipes -> Pantry -> Meal Planner -> Shopping List`
 
 Phase 5 is focused on polish and production readiness: UX consistency, accessibility,
 mobile refinement, and deployment preparation.
@@ -17,7 +17,11 @@ mobile refinement, and deployment preparation.
 - Scan Recipe import (upload/take photo -> OpenAI Vision extraction -> review/edit -> save)
 - Recipe image uploads
 - Weekly meal planner
+- Pantry item tracking (pantry/fridge/freezer)
+- Pantry-aware recipe ingredient checks (have/missing/partial)
+- Cook-from-pantry recipe recommendations
 - Shopping list generation from planned meals
+- Add only missing recipe ingredients to grocery list (with override review)
 - Manual shopping list items
 - Check/uncheck and clear checked shopping items
 - Responsive mobile + desktop layout
@@ -166,6 +170,7 @@ Saved scan recipes behave like regular recipes:
 ```bash
 npm run dev
 npm run lint
+npm test
 npm run build
 npm run start
 ```
@@ -203,6 +208,7 @@ PWA installability requires HTTPS in production. Vercel production deployments p
    - `recipes_spoonacular_import.sql`
    - `recipes_vision_scan.sql`
    - `meal_plans.sql`
+   - `pantry_items.sql`
    - `shopping_list_items.sql`
 4. Buckets:
    - `recipe-images` (public)
@@ -249,4 +255,5 @@ See full QA coverage in [CHECKLIST.md](./CHECKLIST.md).
 - Phase 3: Meal Planner (complete)
 - Phase 4: Shopping List (complete)
 - Phase 5: UX polish, accessibility, responsiveness, and production readiness (complete)
-- Phase 6: Suggested next focus: meal-planning efficiency features (recurring meals, planner shortcuts, smarter defaults)
+- Phase 6: Pantry MVP (complete)
+- Phase 7: Suggested next focus: meal-planning efficiency features (recurring meals, planner shortcuts, smarter defaults)

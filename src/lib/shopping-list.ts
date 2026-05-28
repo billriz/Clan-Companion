@@ -1,4 +1,9 @@
 import { getWeekStart } from "@/lib/meal-plans";
+import {
+  normalizeIngredientName,
+  normalizeMeasurementUnit,
+  parseSimpleQuantity,
+} from "@/lib/ingredients";
 import type { Ingredient } from "@/types/recipes";
 import {
   SHOPPING_CATEGORIES,
@@ -8,6 +13,7 @@ import {
 } from "@/types/shopping-list";
 
 export { getWeekStart };
+export { normalizeIngredientName };
 
 type IngredientAccumulator = {
   name: string;
@@ -17,71 +23,6 @@ type IngredientAccumulator = {
   total: number;
   canSum: boolean;
   hasQuantity: boolean;
-};
-
-const preparationWords = new Set([
-  "fresh",
-  "large",
-  "small",
-  "medium",
-  "diced",
-  "chopped",
-  "minced",
-  "sliced",
-  "shredded",
-  "grated",
-  "crushed",
-  "ground",
-  "cooked",
-  "uncooked",
-  "boneless",
-  "skinless",
-  "lean",
-  "ripe",
-  "whole",
-  "optional",
-]);
-
-const unitAliases: Record<string, string> = {
-  c: "cup",
-  cup: "cup",
-  cups: "cup",
-  tbsp: "tbsp",
-  tablespoon: "tbsp",
-  tablespoons: "tbsp",
-  tbsps: "tbsp",
-  tsp: "tsp",
-  teaspoon: "tsp",
-  teaspoons: "tsp",
-  tsps: "tsp",
-  lb: "lb",
-  lbs: "lb",
-  pound: "lb",
-  pounds: "lb",
-  oz: "oz",
-  ounce: "oz",
-  ounces: "oz",
-  g: "g",
-  gram: "g",
-  grams: "g",
-  kg: "kg",
-  kilogram: "kg",
-  kilograms: "kg",
-  ml: "ml",
-  milliliter: "ml",
-  milliliters: "ml",
-  l: "l",
-  liter: "l",
-  liters: "l",
-  clove: "clove",
-  cloves: "clove",
-  can: "can",
-  cans: "can",
-  package: "package",
-  packages: "package",
-  pkg: "package",
-  bunch: "bunch",
-  bunches: "bunch",
 };
 
 const categoryKeywords: Record<ShoppingCategory, string[]> = {
@@ -188,23 +129,6 @@ const categoryMatchOrder: ShoppingCategory[] = [
   "Produce",
 ];
 
-export function normalizeIngredientName(name: string) {
-  const cleanedName = name
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/\([^)]*\)/g, " ")
-    .replace(/[^a-z0-9\s-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const normalizedTokens = cleanedName
-    .split(" ")
-    .filter((token) => token && !preparationWords.has(token))
-    .map(singularizeToken);
-
-  return normalizedTokens.join(" ").trim();
-}
-
 export function categorizeIngredient(name: string): ShoppingCategory {
   const normalizedName = normalizeIngredientName(name);
 
@@ -228,7 +152,7 @@ export function combineIngredients(ingredients: Ingredient[]): CombinedShoppingI
       continue;
     }
 
-    const normalizedUnit = normalizeUnit(ingredient.unit);
+    const normalizedUnit = normalizeMeasurementUnit(ingredient.unit);
     const key = `${normalizedName}|${normalizedUnit}`;
     const quantity = ingredient.quantity.trim();
     const parsedQuantity = quantity ? parseSimpleQuantity(quantity) : null;
@@ -320,40 +244,6 @@ export function sortShoppingListItems(firstItem: ShoppingListItem, secondItem: S
   return firstItem.name.localeCompare(secondItem.name);
 }
 
-function normalizeUnit(unit: string) {
-  const cleanedUnit = unit.toLowerCase().replace(/\./g, "").trim();
-
-  return unitAliases[cleanedUnit] ?? cleanedUnit;
-}
-
-function parseSimpleQuantity(value: string) {
-  const cleanedValue = value.trim().replace(",", ".");
-
-  if (!cleanedValue) {
-    return null;
-  }
-
-  const wholeAndFractionMatch = cleanedValue.match(/^(\d+(?:\.\d+)?)\s+(\d+)\/(\d+)$/);
-  if (wholeAndFractionMatch) {
-    const whole = Number.parseFloat(wholeAndFractionMatch[1]);
-    const numerator = Number.parseFloat(wholeAndFractionMatch[2]);
-    const denominator = Number.parseFloat(wholeAndFractionMatch[3]);
-
-    return denominator > 0 ? whole + numerator / denominator : null;
-  }
-
-  const fractionMatch = cleanedValue.match(/^(\d+)\/(\d+)$/);
-  if (fractionMatch) {
-    const numerator = Number.parseFloat(fractionMatch[1]);
-    const denominator = Number.parseFloat(fractionMatch[2]);
-
-    return denominator > 0 ? numerator / denominator : null;
-  }
-
-  const numericValue = Number.parseFloat(cleanedValue);
-  return Number.isFinite(numericValue) && String(numericValue) === cleanedValue ? numericValue : null;
-}
-
 function resolveQuantity(ingredient: IngredientAccumulator) {
   if (!ingredient.hasQuantity) {
     return null;
@@ -365,23 +255,6 @@ function resolveQuantity(ingredient: IngredientAccumulator) {
 
   return Array.from(new Set(ingredient.quantityParts)).join(" + ");
 }
-
-function singularizeToken(token: string) {
-  if (token.endsWith("ies") && token.length > 4) {
-    return `${token.slice(0, -3)}y`;
-  }
-
-  if (token.endsWith("oes") && token.length > 4) {
-    return token.slice(0, -2);
-  }
-
-  if (token.endsWith("s") && !token.endsWith("ss") && token.length > 3) {
-    return token.slice(0, -1);
-  }
-
-  return token;
-}
-
 function sortCombinedIngredients(
   firstIngredient: CombinedShoppingIngredient,
   secondIngredient: CombinedShoppingIngredient,

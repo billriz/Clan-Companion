@@ -7,6 +7,17 @@ export type SpoonacularSearchParams = {
   number?: string | number;
 };
 
+export type SpoonacularPantryRecipeSearchParams = {
+  ingredientNames: string[];
+  ingredientItems?: Array<{
+    name: string;
+    category?: string | null;
+  }>;
+  number?: string | number;
+  ranking?: 1 | 2 | string | number;
+  ignorePantry?: boolean;
+};
+
 export type SpoonacularRecipeSearchResult = {
   id?: number;
   title?: string;
@@ -30,6 +41,26 @@ export type SpoonacularExtendedIngredient = {
   unit?: string | null;
   name?: string | null;
   nameClean?: string | null;
+};
+
+export type SpoonacularFindByIngredientsIngredient = {
+  id?: number;
+  name?: string | null;
+  original?: string | null;
+  amount?: number | null;
+  unit?: string | null;
+  image?: string | null;
+};
+
+export type SpoonacularFindByIngredientsResult = {
+  id?: number;
+  title?: string;
+  image?: string | null;
+  usedIngredientCount?: number;
+  missedIngredientCount?: number;
+  usedIngredients?: SpoonacularFindByIngredientsIngredient[];
+  missedIngredients?: SpoonacularFindByIngredientsIngredient[];
+  unusedIngredients?: SpoonacularFindByIngredientsIngredient[];
 };
 
 export type SpoonacularInstructionStep = {
@@ -93,6 +124,27 @@ export type NormalizedImportedRecipe = {
   spoonacular_id: number;
   imported_from: "spoonacular";
   nutrition: Record<string, unknown>;
+};
+
+export type NormalizedPantryRecipeResultIngredient = {
+  id?: number;
+  name: string;
+  original?: string;
+  amount?: number;
+  unit?: string;
+  image?: string;
+};
+
+export type NormalizedPantryRecipeResult = {
+  id: number | string;
+  title: string;
+  image: string | null;
+  usedIngredientCount: number;
+  missedIngredientCount: number;
+  usedIngredients: NormalizedPantryRecipeResultIngredient[];
+  missedIngredients: NormalizedPantryRecipeResultIngredient[];
+  unusedIngredients: NormalizedPantryRecipeResultIngredient[];
+  source: "spoonacular";
 };
 
 export type SpoonacularErrorCode =

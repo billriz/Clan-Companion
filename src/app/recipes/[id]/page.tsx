@@ -16,6 +16,7 @@ import {
 import { RecipeDetailActions } from "@/components/recipes/recipe-detail-actions";
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
 import { RecipeNotFound } from "@/components/recipes/recipe-not-found";
+import { RecipePantryInsights } from "@/components/recipes/recipe-pantry-insights";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/lib/recipes";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import type { PantryItem } from "@/types/pantry";
 import type { Recipe } from "@/types/recipes";
 
 export const metadata: Metadata = {
@@ -63,11 +65,17 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
   }
 
   const recipeWithPreviewUrl = await addScanImagePreviewUrl(supabase, recipe);
+  const { data: pantryData, error: pantryError } = await supabase
+    .from("pantry_items")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("name", { ascending: true });
 
   const ingredients = parseIngredients(recipeWithPreviewUrl.ingredients);
   const instructions = parseInstructions(recipeWithPreviewUrl.instructions);
   const totalTime = getTotalTime(recipeWithPreviewUrl);
   const difficulty = normalizeDifficulty(recipeWithPreviewUrl.difficulty);
+  const pantryItems = pantryError ? [] : ((pantryData ?? []) as PantryItem[]);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -134,25 +142,14 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
           <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
-          {ingredients.length > 0 ? (
-            <ul className="mt-5 space-y-3" aria-label="Ingredients list">
-              {ingredients.map((ingredient, index) => (
-                <li
-                  key={`${ingredient.name}-${index}`}
-                  className="flex gap-3 rounded-xl bg-plate-paper px-4 py-3 text-sm text-plate-charcoal"
-                >
-                  <span className="min-w-20 font-semibold text-primary">
-                    {[ingredient.quantity, ingredient.unit].filter(Boolean).join(" ") || "-"}
-                  </span>
-                  <span>{ingredient.name || "Ingredient"}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-4 text-sm leading-6 text-muted-foreground">
-              No ingredients have been added yet.
-            </p>
-          )}
+          <div className="mt-5">
+            <RecipePantryInsights
+              ingredients={ingredients}
+              pantryItems={pantryItems}
+              recipeTitle={recipeWithPreviewUrl.title}
+              userId={user.id}
+            />
+          </div>
         </div>
 
         <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">

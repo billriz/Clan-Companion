@@ -211,6 +211,65 @@ export type Database = {
           },
         ];
       };
+      pantry_items: {
+        Row: {
+          id: string;
+          user_id: string;
+          household_id: string | null;
+          name: string;
+          normalized_name: string;
+          quantity: number | null;
+          unit: string | null;
+          category: string | null;
+          location: string | null;
+          notes: string | null;
+          is_staple: boolean;
+          low_stock_threshold: number | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          household_id?: string | null;
+          name: string;
+          normalized_name: string;
+          quantity?: number | null;
+          unit?: string | null;
+          category?: string | null;
+          location?: string | null;
+          notes?: string | null;
+          is_staple?: boolean;
+          low_stock_threshold?: number | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          household_id?: string | null;
+          name?: string;
+          normalized_name?: string;
+          quantity?: number | null;
+          unit?: string | null;
+          category?: string | null;
+          location?: string | null;
+          notes?: string | null;
+          is_staple?: boolean;
+          low_stock_threshold?: number | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pantry_items_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

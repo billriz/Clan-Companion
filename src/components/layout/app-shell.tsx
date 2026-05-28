@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { BookOpen, CalendarDays, Download, ChefHat, Home, ListChecks, ShoppingBasket } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  Download,
+  ChefHat,
+  Home,
+  ListChecks,
+  Package,
+  ShoppingBasket,
+} from "lucide-react";
 
 import { LogoutButton } from "@/components/layout/logout-button";
 import { cn } from "@/lib/utils";
@@ -9,7 +18,7 @@ type AppShellProps = {
   children: React.ReactNode;
   userEmail: string;
   userName: string | null;
-  activeItem?: "dashboard" | "recipes" | "planner" | "list";
+  activeItem?: "dashboard" | "recipes" | "planner" | "pantry" | "list";
 };
 
 const navItems = [
@@ -27,6 +36,13 @@ const navItems = [
     mobileLabel: "Planner",
     href: "/meal-planner",
     icon: CalendarDays,
+  },
+  {
+    id: "pantry",
+    label: "Pantry",
+    mobileLabel: "Pantry",
+    href: "/pantry",
+    icon: Package,
   },
   {
     id: "list",
@@ -155,7 +171,7 @@ export function AppShell({
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-plate-paper/95 px-2 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-soft backdrop-blur lg:hidden"
         aria-label="Mobile navigation"
       >
-        <div className="mx-auto grid max-w-md grid-cols-4 gap-1.5">
+        <div className="mx-auto grid max-w-lg grid-cols-5 gap-1.5">
           {navItems.map((item) => {
             const isActive = item.id === activeItem;
 

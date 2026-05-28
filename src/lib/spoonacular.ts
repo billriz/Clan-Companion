@@ -1,11 +1,17 @@
 import "server-only";
 
+import {
+  normalizePantryRecipeSearchResults,
+  parsePantryRecipeSearchParams,
+} from "@/lib/pantry-recipe-search";
 import type {
   NormalizedImportedRecipe,
+  NormalizedPantryRecipeResult,
   NormalizedSpoonacularSearchResult,
   SpoonacularComplexSearchResponse,
   SpoonacularErrorCode,
   SpoonacularExtendedIngredient,
+  SpoonacularPantryRecipeSearchParams,
   SpoonacularInstructionBlock,
   SpoonacularRecipeDetails,
   SpoonacularRecipeSearchResult,
@@ -14,6 +20,16 @@ import type {
 
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
 const MAX_SUMMARY_LENGTH = 320;
+const PANTRY_SEARCH_CACHE_TTL_MS = 1000 * 60 * 3;
+const PANTRY_SEARCH_CACHE_MAX_ITEMS = 120;
+
+type PantrySearchCacheEntry = {
+  key: string;
+  expiresAt: number;
+  results: NormalizedPantryRecipeResult[];
+};
+
+const pantrySearchCache = new Map<string, PantrySearchCacheEntry>();
 
 export class SpoonacularError extends Error {
   code: SpoonacularErrorCode;
@@ -78,6 +94,51 @@ export async function searchSpoonacularRecipes(params: SpoonacularSearchParams):
     results: normalizedResults,
     totalResults: typeof response.totalResults === "number" ? response.totalResults : undefined,
   };
+}
+
+export async function searchRecipesFromPantry(
+  params: SpoonacularPantryRecipeSearchParams,
+): Promise<NormalizedPantryRecipeResult[]> {
+  const parsed = parsePantryRecipeSearchParams(params);
+  const cacheKey = parsed.ingredientNames.join(",");
+  const now = Date.now();
+
+  prunePantrySearchCache(now);
+
+  const cached = pantrySearchCache.get(cacheKey);
+
+  if (cached && cached.expiresAt > now) {
+    return cached.results;
+  }
+
+  const query = new URLSearchParams({
+    ingredients: parsed.ingredientNames.join(","),
+    number: String(parsed.number),
+    ranking: String(parsed.ranking),
+    ignorePantry: String(parsed.ignorePantry),
+  });
+
+  const payload = await fetchFromSpoonacular<unknown>("/recipes/findByIngredients", query);
+  const normalizedResults = normalizePantryRecipeSearchResults(payload);
+
+  if (!Array.isArray(payload)) {
+    throw new SpoonacularError(
+      "Spoonacular returned an unexpected recipe list format.",
+      "BAD_RESPONSE",
+      502,
+      payload,
+    );
+  }
+
+  pantrySearchCache.set(cacheKey, {
+    key: cacheKey,
+    expiresAt: now + PANTRY_SEARCH_CACHE_TTL_MS,
+    results: normalizedResults,
+  });
+
+  prunePantrySearchCache(now);
+
+  return normalizedResults;
 }
 
 export async function getSpoonacularRecipeInformation(id: number): Promise<SpoonacularRecipeDetails> {
@@ -297,6 +358,27 @@ async function fetchFromSpoonacular<T>(path: string, query: URLSearchParams): Pr
   }
 
   return payload as T;
+}
+
+function prunePantrySearchCache(now = Date.now()) {
+  for (const [cacheKey, entry] of pantrySearchCache.entries()) {
+    if (entry.expiresAt <= now) {
+      pantrySearchCache.delete(cacheKey);
+    }
+  }
+
+  if (pantrySearchCache.size <= PANTRY_SEARCH_CACHE_MAX_ITEMS) {
+    return;
+  }
+
+  const staleFirst = Array.from(pantrySearchCache.entries()).sort(
+    (firstEntry, secondEntry) => firstEntry[1].expiresAt - secondEntry[1].expiresAt,
+  );
+  const overflowCount = pantrySearchCache.size - PANTRY_SEARCH_CACHE_MAX_ITEMS;
+
+  staleFirst.slice(0, overflowCount).forEach(([cacheKey]) => {
+    pantrySearchCache.delete(cacheKey);
+  });
 }
 
 async function parsePayload(response: Response): Promise<unknown> {

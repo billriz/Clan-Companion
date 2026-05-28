@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChefHat,
   ClipboardCheck,
+  Package,
   ShoppingBasket,
 } from "lucide-react";
 
@@ -39,6 +40,14 @@ const dashboardCards = [
     tone: "terracotta",
     href: "/meal-planner",
     actionLabel: "Plan week",
+  },
+  {
+    title: "Pantry",
+    description: "Track what you have on hand before building your grocery list.",
+    icon: Package,
+    tone: "blue",
+    href: "/pantry",
+    actionLabel: "Open pantry",
   },
   {
     title: "Shopping List",
