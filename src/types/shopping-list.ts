@@ -5,6 +5,9 @@ export type ShoppingListItemInsert =
   Database["public"]["Tables"]["shopping_list_items"]["Insert"];
 export type ShoppingListItemUpdate =
   Database["public"]["Tables"]["shopping_list_items"]["Update"];
+export type ShoppingList = Database["public"]["Tables"]["shopping_lists"]["Row"];
+export type ShoppingListInsert = Database["public"]["Tables"]["shopping_lists"]["Insert"];
+export type ShoppingListExport = Database["public"]["Tables"]["shopping_list_exports"]["Row"];
 
 export const SHOPPING_CATEGORIES = [
   "Produce",

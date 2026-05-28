@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Copy,
   Eraser,
+  ExternalLink,
+  Loader2,
   Plus,
   RefreshCcw,
   ShoppingBasket,
@@ -18,6 +21,9 @@ import { GenerateShoppingListButton } from "@/components/shopping-list/generate-
 import { ShoppingCategorySection } from "@/components/shopping-list/shopping-category-section";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   addDays,
   formatDateKey,
@@ -32,6 +38,7 @@ import {
   groupShoppingItemsByCategory,
   sortShoppingListItems,
 } from "@/lib/shopping-list";
+import { filterExportableShoppingItems, flagLowConfidenceItems } from "@/lib/instacart/line-items";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { MealPlanWithRecipe } from "@/types/meal-plans";
@@ -45,12 +52,45 @@ type ShoppingListPageProps = {
   initialItems: ShoppingListItem[];
   initialMealPlanCount: number;
   initialWeekStartKey: string;
+  initialShoppingListId: string;
+  preferredGroceryProvider: string;
+  preferredGroceryStoreName: string;
+  preferredGroceryStoreNotes: string;
   userId: string;
 };
 
 type ShoppingWeekData = {
+  shoppingListId: string;
   items: ShoppingListItem[];
   mealPlanCount: number;
+};
+
+type GroceryPreferenceForm = {
+  provider: string;
+  storeName: string;
+  storeNotes: string;
+};
+
+type InstacartExportResult = {
+  instacartUrl: string;
+  exportId: string;
+  lowConfidenceItems: Array<{
+    itemId: string;
+    name: string;
+    reasons: string[];
+  }>;
+};
+
+type InstacartExportResponse = {
+  success: boolean;
+  instacartUrl?: string;
+  exportId?: string;
+  error?: string;
+  lowConfidenceItems?: Array<{
+    itemId: string;
+    name: string;
+    reasons: string[];
+  }>;
 };
 
 const emptyShoppingItems: ShoppingListItem[] = [];
@@ -59,30 +99,58 @@ export function ShoppingListPage({
   initialItems,
   initialMealPlanCount,
   initialWeekStartKey,
+  initialShoppingListId,
+  preferredGroceryProvider,
+  preferredGroceryStoreName,
+  preferredGroceryStoreNotes,
   userId,
 }: ShoppingListPageProps) {
   const [weekStartKey, setWeekStartKey] = useState(initialWeekStartKey);
   const [weekDataByWeek, setWeekDataByWeek] = useState<Record<string, ShoppingWeekData>>({
     [initialWeekStartKey]: {
+      shoppingListId: initialShoppingListId,
       items: [...initialItems].sort(sortShoppingListItems),
       mealPlanCount: initialMealPlanCount,
     },
   });
+  const [exportResultByWeek, setExportResultByWeek] = useState<Record<string, InstacartExportResult>>({});
   const [busyItemIds, setBusyItemIds] = useState<Set<string>>(new Set());
   const [isLoadingWeek, setIsLoadingWeek] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [isPreferenceEditing, setIsPreferenceEditing] = useState(false);
+  const [isSavingPreference, setIsSavingPreference] = useState(false);
+  const [preferenceError, setPreferenceError] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const [savedPreference, setSavedPreference] = useState<GroceryPreferenceForm>({
+    provider: preferredGroceryProvider,
+    storeName: preferredGroceryStoreName,
+    storeNotes: preferredGroceryStoreNotes,
+  });
+  const [preferenceForm, setPreferenceForm] = useState<GroceryPreferenceForm>({
+    provider: preferredGroceryProvider,
+    storeName: preferredGroceryStoreName,
+    storeNotes: preferredGroceryStoreNotes,
+  });
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const inFlightWeeks = useRef(new Set<string>());
 
   const weekData = weekDataByWeek[weekStartKey];
+  const currentExportResult = exportResultByWeek[weekStartKey] ?? null;
   const items = weekData?.items ?? emptyShoppingItems;
+  const shoppingListId = weekData?.shoppingListId ?? "";
   const mealPlanCount = weekData?.mealPlanCount ?? 0;
   const checkedCount = items.filter((item) => item.checked).length;
   const totalCount = items.length;
   const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const exportableItems = useMemo(() => filterExportableShoppingItems(items), [items]);
+  const lowConfidenceItems = useMemo(() => flagLowConfidenceItems(exportableItems), [exportableItems]);
+  const preferredStoreLabel = `${savedPreference.storeName.trim() || "Woodman's"} via ${formatProviderLabel(
+    savedPreference.provider,
+  )}`;
   const groupedItems = useMemo(() => groupShoppingItemsByCategory(items), [items]);
   const visibleCategories = SHOPPING_CATEGORIES.filter(
     (category) => groupedItems[category].length > 0,
@@ -135,12 +203,14 @@ export function ShoppingListPage({
       addDays(parseDateKey(weekStartKey), direction === "next" ? 7 : -7),
     );
     setWeekStartKey(nextWeekStartKey);
+    setCopyStatus("idle");
     setError(null);
     setNotice(null);
   }
 
   function returnToCurrentWeek() {
     setWeekStartKey(getWeekStartKey(new Date()));
+    setCopyStatus("idle");
     setError(null);
     setNotice(null);
   }
@@ -148,6 +218,7 @@ export function ShoppingListPage({
   function reloadCurrentWeek() {
     setError(null);
     setNotice(null);
+    setCopyStatus("idle");
     setWeekDataByWeek((currentData) => {
       const nextData = { ...currentData };
       delete nextData[weekStartKey];
@@ -161,6 +232,7 @@ export function ShoppingListPage({
   ) {
     setWeekDataByWeek((currentData) => {
       const currentWeekData = currentData[targetWeekStartKey] ?? {
+        shoppingListId: "",
         items: [],
         mealPlanCount: 0,
       };
@@ -172,6 +244,15 @@ export function ShoppingListPage({
           items: updater(currentWeekData.items).sort(sortShoppingListItems),
         },
       };
+    });
+    setExportResultByWeek((currentResults) => {
+      if (!currentResults[targetWeekStartKey]) {
+        return currentResults;
+      }
+
+      const nextResults = { ...currentResults };
+      delete nextResults[targetWeekStartKey];
+      return nextResults;
     });
   }
 
@@ -306,6 +387,7 @@ export function ShoppingListPage({
       setWeekDataByWeek((currentData) => ({
         ...currentData,
         [weekStartKey]: {
+          shoppingListId: currentData[weekStartKey]?.shoppingListId ?? shoppingListId,
           items: currentData[weekStartKey]?.items ?? [],
           mealPlanCount: plans.length,
         },
@@ -374,7 +456,131 @@ export function ShoppingListPage({
     }
   }
 
-  const isBusy = isLoadingWeek || isGenerating || isClearing;
+  async function handleExportToInstacart() {
+    if (!shoppingListId) {
+      setError("Shopping list metadata is missing. Reload and try again.");
+      return;
+    }
+
+    if (exportableItems.length === 0) {
+      setError("This shopping list has no items to export.");
+      return;
+    }
+
+    setIsExporting(true);
+    setCopyStatus("idle");
+    setError(null);
+    setNotice(null);
+
+    try {
+      const response = await fetch("/api/integrations/instacart/export-shopping-list", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ shoppingListId }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as InstacartExportResponse;
+
+      if (!response.ok || !payload.success || !payload.instacartUrl || !payload.exportId) {
+        setError(payload.error ?? "We could not create your Instacart list right now.");
+        return;
+      }
+
+      setExportResultByWeek((currentResults) => ({
+        ...currentResults,
+        [weekStartKey]: {
+          instacartUrl: payload.instacartUrl as string,
+          exportId: payload.exportId as string,
+          lowConfidenceItems: payload.lowConfidenceItems ?? [],
+        },
+      }));
+      setNotice("Your Instacart shopping list is ready.");
+    } catch {
+      setError("We could not create your Instacart list right now.");
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
+  async function handleCopyInstacartLink() {
+    if (!currentExportResult?.instacartUrl) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentExportResult.instacartUrl);
+      setCopyStatus("success");
+      setNotice("Instacart link copied.");
+    } catch {
+      setCopyStatus("error");
+      setError("Could not copy the Instacart link.");
+    }
+  }
+
+  async function handleSavePreference(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const cleanProvider = preferenceForm.provider.trim().toLowerCase();
+    const cleanStoreName = preferenceForm.storeName.trim();
+
+    if (!cleanProvider) {
+      setPreferenceError("Provider is required.");
+      return;
+    }
+
+    if (!cleanStoreName) {
+      setPreferenceError("Store name is required.");
+      return;
+    }
+
+    setIsSavingPreference(true);
+    setPreferenceError(null);
+
+    const supabase = createClient();
+    const { error: saveError } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
+        preferred_grocery_provider: cleanProvider,
+        preferred_grocery_store_name: cleanStoreName,
+        preferred_grocery_store_notes: preferenceForm.storeNotes.trim() || null,
+      },
+      {
+        onConflict: "id",
+      },
+    );
+
+    if (saveError) {
+      setPreferenceError(saveError.message);
+      setIsSavingPreference(false);
+      return;
+    }
+
+    setSavedPreference((currentForm) => ({
+      ...currentForm,
+      provider: cleanProvider,
+      storeName: cleanStoreName,
+      storeNotes: currentForm.storeNotes.trim(),
+    }));
+    setPreferenceForm((currentForm) => ({
+      ...currentForm,
+      provider: cleanProvider,
+      storeName: cleanStoreName,
+      storeNotes: currentForm.storeNotes.trim(),
+    }));
+    setIsSavingPreference(false);
+    setIsPreferenceEditing(false);
+    setNotice("Grocery preferences saved.");
+  }
+
+  function handleCancelPreferenceEdit() {
+    setPreferenceForm({ ...savedPreference });
+    setPreferenceError(null);
+    setIsPreferenceEditing(false);
+  }
+
+  const isBusy = isLoadingWeek || isGenerating || isClearing || isExporting;
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -496,7 +702,122 @@ export function ShoppingListPage({
             <Eraser className="h-4 w-4" aria-hidden="true" />
             {isClearing ? "Clearing..." : "Clear Checked"}
           </Button>
+          <Button
+            className="h-11 gap-2 rounded-xl"
+            disabled={isBusy || exportableItems.length === 0 || !shoppingListId}
+            type="button"
+            onClick={handleExportToInstacart}
+          >
+            {isExporting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                Export to Instacart
+              </>
+            )}
+          </Button>
         </div>
+      </section>
+
+      <section className="rounded-2xl border bg-white px-4 py-4 text-sm text-muted-foreground shadow-subtle">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p>
+            Preferred store: <span className="font-medium text-plate-charcoal">{preferredStoreLabel}</span>
+          </p>
+          {isPreferenceEditing ? null : (
+            <Button
+              className="h-9 rounded-xl"
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setPreferenceForm({ ...savedPreference });
+                setPreferenceError(null);
+                setIsPreferenceEditing(true);
+              }}
+            >
+              Edit preference
+            </Button>
+          )}
+        </div>
+
+        {isPreferenceEditing ? (
+          <form className="mt-4 grid gap-3" onSubmit={handleSavePreference}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="groceryProvider">Provider</Label>
+                <Input
+                  id="groceryProvider"
+                  value={preferenceForm.provider}
+                  placeholder="instacart"
+                  disabled={isSavingPreference}
+                  onChange={(event) =>
+                    setPreferenceForm((currentForm) => ({
+                      ...currentForm,
+                      provider: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="groceryStoreName">Store name</Label>
+                <Input
+                  id="groceryStoreName"
+                  value={preferenceForm.storeName}
+                  placeholder="Woodman's"
+                  disabled={isSavingPreference}
+                  onChange={(event) =>
+                    setPreferenceForm((currentForm) => ({
+                      ...currentForm,
+                      storeName: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="groceryStoreNotes">Store notes (optional)</Label>
+              <Textarea
+                id="groceryStoreNotes"
+                value={preferenceForm.storeNotes}
+                rows={2}
+                placeholder="Any preference notes for your household"
+                disabled={isSavingPreference}
+                onChange={(event) =>
+                  setPreferenceForm((currentForm) => ({
+                    ...currentForm,
+                    storeNotes: event.target.value,
+                  }))
+                }
+              />
+            </div>
+            {preferenceError ? (
+              <div
+                className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+                role="alert"
+              >
+                {preferenceError}
+              </div>
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              <Button className="h-10 rounded-xl" disabled={isSavingPreference} type="submit">
+                {isSavingPreference ? "Saving..." : "Save preference"}
+              </Button>
+              <Button
+                className="h-10 rounded-xl"
+                disabled={isSavingPreference}
+                type="button"
+                variant="secondary"
+                onClick={handleCancelPreferenceEdit}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        ) : null}
       </section>
 
       {error ? (
@@ -519,6 +840,57 @@ export function ShoppingListPage({
         >
           {notice}
         </div>
+      ) : null}
+
+      {lowConfidenceItems.length > 0 ? (
+        <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-4 text-sm text-plate-charcoal shadow-subtle">
+          <h2 className="text-sm font-semibold">Review before export</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {lowConfidenceItems.length} item{lowConfidenceItems.length === 1 ? "" : "s"} may be harder for Instacart to match.
+          </p>
+          <ul className="mt-3 space-y-1 text-sm">
+            {lowConfidenceItems.slice(0, 4).map((item) => (
+              <li key={item.itemId} className="rounded-xl bg-white px-3 py-2">
+                <span className="font-medium">{item.name}</span>
+                <span className="ml-2 text-xs text-muted-foreground">{item.reasons.join(" ")}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {currentExportResult ? (
+        <section className="rounded-2xl border border-primary/30 bg-primary/10 p-5 shadow-subtle">
+          <h2 className="text-lg font-semibold text-plate-charcoal">
+            Your Instacart shopping list is ready
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Open Instacart to review matches, choose your store, add items to cart, and check out.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              className={cn(buttonVariants(), "h-10 gap-2 rounded-xl")}
+              href={currentExportResult.instacartUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              Open in Instacart
+            </a>
+            <Button
+              className="h-10 gap-2 rounded-xl"
+              type="button"
+              variant="secondary"
+              onClick={handleCopyInstacartLink}
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              {copyStatus === "success" ? "Copied" : "Copy link"}
+            </Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Final prices, availability, substitutions, and checkout are handled by Instacart.
+          </p>
+        </section>
       ) : null}
 
       {isLoadingWeek && !weekData ? (
@@ -562,7 +934,7 @@ async function fetchShoppingWeekData(
   weekStartKey: string,
 ): Promise<ShoppingWeekData> {
   const supabase = createClient();
-  const [itemsResponse, plansResponse] = await Promise.all([
+  const [itemsResponse, plansResponse, shoppingListResponse] = await Promise.all([
     supabase
       .from("shopping_list_items")
       .select("*")
@@ -577,6 +949,19 @@ async function fetchShoppingWeekData(
       .eq("user_id", userId)
       .gte("planned_date", weekStartKey)
       .lte("planned_date", getWeekEndKey(weekStartKey)),
+    supabase
+      .from("shopping_lists")
+      .upsert(
+        {
+          user_id: userId,
+          week_start: weekStartKey,
+        },
+        {
+          onConflict: "user_id,week_start",
+        },
+      )
+      .select("id")
+      .single(),
   ]);
 
   if (itemsResponse.error) {
@@ -587,7 +972,12 @@ async function fetchShoppingWeekData(
     throw new Error(plansResponse.error.message);
   }
 
+  if (shoppingListResponse.error || !shoppingListResponse.data?.id) {
+    throw new Error(shoppingListResponse.error?.message ?? "Shopping list metadata could not be loaded.");
+  }
+
   return {
+    shoppingListId: shoppingListResponse.data.id,
     items: ((itemsResponse.data ?? []) as ShoppingListItem[]).sort(sortShoppingListItems),
     mealPlanCount: plansResponse.data?.length ?? 0,
   };
@@ -675,6 +1065,20 @@ function ShoppingListSkeleton() {
       ))}
     </div>
   );
+}
+
+function formatProviderLabel(provider: string) {
+  const cleanProvider = provider.trim();
+
+  if (!cleanProvider) {
+    return "Instacart";
+  }
+
+  if (cleanProvider.toLowerCase() === "instacart") {
+    return "Instacart";
+  }
+
+  return cleanProvider;
 }
 
 function getErrorMessage(error: unknown, fallbackMessage: string) {

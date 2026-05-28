@@ -8,18 +8,27 @@ export type Database = {
           id: string;
           email: string | null;
           full_name: string | null;
+          preferred_grocery_provider: string | null;
+          preferred_grocery_store_name: string | null;
+          preferred_grocery_store_notes: string | null;
           created_at: string | null;
         };
         Insert: {
           id: string;
           email?: string | null;
           full_name?: string | null;
+          preferred_grocery_provider?: string | null;
+          preferred_grocery_store_name?: string | null;
+          preferred_grocery_store_notes?: string | null;
           created_at?: string | null;
         };
         Update: {
           id?: string;
           email?: string | null;
           full_name?: string | null;
+          preferred_grocery_provider?: string | null;
+          preferred_grocery_store_name?: string | null;
+          preferred_grocery_store_notes?: string | null;
           created_at?: string | null;
         };
         Relationships: [];
@@ -164,6 +173,35 @@ export type Database = {
           },
         ];
       };
+      shopping_lists: {
+        Row: {
+          id: string;
+          user_id: string;
+          week_start: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          week_start: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          week_start?: string;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shopping_lists_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       shopping_list_items: {
         Row: {
           id: string;
@@ -204,6 +242,57 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "shopping_list_items_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shopping_list_exports: {
+        Row: {
+          id: string;
+          user_id: string;
+          shopping_list_id: string;
+          provider: string;
+          provider_url: string | null;
+          status: string;
+          item_count: number | null;
+          error_message: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          shopping_list_id: string;
+          provider?: string;
+          provider_url?: string | null;
+          status: string;
+          item_count?: number | null;
+          error_message?: string | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          shopping_list_id?: string;
+          provider?: string;
+          provider_url?: string | null;
+          status?: string;
+          item_count?: number | null;
+          error_message?: string | null;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_exports_shopping_list_id_fkey";
+            columns: ["shopping_list_id"];
+            isOneToOne: false;
+            referencedRelation: "shopping_lists";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shopping_list_exports_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";

@@ -24,6 +24,7 @@ mobile refinement, and deployment preparation.
 - Add only missing recipe ingredients to grocery list (with override review)
 - Manual shopping list items
 - Check/uncheck and clear checked shopping items
+- Instacart shopping list export (server-side) with preferred store support
 - Responsive mobile + desktop layout
 
 ## Tech Stack
@@ -121,6 +122,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 SPOONACULAR_API_KEY=your_spoonacular_api_key
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_RECIPE_SCAN_MODEL=gpt-4.1-mini
+INSTACART_API_KEY=your_instacart_api_key
+INSTACART_API_BASE_URL=https://connect.dev.instacart.tools
 ```
 
 Required variables for local and production:
@@ -129,6 +132,8 @@ Required variables for local and production:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SPOONACULAR_API_KEY` (server-only, never `NEXT_PUBLIC_`)
 - `OPENAI_API_KEY` (server-only, never `NEXT_PUBLIC_`)
+- `INSTACART_API_KEY` (server-only, never `NEXT_PUBLIC_`)
+- `INSTACART_API_BASE_URL` (server-only)
 
 Optional:
 
@@ -209,7 +214,9 @@ PWA installability requires HTTPS in production. Vercel production deployments p
    - `recipes_vision_scan.sql`
    - `meal_plans.sql`
    - `pantry_items.sql`
+   - `shopping_lists.sql`
    - `shopping_list_items.sql`
+   - `shopping_list_exports.sql`
 4. Buckets:
    - `recipe-images` (public)
    - `recipe-scans` (private, created/configured in `recipes_vision_scan.sql`)
@@ -223,6 +230,8 @@ PWA installability requires HTTPS in production. Vercel production deployments p
    - `SPOONACULAR_API_KEY` (server-only)
    - `OPENAI_API_KEY` (server-only)
    - `OPENAI_RECIPE_SCAN_MODEL` (optional)
+   - `INSTACART_API_KEY` (server-only)
+   - `INSTACART_API_BASE_URL` (server-only)
 3. Deploy.
 4. In Supabase Auth settings, update URLs:
    - **Site URL** should match your Vercel production domain.
@@ -240,6 +249,8 @@ Example production redirect host:
 - `SPOONACULAR_API_KEY` is set in Vercel project settings
 - `OPENAI_API_KEY` is set in Vercel project settings
 - `OPENAI_RECIPE_SCAN_MODEL` set in Vercel if overriding default model
+- `INSTACART_API_KEY` is set in Vercel project settings
+- `INSTACART_API_BASE_URL` is set in Vercel project settings
 - Supabase variables are set in Vercel project settings
 - Supabase Auth redirect URLs updated with deployed domain
 - Supabase storage bucket `recipe-scans` exists and policies are configured
@@ -247,6 +258,7 @@ Example production redirect host:
 - Core MVP flow manually verified
 
 See full QA coverage in [CHECKLIST.md](./CHECKLIST.md).
+See Instacart integration details in [docs/integrations/instacart.md](./docs/integrations/instacart.md).
 
 ## Phase Roadmap
 

@@ -28,7 +28,7 @@ export default async function ShoppingListRoute() {
   const initialWeekStartKey = getWeekStartKey(new Date());
   const initialWeekEndKey = getWeekEndKey(initialWeekStartKey);
 
-  const [itemsResponse, plansResponse] = await Promise.all([
+  const [itemsResponse, plansResponse, shoppingListResponse, profileResponse] = await Promise.all([
     supabase
       .from("shopping_list_items")
       .select("*")
@@ -43,9 +43,31 @@ export default async function ShoppingListRoute() {
       .eq("user_id", user.id)
       .gte("planned_date", initialWeekStartKey)
       .lte("planned_date", initialWeekEndKey),
+    supabase
+      .from("shopping_lists")
+      .upsert(
+        {
+          user_id: user.id,
+          week_start: initialWeekStartKey,
+        },
+        {
+          onConflict: "user_id,week_start",
+        },
+      )
+      .select("id")
+      .single(),
+    supabase
+      .from("profiles")
+      .select("preferred_grocery_provider, preferred_grocery_store_name, preferred_grocery_store_notes")
+      .eq("id", user.id)
+      .maybeSingle(),
   ]);
 
-  const loadError = itemsResponse.error ?? plansResponse.error;
+  const loadError =
+    itemsResponse.error ??
+    plansResponse.error ??
+    shoppingListResponse.error ??
+    (shoppingListResponse.data?.id ? null : new Error("Shopping list metadata could not be loaded."));
 
   if (loadError) {
     return (
@@ -78,11 +100,34 @@ export default async function ShoppingListRoute() {
     );
   }
 
+  const initialShoppingListId = shoppingListResponse.data?.id;
+
+  if (!initialShoppingListId) {
+    return (
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+        <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-5 text-sm leading-6 text-plate-terracotta shadow-subtle">
+          <p>Shopping list metadata could not be loaded.</p>
+        </section>
+      </div>
+    );
+  }
+
+  const preferredGroceryProvider =
+    profileResponse.data?.preferred_grocery_provider?.trim() || "instacart";
+  const preferredGroceryStoreName =
+    profileResponse.data?.preferred_grocery_store_name?.trim() || "Woodman's";
+  const preferredGroceryStoreNotes =
+    profileResponse.data?.preferred_grocery_store_notes?.trim() || "";
+
   return (
     <ShoppingListPage
       initialItems={(itemsResponse.data ?? []) as ShoppingListItem[]}
       initialMealPlanCount={plansResponse.data?.length ?? 0}
+      initialShoppingListId={initialShoppingListId}
       initialWeekStartKey={initialWeekStartKey}
+      preferredGroceryProvider={preferredGroceryProvider}
+      preferredGroceryStoreName={preferredGroceryStoreName}
+      preferredGroceryStoreNotes={preferredGroceryStoreNotes}
       userId={user.id}
     />
   );
