@@ -301,7 +301,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
   const emptyStateMessage = hasSearched && !isSearching && results.length === 0 ? NO_RESULTS_MESSAGE : null;
 
   return (
-    <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
+    <section id="find-recipes-from-pantry" className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <Badge variant="blue">Find recipes from pantry</Badge>
