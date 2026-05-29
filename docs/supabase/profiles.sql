@@ -1,4 +1,4 @@
--- Run this in the Supabase SQL editor for the PlatePlan project.
+-- Run this in the Supabase SQL editor for the GravyTime project.
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

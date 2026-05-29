@@ -100,7 +100,7 @@ export function ModalShell({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-plate-charcoal/35 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-gravy-charcoal/35 p-0 backdrop-blur-sm sm:items-center sm:p-6">
       <button
         aria-hidden="true"
         className="absolute inset-0 cursor-default"
@@ -115,7 +115,7 @@ export function ModalShell({
         aria-labelledby={labelledBy}
         aria-modal="true"
         className={cn(
-          "relative flex w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl border border-border bg-plate-paper shadow-soft focus:outline-none sm:rounded-2xl",
+          "relative flex w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl border border-border bg-gravy-paper shadow-soft focus:outline-none sm:rounded-2xl",
           panelClassName,
         )}
         role="dialog"

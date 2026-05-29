@@ -374,7 +374,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="default">Pantry inventory</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Pantry
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -386,9 +386,9 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
+      <section className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-plate-charcoal">Quick add</h2>
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Quick add</h2>
           <Button className="h-10 rounded-xl" type="button" variant="secondary" onClick={openAddDetailsForm}>
             Add with details
           </Button>
@@ -422,7 +422,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
             }
           />
           <select
-            className="flex h-11 rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
             value={quickAddValues.category}
             disabled={isSavingQuickAdd}
             onChange={(event) =>
@@ -437,7 +437,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
             ))}
           </select>
           <select
-            className="flex h-11 rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
             value={quickAddValues.location}
             disabled={isSavingQuickAdd}
             onChange={(event) =>
@@ -458,7 +458,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
         </form>
       </section>
 
-      <section className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
+      <section className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,180px))]">
           <div className="relative">
             <Search
@@ -474,7 +474,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
           </div>
 
           <select
-            className="flex h-11 rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={categoryFilter}
             onChange={(event) => setCategoryFilter(event.target.value)}
           >
@@ -487,7 +487,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
           </select>
 
           <select
-            className="flex h-11 rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={locationFilter}
             onChange={(event) => setLocationFilter(event.target.value)}
           >
@@ -499,14 +499,14 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
             ))}
           </select>
 
-          <div className="flex items-center gap-2 rounded-md border border-input bg-plate-paper px-3 py-2">
+          <div className="flex items-center gap-2 rounded-md border border-input bg-gravy-paper px-3 py-2">
             <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <label className="sr-only" htmlFor="pantry-group-by">
               Group pantry items by
             </label>
             <select
               id="pantry-group-by"
-              className="w-full bg-transparent text-sm text-plate-charcoal focus-visible:outline-none"
+              className="w-full bg-transparent text-sm text-gravy-charcoal focus-visible:outline-none"
               value={groupBy}
               onChange={(event) => setGroupBy(event.target.value as GroupByMode)}
             >
@@ -519,7 +519,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
 
       {error ? (
         <div
-          className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+          className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown"
           role="alert"
         >
           {error}
@@ -528,7 +528,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
 
       {notice ? (
         <div
-          className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm text-plate-blue"
+          className="rounded-2xl border border-gravy-gold/25 bg-gravy-gold/10 px-4 py-3 text-sm text-gravy-brown"
           role="status"
         >
           {notice}
@@ -536,28 +536,28 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
       ) : null}
 
       {filteredItems.length === 0 ? (
-        <section className="rounded-2xl border border-dashed bg-white p-8 text-center shadow-subtle">
+        <section className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
           <Badge variant="terracotta">Pantry starter</Badge>
-          <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">
+          <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">
             {hasFilters ? "No pantry items match your filters." : "Your pantry is empty."}
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
             {hasFilters
               ? "Try a different search term or filter combination."
-              : "Add items you already have so Plate Plan can help you build meals and smarter grocery lists."}
+              : "Add items you already have so GravyTime can help you build meals and smarter grocery lists."}
           </p>
         </section>
       ) : (
         <div className="space-y-6">
           {groupedItems.map((group) => (
             <section key={group.key}>
-              <h2 className="mb-3 text-lg font-semibold text-plate-charcoal">{group.key}</h2>
+              <h2 className="mb-3 text-lg font-semibold text-gravy-charcoal">{group.key}</h2>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {group.items.map((item) => (
-                  <article key={item.id} className="rounded-2xl border bg-white p-4 shadow-subtle">
+                  <article key={item.id} className="rounded-2xl border bg-card p-4 shadow-subtle">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="truncate text-base font-semibold text-plate-charcoal">{item.name}</h3>
+                        <h3 className="truncate text-base font-semibold text-gravy-charcoal">{item.name}</h3>
                         <p className="mt-1 text-sm text-muted-foreground">
                           {formatItemAmount(item) || "Quantity optional"}
                         </p>
@@ -574,7 +574,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
                         </Button>
                         <Button
                           aria-label={`Delete ${item.name}`}
-                          className="h-9 w-9 rounded-lg px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+                          className="h-9 w-9 rounded-lg px-0 text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
                           disabled={isDeletingId === item.id}
                           type="button"
                           variant="ghost"
@@ -599,7 +599,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
                     ) : null}
 
                     {item.notes ? (
-                      <p className="mt-3 rounded-xl bg-plate-paper px-3 py-2 text-xs text-muted-foreground">
+                      <p className="mt-3 rounded-xl bg-gravy-paper px-3 py-2 text-xs text-muted-foreground">
                         {item.notes}
                       </p>
                     ) : null}
@@ -613,11 +613,11 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
 
       <FindRecipesFromPantry pantryItems={pantryItems} userId={userId} />
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Badge variant="blue">Cook from Pantry</Badge>
-            <h2 className="mt-3 text-2xl font-semibold text-plate-charcoal">What you can cook now</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-gravy-charcoal">What you can cook now</h2>
           </div>
         </div>
 
@@ -628,8 +628,8 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
         ) : (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {recommendations.slice(0, 9).map((recommendation) => (
-              <article key={recommendation.recipe.id} className="rounded-2xl border bg-plate-paper p-4">
-                <h3 className="text-base font-semibold text-plate-charcoal">{recommendation.recipe.title}</h3>
+              <article key={recommendation.recipe.id} className="rounded-2xl border bg-gravy-paper p-4">
+                <h3 className="text-base font-semibold text-gravy-charcoal">{recommendation.recipe.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {recommendation.comparison.availableCount}/{recommendation.comparison.totalCount} ingredients
                   available
@@ -738,9 +738,9 @@ function PantryItemFormModal({
       onClose={onClose}
     >
       <form onSubmit={onSubmit}>
-        <header className="border-b bg-white px-4 py-4 sm:px-6">
+        <header className="border-b bg-card px-4 py-4 sm:px-6">
           <Badge variant="default">Pantry item</Badge>
-          <h2 id="pantry-item-form-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+          <h2 id="pantry-item-form-title" className="mt-2 text-xl font-semibold text-gravy-charcoal">
             {isEditing ? "Edit pantry item" : "Add pantry item"}
           </h2>
           <p id="pantry-item-form-description" className="mt-1 text-sm text-muted-foreground">
@@ -792,7 +792,7 @@ function PantryItemFormModal({
               <Label htmlFor="pantryItemCategory">Category</Label>
               <select
                 id="pantryItemCategory"
-                className="flex h-11 w-full rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-11 w-full rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
                 value={formValues.category}
                 disabled={isSaving}
                 onChange={(event) =>
@@ -812,7 +812,7 @@ function PantryItemFormModal({
               <Label htmlFor="pantryItemLocation">Location</Label>
               <select
                 id="pantryItemLocation"
-                className="flex h-11 w-full rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-11 w-full rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
                 value={formValues.location}
                 disabled={isSaving}
                 onChange={(event) =>
@@ -853,7 +853,7 @@ function PantryItemFormModal({
             />
           </div>
 
-          <label className="flex items-center gap-3 rounded-xl border bg-plate-paper px-3 py-2">
+          <label className="flex items-center gap-3 rounded-xl border bg-gravy-paper px-3 py-2">
             <input
               type="checkbox"
               checked={formValues.isStaple}
@@ -862,11 +862,11 @@ function PantryItemFormModal({
                 onFormValuesChange({ ...formValues, isStaple: event.target.checked })
               }
             />
-            <span className="text-sm font-medium text-plate-charcoal">Mark as staple item</span>
+            <span className="text-sm font-medium text-gravy-charcoal">Mark as staple item</span>
           </label>
         </div>
 
-        <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
           <Button
             className="h-11 rounded-xl"
             disabled={isSaving}

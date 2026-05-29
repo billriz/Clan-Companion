@@ -3,7 +3,9 @@
 import { Download, Share2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import { Button } from "@/components/ui/button";
+import { BRAND } from "@/lib/brand";
 
 type PromptChoiceOutcome = "accepted" | "dismissed";
 
@@ -16,8 +18,8 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 const DISMISS_DURATION_MS = 1000 * 60 * 60 * 24 * 7;
-const NATIVE_DISMISSED_KEY = "plateplan_install_prompt_dismissed_at";
-const IOS_DISMISSED_KEY = "plateplan_ios_install_prompt_dismissed_at";
+const NATIVE_DISMISSED_KEY = "gravytime_install_prompt_dismissed_at";
+const IOS_DISMISSED_KEY = "gravytime_ios_install_prompt_dismissed_at";
 
 function hasRecentDismissal(storageKey: string) {
   if (typeof window === "undefined") {
@@ -153,16 +155,21 @@ export function InstallPrompt() {
   }
 
   return (
-    <section className="rounded-2xl border border-plate-blue/25 bg-plate-paper p-4 shadow-subtle">
+    <section className="rounded-2xl border border-gravy-gold/25 bg-gravy-paper p-4 shadow-subtle">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-base font-semibold text-plate-charcoal">Install Plate Plan</p>
+          <div className="mb-2 flex items-center gap-2">
+            <div className="w-9 shrink-0">
+              <BrandMark variant="icon" className="rounded-lg" />
+            </div>
+            <p className="text-base font-semibold text-gravy-charcoal">Install {BRAND.name}</p>
+          </div>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Add Plate Plan to your home screen for quick access to recipes, meal plans, and
+            Add {BRAND.name} to your home screen for quick access to recipes, meal plans, and
             shopping lists.
           </p>
           {mode === "ios" ? (
-            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-plate-terracotta">
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card/80 px-3 py-1 text-xs font-medium text-gravy-brown">
               <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
               On iPhone or iPad, tap Share, then Add to Home Screen.
             </p>

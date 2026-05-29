@@ -21,7 +21,7 @@ export default async function PantryLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="pantry" userEmail={user.email ?? "PlatePlan user"} userName={fullName}>
+    <AppShell activeItem="pantry" userEmail={user.email ?? "GravyTime user"} userName={fullName}>
       {children}
     </AppShell>
   );

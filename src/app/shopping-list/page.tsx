@@ -53,7 +53,7 @@ export default async function ShoppingListRoute() {
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Badge variant="blue">Weekly groceries</Badge>
-            <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+            <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
               Shopping List
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -65,7 +65,7 @@ export default async function ShoppingListRoute() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-5 text-sm leading-6 text-plate-terracotta shadow-subtle">
+        <section className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 p-5 text-sm leading-6 text-gravy-brown shadow-subtle">
           <p>Shopping list data could not be loaded. {loadError.message}</p>
           <div className="mt-4">
             <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/shopping-list">

@@ -29,8 +29,8 @@ export function ShoppingListItem({
   return (
     <article
       className={cn(
-        "rounded-2xl border bg-white p-4 shadow-subtle transition",
-        isChecked && "bg-plate-paper/70",
+        "rounded-2xl border bg-card p-4 shadow-subtle transition",
+        isChecked && "bg-gravy-paper/70",
       )}
     >
       <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-start gap-3">
@@ -53,7 +53,7 @@ export function ShoppingListItem({
           <div className="flex flex-wrap items-center gap-2">
             <h3
               className={cn(
-                "text-base font-semibold leading-6 text-plate-charcoal",
+                "text-base font-semibold leading-6 text-gravy-charcoal",
                 isChecked && "text-muted-foreground line-through",
               )}
             >
@@ -70,7 +70,7 @@ export function ShoppingListItem({
 
         <Button
           aria-label={`Delete ${item.name}`}
-          className="h-12 w-12 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+          className="h-12 w-12 rounded-xl px-0 text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
           disabled={isBusy}
           type="button"
           variant="ghost"

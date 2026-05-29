@@ -249,11 +249,11 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Badge variant="terracotta">{mode === "create" ? "New" : "Editing"}</Badge>
-            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-plate-charcoal">{title}</h1>
+            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-gravy-charcoal">{title}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{subtitle}</p>
           </div>
           <Link className={cn(buttonVariants({ variant: "secondary" }))} href="/recipes">
@@ -273,7 +273,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
 
       {warning ? (
         <div
-          className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+          className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown"
           role="status"
         >
           {warning}
@@ -282,7 +282,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
-          <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+          <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
             <div className="grid gap-5">
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
@@ -339,7 +339,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
                   <Label htmlFor="difficulty">Difficulty</Label>
                   <select
                     id="difficulty"
-                    className="flex h-11 w-full rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex h-11 w-full rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
                     value={values.difficulty}
                     disabled={isSaving}
                     onChange={(event) =>
@@ -379,10 +379,10 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
             </div>
           </section>
 
-          <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+          <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
+                <h2 className="text-xl font-semibold text-gravy-charcoal">Ingredients</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Quantity, unit, and ingredient name.</p>
               </div>
               <Button className="gap-2" type="button" variant="secondary" disabled={isSaving} onClick={addIngredient}>
@@ -395,7 +395,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
               {values.ingredients.map((ingredient, index) => (
                 <div
                   key={index}
-                  className="grid gap-3 rounded-xl border bg-plate-paper/70 p-3 sm:grid-cols-[90px_110px_minmax(0,1fr)_40px] sm:items-center"
+                  className="grid gap-3 rounded-xl border bg-gravy-paper/70 p-3 sm:grid-cols-[90px_110px_minmax(0,1fr)_40px] sm:items-center"
                 >
                   <Input
                     aria-label={`Ingredient ${index + 1} quantity`}
@@ -433,10 +433,10 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
             </div>
           </section>
 
-          <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+          <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-plate-charcoal">Instructions</h2>
+                <h2 className="text-xl font-semibold text-gravy-charcoal">Instructions</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Add the ordered cooking steps.</p>
               </div>
               <Button className="gap-2" type="button" variant="secondary" disabled={isSaving} onClick={addInstruction}>
@@ -449,7 +449,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
               {values.instructions.map((instruction, index) => (
                 <div
                   key={index}
-                  className="grid gap-3 rounded-xl border bg-plate-paper/70 p-3 sm:grid-cols-[40px_minmax(0,1fr)_40px]"
+                  className="grid gap-3 rounded-xl border bg-gravy-paper/70 p-3 sm:grid-cols-[40px_minmax(0,1fr)_40px]"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
                     {index + 1}
@@ -479,10 +479,10 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6 lg:sticky lg:top-20">
+          <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6 lg:sticky lg:top-20">
             <div className="flex items-center gap-2">
               <Camera className="h-5 w-5 text-primary" aria-hidden="true" />
-              <h2 className="text-lg font-semibold text-plate-charcoal">Recipe image</h2>
+              <h2 className="text-lg font-semibold text-gravy-charcoal">Recipe image</h2>
             </div>
 
             <div className="relative mt-4 aspect-video overflow-hidden rounded-2xl border bg-secondary">
@@ -502,7 +502,7 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
 
             <div className="mt-4 space-y-3">
               <Label
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-plate-paper px-4 py-2 text-sm font-medium text-plate-charcoal shadow-sm transition hover:bg-secondary"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-gravy-paper px-4 py-2 text-sm font-medium text-gravy-charcoal shadow-sm transition hover:bg-secondary"
                 htmlFor="recipeImage"
               >
                 <ImagePlus className="h-4 w-4 text-primary" aria-hidden="true" />

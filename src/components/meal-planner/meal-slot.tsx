@@ -29,13 +29,13 @@ export function MealSlot({
 }: MealSlotProps) {
   if (!plan) {
     return (
-      <section className="min-h-[164px] rounded-2xl border border-dashed border-primary/35 bg-white/70 p-3 shadow-subtle transition hover:-translate-y-0.5 hover:border-primary/60 hover:bg-white hover:shadow-soft">
+      <section className="min-h-[164px] rounded-2xl border border-dashed border-primary/35 bg-card/70 p-3 shadow-subtle transition hover:-translate-y-0.5 hover:border-primary/60 hover:bg-card hover:shadow-soft">
         <div className="flex h-full min-h-[138px] flex-col items-center justify-center gap-3 text-center">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <CalendarPlus className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-plate-charcoal">{mealType}</h3>
+            <h3 className="text-sm font-semibold text-gravy-charcoal">{mealType}</h3>
             <p className="mt-1 text-xs text-muted-foreground">No meal planned</p>
           </div>
           <Button className="h-10 gap-2 rounded-xl px-4" type="button" onClick={() => onAdd(dateKey, mealType)}>
@@ -51,13 +51,13 @@ export function MealSlot({
   const prepTime = formatMinutes(recipe?.prep_time);
 
   return (
-    <section className="min-h-[164px] rounded-2xl border bg-white p-3 shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
+    <section className="min-h-[164px] rounded-2xl border bg-card p-3 shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
       <div className="flex h-full min-h-[138px] flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-primary">{mealType}</h3>
           <Button
             aria-label={`Remove ${recipe?.title ?? "meal"} from ${mealType}`}
-            className="h-10 w-10 rounded-xl px-0 text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+            className="h-10 w-10 rounded-xl px-0 text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
             disabled={isRemoving}
             type="button"
             variant="ghost"
@@ -82,7 +82,7 @@ export function MealSlot({
             )}
           </div>
           <div className="min-w-0">
-            <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-plate-charcoal">
+            <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-gravy-charcoal">
               {recipe?.title ?? "Saved meal"}
             </h4>
             <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">

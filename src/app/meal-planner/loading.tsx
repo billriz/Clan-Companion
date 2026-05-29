@@ -1,6 +1,10 @@
+import { BrandLoadingState } from "@/components/brand/brand-loading-state";
+
 export default function MealPlannerLoading() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <BrandLoadingState label="Loading meal planner" />
+
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
           <div className="h-7 w-24 animate-pulse rounded-full bg-secondary" />
@@ -10,7 +14,7 @@ export default function MealPlannerLoading() {
         <div className="h-14 w-14 animate-pulse rounded-2xl bg-secondary" />
       </section>
 
-      <div className="rounded-2xl border bg-white p-5 shadow-subtle">
+      <div className="rounded-2xl border bg-card p-5 shadow-subtle">
         <div className="h-8 w-56 animate-pulse rounded bg-secondary" />
         <div className="mt-4 flex gap-2">
           <div className="h-11 w-11 animate-pulse rounded-xl bg-secondary" />

@@ -119,13 +119,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <section className="grid gap-6 rounded-2xl border bg-white p-5 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end sm:p-6">
+      <section className="grid gap-6 rounded-2xl border bg-card p-5 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end sm:p-6">
         <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-plate-paper px-3 py-1 text-sm font-medium text-plate-olive shadow-subtle">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-gravy-paper px-3 py-1 text-sm font-medium text-gravy-brown shadow-subtle">
             <ChefHat className="h-4 w-4" aria-hidden="true" />
-            Welcome to PlatePlan
+            Welcome to GravyTime
           </div>
-          <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Hello, {userName}. Your planning workspace is ready.
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -198,9 +198,9 @@ export default async function DashboardPage() {
           </section>
 
           {!hasAnyData ? (
-            <section className="rounded-2xl border border-dashed bg-plate-paper/70 p-6 shadow-subtle">
+            <section className="rounded-2xl border border-dashed bg-gravy-paper/70 p-6 shadow-subtle">
               <Badge variant="terracotta">Get started</Badge>
-              <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">Set up your first planning cycle</h2>
+              <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Set up your first planning cycle</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
                 Start by creating a few recipes. Then add meals to this week and generate your
                 shopping list from those ingredients.

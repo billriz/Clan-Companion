@@ -4,7 +4,7 @@ export function RecipeLoadingGrid() {
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
-          className="min-h-[420px] overflow-hidden rounded-2xl border bg-white shadow-subtle"
+          className="min-h-[420px] overflow-hidden rounded-2xl border bg-card shadow-subtle"
         >
           <div className="aspect-video animate-pulse bg-secondary" />
           <div className="space-y-4 p-4">

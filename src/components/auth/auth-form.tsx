@@ -132,7 +132,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
 
       {message ? (
         <div
-          className="rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-plate-olive"
+          className="rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-primary"
           role="status"
         >
           {message}
@@ -140,7 +140,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
       ) : null}
 
       <Button className="w-full" type="submit" disabled={isLoading}>
-        {isLoading ? "Please wait..." : isSignup ? "Create account" : "Log in"}
+        {isLoading ? "Please wait..." : isSignup ? "Start planning" : "Log in"}
       </Button>
     </form>
   );

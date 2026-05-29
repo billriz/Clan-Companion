@@ -1,4 +1,4 @@
--- Run this in the Supabase SQL editor for the PlatePlan project.
+-- Run this in the Supabase SQL editor for the GravyTime project.
 -- This creates the Phase 3 weekly meal planner table and RLS policies.
 
 create table if not exists public.meal_plans (

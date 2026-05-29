@@ -381,7 +381,7 @@ export function ShoppingListPage({
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Weekly groceries</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Shopping List
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -395,25 +395,25 @@ export function ShoppingListPage({
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Items total</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{totalCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{totalCount}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Checked</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{checkedCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{checkedCount}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Planned meals</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{mealPlanCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{mealPlanCount}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Progress</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{progressPercent}%</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{progressPercent}%</p>
         </div>
       </section>
 
-      <section className="grid gap-4 rounded-2xl border bg-white p-4 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center sm:p-5">
+      <section className="grid gap-4 rounded-2xl border bg-card p-4 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center sm:p-5">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="default">Current week</Badge>
@@ -487,7 +487,7 @@ export function ShoppingListPage({
             Add Item
           </Button>
           <Button
-            className="h-11 gap-2 rounded-xl text-plate-terracotta hover:bg-plate-terracotta/10 hover:text-plate-terracotta"
+            className="h-11 gap-2 rounded-xl text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
             disabled={isBusy || checkedCount === 0}
             type="button"
             variant="ghost"
@@ -501,7 +501,7 @@ export function ShoppingListPage({
 
       {error ? (
         <div
-          className="flex flex-col gap-3 rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm leading-6 text-plate-terracotta shadow-subtle sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-3 rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm leading-6 text-gravy-brown shadow-subtle sm:flex-row sm:items-center sm:justify-between"
           role="alert"
         >
           <span>{error}</span>
@@ -514,7 +514,7 @@ export function ShoppingListPage({
 
       {notice ? (
         <div
-          className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm leading-6 text-plate-blue shadow-subtle"
+          className="rounded-2xl border border-gravy-gold/25 bg-gravy-gold/10 px-4 py-3 text-sm leading-6 text-gravy-brown shadow-subtle"
           role="status"
         >
           {notice}
@@ -608,11 +608,9 @@ function EmptyShoppingList({
 }) {
   if (mealPlanCount === 0) {
     return (
-      <section className="rounded-2xl border border-dashed bg-white p-8 text-center shadow-subtle">
+      <section className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
         <Badge variant="terracotta">No meals planned</Badge>
-        <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">
-          No meals planned for this week yet.
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Add meals to build your shopping list.</h2>
         <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
           Add recipes to the meal planner first, then come back to turn those ingredients into a
           grocery run.
@@ -626,9 +624,9 @@ function EmptyShoppingList({
   }
 
   return (
-    <section className="rounded-2xl border border-dashed bg-white p-8 text-center shadow-subtle">
+    <section className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
       <Badge variant="default">Ready to build</Badge>
-      <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">Your shopping list is empty.</h2>
+      <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Add meals to build your shopping list.</h2>
       <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
         Generate a list from planned recipes for the current week, then add any household extras by
         hand.
@@ -658,7 +656,7 @@ function ShoppingListSkeleton() {
             {[0, 1].map((itemIndex) => (
               <div
                 key={`${sectionIndex}-${itemIndex}`}
-                className="rounded-2xl border bg-white p-4 shadow-subtle"
+                className="rounded-2xl border bg-card p-4 shadow-subtle"
               >
                 <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] gap-3">
                   <div className="h-12 w-12 animate-pulse rounded-xl bg-muted" />

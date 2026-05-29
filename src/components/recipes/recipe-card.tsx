@@ -35,10 +35,10 @@ export function RecipeCard({ recipe, onAddToPlan }: RecipeCardProps) {
   }
 
   return (
-    <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border bg-white text-plate-charcoal shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
+    <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border bg-card text-gravy-charcoal shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
       <Link
         aria-label={`View ${recipe.title}`}
-        className="group flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-plate-cream"
+        className="group flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-gravy-cream"
         href={`/recipes/${recipe.id}`}
       >
         <div className="relative aspect-video overflow-hidden rounded-t-2xl bg-secondary">
@@ -58,7 +58,7 @@ export function RecipeCard({ recipe, onAddToPlan }: RecipeCardProps) {
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-3">
-              <h2 className="line-clamp-2 text-lg font-semibold leading-6 text-plate-charcoal">
+              <h2 className="line-clamp-2 text-lg font-semibold leading-6 text-gravy-charcoal">
                 {recipe.title}
               </h2>
               <Badge className="shrink-0" variant={recipe.category ? "blue" : "terracotta"}>
@@ -101,7 +101,7 @@ export function RecipeCard({ recipe, onAddToPlan }: RecipeCardProps) {
           onClick={() => setIsFavorite((current) => !current)}
         >
           <Heart
-            className={isFavorite ? "h-4 w-4 fill-plate-terracotta text-plate-terracotta" : "h-4 w-4"}
+            className={isFavorite ? "h-4 w-4 fill-gravy-brown text-gravy-brown" : "h-4 w-4"}
             aria-hidden="true"
           />
         </Button>

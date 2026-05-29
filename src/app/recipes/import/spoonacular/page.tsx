@@ -17,11 +17,11 @@ export default function SpoonacularImportPage() {
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Recipe import</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Import from Spoonacular
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-            Search online recipes and save them to your PlatePlan library.
+            Search online recipes and save them to your GravyTime library.
           </p>
         </div>
         <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import">

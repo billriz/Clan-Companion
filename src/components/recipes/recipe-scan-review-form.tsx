@@ -181,19 +181,19 @@ export function RecipeScanReviewForm({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 p-4 text-sm text-plate-blue sm:p-5">
+      <section className="rounded-2xl border border-gravy-gold/25 bg-gravy-gold/10 p-4 text-sm text-gravy-brown sm:p-5">
         <p className="font-semibold">{confidenceMessage}</p>
       </section>
 
       {values.warnings.length > 0 ? (
-        <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-4 sm:p-5">
+        <section className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 p-4 sm:p-5">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-plate-terracotta" aria-hidden="true" />
-            <h2 className="text-sm font-semibold text-plate-terracotta">Warnings</h2>
+            <AlertTriangle className="h-4 w-4 text-gravy-brown" aria-hidden="true" />
+            <h2 className="text-sm font-semibold text-gravy-brown">Warnings</h2>
           </div>
-          <ul className="mt-3 space-y-2 text-sm text-plate-charcoal">
+          <ul className="mt-3 space-y-2 text-sm text-gravy-charcoal">
             {values.warnings.map((warning) => (
-              <li key={warning} className="rounded-lg bg-white/70 px-3 py-2">
+              <li key={warning} className="rounded-lg bg-card/70 px-3 py-2">
                 {warning}
               </li>
             ))}
@@ -207,8 +207,8 @@ export function RecipeScanReviewForm({
         </section>
       ) : null}
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
-        <h2 className="text-xl font-semibold text-plate-charcoal">Review Recipe</h2>
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
+        <h2 className="text-xl font-semibold text-gravy-charcoal">Review Recipe</h2>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
@@ -340,9 +340,9 @@ export function RecipeScanReviewForm({
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
+          <h2 className="text-xl font-semibold text-gravy-charcoal">Ingredients</h2>
           <Button className="gap-2" type="button" variant="secondary" onClick={addIngredient}>
             <Plus className="h-4 w-4" aria-hidden="true" />
             Add ingredient
@@ -357,7 +357,7 @@ export function RecipeScanReviewForm({
               <div
                 key={`ingredient-${index}`}
                 className={`rounded-xl border p-4 ${
-                  isLowConfidence ? "border-plate-terracotta/45 bg-plate-terracotta/5" : "bg-plate-paper"
+                  isLowConfidence ? "border-gravy-brown/45 bg-gravy-brown/5" : "bg-gravy-paper"
                 }`}
               >
                 <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -426,7 +426,7 @@ export function RecipeScanReviewForm({
                     value={ingredient.preparation ?? ""}
                     onChange={(event) => updateIngredient(index, "preparation", event.target.value || null)}
                   />
-                  <label className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm">
+                  <label className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm">
                     <input
                       checked={ingredient.optional}
                       className="h-4 w-4"
@@ -442,9 +442,9 @@ export function RecipeScanReviewForm({
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-xl font-semibold text-plate-charcoal">Instructions</h2>
+          <h2 className="text-xl font-semibold text-gravy-charcoal">Instructions</h2>
           <Button className="gap-2" type="button" variant="secondary" onClick={addInstruction}>
             <Plus className="h-4 w-4" aria-hidden="true" />
             Add step
@@ -459,7 +459,7 @@ export function RecipeScanReviewForm({
               <div
                 key={`instruction-${index}`}
                 className={`rounded-xl border p-4 ${
-                  isLowConfidence ? "border-plate-terracotta/45 bg-plate-terracotta/5" : "bg-plate-paper"
+                  isLowConfidence ? "border-gravy-brown/45 bg-gravy-brown/5" : "bg-gravy-paper"
                 }`}
               >
                 <div className="mb-3 flex items-center gap-2">
@@ -517,7 +517,7 @@ export function RecipeScanReviewForm({
         </div>
       </section>
 
-      <footer className="flex flex-col gap-2 rounded-2xl border bg-white p-4 shadow-subtle sm:flex-row sm:justify-end">
+      <footer className="flex flex-col gap-2 rounded-2xl border bg-card p-4 shadow-subtle sm:flex-row sm:justify-end">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

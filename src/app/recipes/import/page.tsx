@@ -16,11 +16,11 @@ export default function ImportRecipesPage() {
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Recipe import</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Import Recipes
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-            Choose how you want to bring recipes into your PlatePlan library.
+            Choose how you want to bring recipes into your GravyTime library.
           </p>
         </div>
         <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes">
@@ -30,11 +30,11 @@ export default function ImportRecipesPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-3">
-        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-plate-terracotta/10 text-plate-terracotta">
+        <article className="rounded-2xl border bg-card p-6 shadow-subtle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gravy-brown/10 text-gravy-brown">
             <PenSquare className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Manual Entry</h2>
+          <h2 className="mt-5 text-2xl font-semibold text-gravy-charcoal">Manual Entry</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Add your own recipe details by hand with full control over ingredients and steps.
           </p>
@@ -43,11 +43,11 @@ export default function ImportRecipesPage() {
           </Link>
         </article>
 
-        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
+        <article className="rounded-2xl border bg-card p-6 shadow-subtle">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Sparkles className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Import from Spoonacular</h2>
+          <h2 className="mt-5 text-2xl font-semibold text-gravy-charcoal">Import from Spoonacular</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Browse online recipe ideas and import them with ingredients and instructions.
           </p>
@@ -56,11 +56,11 @@ export default function ImportRecipesPage() {
           </Link>
         </article>
 
-        <article className="rounded-2xl border bg-white p-6 shadow-subtle">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-plate-blue/10 text-plate-blue">
+        <article className="rounded-2xl border bg-card p-6 shadow-subtle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gravy-gold/10 text-gravy-brown">
             <Camera className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-2xl font-semibold text-plate-charcoal">Scan Recipe</h2>
+          <h2 className="mt-5 text-2xl font-semibold text-gravy-charcoal">Scan Recipe</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Upload or take a photo of a recipe card, cookbook snippet, or handwritten recipe.
           </p>

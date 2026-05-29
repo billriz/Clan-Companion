@@ -99,10 +99,10 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
+      <div className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-plate-charcoal">Recipe library</h2>
+            <h2 className="text-lg font-semibold text-gravy-charcoal">Recipe library</h2>
             <p className="text-sm text-muted-foreground">
               {filteredRecipes.length} of {recipes.length} recipes shown
             </p>
@@ -155,8 +155,8 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
                   isActive
                     ? "border-primary bg-primary text-primary-foreground shadow-subtle"
                     : filter.type === "category"
-                      ? "border-plate-blue/25 bg-plate-blue/10 text-plate-blue hover:bg-plate-blue/15"
-                      : "border-border bg-plate-paper text-muted-foreground hover:bg-secondary hover:text-plate-charcoal",
+                      ? "border-gravy-gold/25 bg-gravy-gold/10 text-gravy-brown hover:bg-gravy-gold/15"
+                      : "border-border bg-gravy-paper text-muted-foreground hover:bg-secondary hover:text-gravy-charcoal",
                 )}
                 type="button"
                 onClick={() => setActiveFilter(filter.value)}
@@ -176,11 +176,11 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
         </div>
       ) : (
         <div
-          className="rounded-2xl border border-dashed bg-plate-paper p-8 text-center shadow-subtle"
+          className="rounded-2xl border border-dashed bg-gravy-paper p-8 text-center shadow-subtle"
           role="status"
         >
           <Badge variant="neutral">No matches</Badge>
-          <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">No recipes found</h2>
+          <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">No recipes found</h2>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
             Try a different search term or clear the active filter to bring more recipes back into
             view.
@@ -206,9 +206,9 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
 
 function RecipeEmptyState() {
   return (
-    <div className="rounded-2xl border border-dashed bg-plate-paper p-8 text-center shadow-subtle">
+    <div className="rounded-2xl border border-dashed bg-gravy-paper p-8 text-center shadow-subtle">
       <Badge variant="terracotta">Recipe library</Badge>
-      <h2 className="mt-4 text-2xl font-semibold text-plate-charcoal">Save your first recipe</h2>
+      <h2 className="mt-4 text-2xl font-semibold text-gravy-charcoal">Your recipe box is waiting.</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
         Add family favorites, weeknight staples, and recipes you want ready when planning begins.
       </p>

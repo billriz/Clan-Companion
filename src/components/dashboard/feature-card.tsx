@@ -18,8 +18,8 @@ type FeatureCardProps = {
 
 const toneClasses: Record<FeatureTone, string> = {
   sage: "bg-primary/10 text-primary",
-  terracotta: "bg-plate-terracotta/15 text-plate-terracotta",
-  blue: "bg-plate-blue/15 text-plate-blue",
+  terracotta: "bg-gravy-brown/15 text-gravy-brown",
+  blue: "bg-gravy-gold/15 text-gravy-brown",
 };
 
 export function FeatureCard({

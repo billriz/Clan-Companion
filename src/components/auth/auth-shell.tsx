@@ -1,6 +1,8 @@
-import { ChefHat, Sprout, Utensils } from "lucide-react";
+import { ClipboardList, Sprout, Utensils } from "lucide-react";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { BRAND } from "@/lib/brand";
 
 type AuthShellProps = {
   eyebrow: string;
@@ -12,63 +14,61 @@ type AuthShellProps = {
 
 export function AuthShell({ eyebrow, title, description, footer, children }: AuthShellProps) {
   return (
-    <main className="grid min-h-screen bg-plate-cream lg:grid-cols-[minmax(0,1fr)_480px]">
-      <section className="hidden border-r bg-plate-paper px-10 py-12 lg:flex lg:flex-col lg:justify-between">
-        <div className="flex items-center gap-3 text-plate-charcoal">
-          <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-subtle">
-            <ChefHat className="h-6 w-6" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-lg font-semibold">PlatePlan</p>
-            <p className="text-sm text-muted-foreground">Recipe planning workspace</p>
-          </div>
+    <main className="grid min-h-screen bg-gravy-cream lg:grid-cols-[minmax(0,1fr)_500px]">
+      <section className="hidden border-r bg-gravy-paper px-10 py-12 lg:flex lg:flex-col lg:justify-between">
+        <div className="max-w-xs">
+          <BrandMark className="max-w-[12.5rem]" priority />
+          <p className="mt-3 text-sm text-muted-foreground">{BRAND.tagline}</p>
         </div>
 
         <div className="max-w-xl">
           <div className="mb-8 grid max-w-md grid-cols-2 gap-3">
-            <div className="rounded-lg border bg-plate-cream p-5 shadow-subtle">
+            <div className="rounded-lg border bg-gravy-cream p-5 shadow-subtle">
               <Utensils className="mb-8 h-7 w-7 text-primary" aria-hidden="true" />
-              <p className="text-sm font-medium text-plate-charcoal">Recipes</p>
+              <p className="text-sm font-medium text-gravy-charcoal">Recipes</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Save the meals worth repeating.
               </p>
             </div>
-            <div className="rounded-lg border bg-[#F4E7DF] p-5 shadow-subtle">
-              <Sprout className="mb-8 h-7 w-7 text-plate-terracotta" aria-hidden="true" />
-              <p className="text-sm font-medium text-plate-charcoal">Weekly rhythm</p>
+            <div className="rounded-lg border bg-gravy-gold/12 p-5 shadow-subtle">
+              <Sprout className="mb-8 h-7 w-7 text-gravy-brown" aria-hidden="true" />
+              <p className="text-sm font-medium text-gravy-charcoal">Meal plans</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Keep planning quiet and organized.
+                Build your week in a calm, flexible planner.
               </p>
             </div>
+          </div>
+          <div className="mb-6 rounded-lg border bg-gravy-cream p-5 shadow-subtle">
+            <ClipboardList className="mb-8 h-7 w-7 text-gravy-brown" aria-hidden="true" />
+            <p className="text-sm font-medium text-gravy-charcoal">Shopping lists</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Turn planned meals into organized grocery lists in one click.
+            </p>
           </div>
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-primary">
             {eyebrow}
           </p>
-          <h1 className="mt-3 max-w-lg text-4xl font-semibold tracking-normal text-plate-charcoal">
+          <h1 className="mt-3 max-w-lg text-4xl font-semibold tracking-normal text-gravy-charcoal">
             {title}
           </h1>
           <p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">{description}</p>
         </div>
 
-        <p className="text-sm text-muted-foreground">Built for meals, lists, and calmer weeks.</p>
+        <p className="text-sm text-muted-foreground">
+          Save your favorite recipes, plan your week, and turn meals into organized shopping lists.
+        </p>
       </section>
 
       <section className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:min-h-0">
         <Card className="w-full max-w-md shadow-soft">
           <CardHeader>
             <div className="mb-5 flex items-center gap-3 lg:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <ChefHat className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <div>
-                <p className="font-semibold text-plate-charcoal">PlatePlan</p>
-                <p className="text-sm text-muted-foreground">Recipe planning workspace</p>
-              </div>
+              <BrandMark className="max-w-[9.5rem]" />
             </div>
             <p className="text-sm font-medium uppercase tracking-[0.16em] text-primary">
               {eyebrow}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-normal text-plate-charcoal">
+            <h2 className="mt-2 text-2xl font-semibold tracking-normal text-gravy-charcoal">
               {title}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>

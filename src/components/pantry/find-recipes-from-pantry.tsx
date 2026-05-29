@@ -66,7 +66,7 @@ type SelectablePantryIngredient = {
 };
 
 const NO_PANTRY_ITEMS_MESSAGE =
-  "Add a few pantry items first, then Plate Plan can help find recipes you can make.";
+  "Add a few pantry items first, then GravyTime can help find recipes you can make.";
 const NO_SELECTION_MESSAGE = "Select at least one pantry item to search for recipes.";
 const NO_RESULTS_MESSAGE =
   "No recipes found with those pantry items. Try selecting more ingredients.";
@@ -228,7 +228,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
       showToast({
         variant: "success",
         title: "Already in your library",
-        message: "This recipe is already saved in Plate Plan.",
+        message: "This recipe is already saved in GravyTime.",
         recipeId: existingRecipe.recipeId,
       });
       return;
@@ -284,7 +284,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
           payload.message ??
           (payload.alreadyImported
             ? "This recipe was already saved to your library."
-            : "Recipe saved to your Plate Plan library."),
+            : "Recipe saved to your GravyTime library."),
         recipeId: savedRecipe.id,
       });
     } catch {
@@ -301,11 +301,11 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
   const emptyStateMessage = hasSearched && !isSearching && results.length === 0 ? NO_RESULTS_MESSAGE : null;
 
   return (
-    <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+    <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <Badge variant="blue">Find recipes from pantry</Badge>
-          <h2 className="mt-3 text-2xl font-semibold text-plate-charcoal">Find recipes from your pantry</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-gravy-charcoal">Find recipes from your pantry</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Select pantry items and search for recipes you can make with what you already have.
           </p>
@@ -316,14 +316,14 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
       </div>
 
       {selectableIngredients.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-dashed bg-plate-paper p-5 text-sm text-muted-foreground">
+        <div className="mt-5 rounded-2xl border border-dashed bg-gravy-paper p-5 text-sm text-muted-foreground">
           {NO_PANTRY_ITEMS_MESSAGE}
         </div>
       ) : (
         <>
-          <div className="mt-5 rounded-2xl border bg-plate-paper p-4">
+          <div className="mt-5 rounded-2xl border bg-gravy-paper p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-medium text-plate-charcoal">
+              <p className="text-sm font-medium text-gravy-charcoal">
                 {selectedIngredients.length} of {selectableIngredients.length} selected
               </p>
               <div className="flex flex-wrap gap-2">
@@ -347,8 +347,8 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
                     className={cn(
                       "flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-2 text-sm transition",
                       isSelected
-                        ? "border-plate-blue/70 bg-plate-blue/10"
-                        : "border-border bg-white hover:border-plate-blue/40",
+                        ? "border-gravy-gold/70 bg-gravy-gold/10"
+                        : "border-border bg-card hover:border-gravy-gold/40",
                     )}
                   >
                     <input
@@ -358,7 +358,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
                       onChange={() => toggleIngredientSelection(ingredient.key)}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block font-medium text-plate-charcoal">{ingredient.name}</span>
+                      <span className="block font-medium text-gravy-charcoal">{ingredient.name}</span>
                       <span className="text-xs text-muted-foreground">
                         {ingredient.category ?? "Other"}
                         {isNonFood ? " (not selected by default)" : ""}
@@ -388,7 +388,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
 
           {searchError ? (
             <div
-              className="mt-4 flex items-start gap-3 rounded-2xl border border-plate-terracotta/35 bg-plate-terracotta/10 p-4 text-sm text-plate-terracotta"
+              className="mt-4 flex items-start gap-3 rounded-2xl border border-gravy-brown/35 bg-gravy-brown/10 p-4 text-sm text-gravy-brown"
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -398,7 +398,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
 
           {notice ? (
             <div
-              className="mt-4 rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm text-plate-blue"
+              className="mt-4 rounded-2xl border border-gravy-gold/25 bg-gravy-gold/10 px-4 py-3 text-sm text-gravy-brown"
               role="status"
             >
               {notice}
@@ -407,7 +407,7 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
 
           <div className="mt-5">
             {isSearching ? (
-              <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed bg-plate-paper p-8 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed bg-gravy-paper p-8 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Looking up recipes...
               </div>
@@ -432,9 +432,9 @@ export function FindRecipesFromPantry({ pantryItems, userId }: FindRecipesFromPa
                 })}
               </div>
             ) : emptyStateMessage ? (
-              <div className="rounded-2xl border border-dashed bg-plate-paper p-8 text-center">
+              <div className="rounded-2xl border border-dashed bg-gravy-paper p-8 text-center">
                 <Badge variant="neutral">No results</Badge>
-                <h3 className="mt-3 text-xl font-semibold text-plate-charcoal">No recipes found</h3>
+                <h3 className="mt-3 text-xl font-semibold text-gravy-charcoal">No recipes found</h3>
                 <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                   {emptyStateMessage}
                 </p>
@@ -502,7 +502,7 @@ function PantryRecipeResultCard({
   const missedPreview = recipe.missedIngredients.slice(0, 3).map((ingredient) => ingredient.name);
 
   return (
-    <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border bg-white shadow-subtle">
+    <article className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border bg-card shadow-subtle">
       <div className="relative aspect-video overflow-hidden rounded-t-2xl bg-secondary">
         {recipe.image ? (
           <Image
@@ -518,24 +518,24 @@ function PantryRecipeResultCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
-        <h3 className="line-clamp-2 text-lg font-semibold text-plate-charcoal">{recipe.title}</h3>
+        <h3 className="line-clamp-2 text-lg font-semibold text-gravy-charcoal">{recipe.title}</h3>
 
         <div className="grid grid-cols-2 gap-2 text-xs font-medium text-muted-foreground">
-          <span className="rounded-lg bg-plate-paper px-2 py-1">
+          <span className="rounded-lg bg-gravy-paper px-2 py-1">
             Used: {recipe.usedIngredientCount}
           </span>
-          <span className="rounded-lg bg-plate-paper px-2 py-1">
+          <span className="rounded-lg bg-gravy-paper px-2 py-1">
             Missing: {recipe.missedIngredientCount}
           </span>
         </div>
 
         <div className="space-y-1 text-xs text-muted-foreground">
           <p className="line-clamp-2">
-            <span className="font-medium text-plate-charcoal">Used:</span>{" "}
+            <span className="font-medium text-gravy-charcoal">Used:</span>{" "}
             {usedPreview.length > 0 ? usedPreview.join(", ") : "None listed"}
           </p>
           <p className="line-clamp-2">
-            <span className="font-medium text-plate-charcoal">Missing:</span>{" "}
+            <span className="font-medium text-gravy-charcoal">Missing:</span>{" "}
             {missedPreview.length > 0 ? missedPreview.join(", ") : "None listed"}
           </p>
         </div>
@@ -577,7 +577,7 @@ function PantryRecipeResultCard({
       </div>
 
       {importMeta ? (
-        <div className="border-t border-border/60 bg-plate-paper px-4 py-3">
+        <div className="border-t border-border/60 bg-gravy-paper px-4 py-3">
           <Link className="text-sm font-medium text-primary hover:underline" href={`/recipes/${importMeta.recipeId}`}>
             View saved recipe
           </Link>
@@ -616,10 +616,10 @@ function PantryRecipeDetailsModal({
     >
       {recipe ? (
         <>
-          <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+          <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
             <div>
               <Badge variant="blue">Recipe details</Badge>
-              <h2 id="pantry-recipe-preview-title" className="mt-2 text-2xl font-semibold text-plate-charcoal">
+              <h2 id="pantry-recipe-preview-title" className="mt-2 text-2xl font-semibold text-gravy-charcoal">
                 {recipe.title}
               </h2>
             </div>
@@ -650,13 +650,13 @@ function PantryRecipeDetailsModal({
             </div>
 
             <div className="grid gap-3 text-sm sm:grid-cols-2">
-              <div className="rounded-xl border bg-plate-paper p-3">
+              <div className="rounded-xl border bg-gravy-paper p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Used ingredients</p>
-                <p className="mt-2 text-lg font-semibold text-plate-charcoal">{recipe.usedIngredientCount}</p>
+                <p className="mt-2 text-lg font-semibold text-gravy-charcoal">{recipe.usedIngredientCount}</p>
               </div>
-              <div className="rounded-xl border bg-plate-paper p-3">
+              <div className="rounded-xl border bg-gravy-paper p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Missing ingredients</p>
-                <p className="mt-2 text-lg font-semibold text-plate-charcoal">{recipe.missedIngredientCount}</p>
+                <p className="mt-2 text-lg font-semibold text-gravy-charcoal">{recipe.missedIngredientCount}</p>
               </div>
             </div>
 
@@ -676,11 +676,11 @@ function PantryRecipeDetailsModal({
             </div>
 
             <p id="pantry-recipe-preview-description" className="text-sm text-muted-foreground">
-              Save this recipe to import full instructions and nutrition details into Plate Plan.
+              Save this recipe to import full instructions and nutrition details into GravyTime.
             </p>
           </div>
 
-          <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6">
+          <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6">
             {importMeta ? (
               <Link className="text-sm font-medium text-primary hover:underline" href={`/recipes/${importMeta.recipeId}`}>
                 View saved recipe
@@ -737,21 +737,21 @@ function IngredientList({
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-plate-charcoal">{title}</h3>
+        <h3 className="text-sm font-semibold text-gravy-charcoal">{title}</h3>
         <Badge variant={tone}>{ingredients.length}</Badge>
       </div>
 
       {ingredients.length > 0 ? (
         <ul className="space-y-2">
           {ingredients.map((ingredient, index) => (
-            <li key={`${ingredient.name}-${index}`} className="rounded-xl border bg-white px-3 py-2 text-sm">
-              <p className="font-medium text-plate-charcoal">{ingredient.name}</p>
+            <li key={`${ingredient.name}-${index}`} className="rounded-xl border bg-card px-3 py-2 text-sm">
+              <p className="font-medium text-gravy-charcoal">{ingredient.name}</p>
               <p className="text-xs text-muted-foreground">{ingredient.original ?? formatIngredientAmount(ingredient)}</p>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="rounded-xl border border-dashed bg-plate-paper px-3 py-3 text-xs text-muted-foreground">
+        <p className="rounded-xl border border-dashed bg-gravy-paper px-3 py-3 text-xs text-muted-foreground">
           {emptyMessage}
         </p>
       )}
@@ -770,14 +770,14 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
   }
 
   return (
-    <div className="fixed bottom-24 right-4 z-[70] w-[min(24rem,calc(100vw-2rem))] rounded-2xl border bg-white p-4 shadow-soft lg:bottom-6">
+    <div className="fixed bottom-24 right-4 z-[70] w-[min(24rem,calc(100vw-2rem))] rounded-2xl border bg-card p-4 shadow-soft lg:bottom-6">
       <div className="flex items-start gap-3">
         <div
           className={cn(
             "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
             toast.variant === "success"
               ? "bg-primary/15 text-primary"
-              : "bg-plate-terracotta/15 text-plate-terracotta",
+              : "bg-gravy-brown/15 text-gravy-brown",
           )}
         >
           {toast.variant === "success" ? (
@@ -788,7 +788,7 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-plate-charcoal">{toast.title}</p>
+          <p className="font-semibold text-gravy-charcoal">{toast.title}</p>
           <p className="mt-1 text-sm leading-5 text-muted-foreground">{toast.message}</p>
           {toast.recipeId ? (
             <Link className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline" href={`/recipes/${toast.recipeId}`}>
@@ -800,7 +800,7 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
 
         <button
           aria-label="Close notification"
-          className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-plate-charcoal"
+          className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-gravy-charcoal"
           type="button"
           onClick={onClose}
         >

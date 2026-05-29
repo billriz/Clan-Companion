@@ -100,7 +100,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           )}
         </div>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
           <div className="flex flex-wrap gap-2">
             {recipeWithPreviewUrl.category ? (
               <Badge variant="blue">{recipeWithPreviewUrl.category}</Badge>
@@ -113,7 +113,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
             ))}
           </div>
 
-          <h1 className="mt-5 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-5 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             {recipeWithPreviewUrl.title}
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
@@ -140,8 +140,8 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
-          <h2 className="text-xl font-semibold text-plate-charcoal">Ingredients</h2>
+        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
+          <h2 className="text-xl font-semibold text-gravy-charcoal">Ingredients</h2>
           <div className="mt-5">
             <RecipePantryInsights
               ingredients={ingredients}
@@ -152,8 +152,8 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           </div>
         </div>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
-          <h2 className="text-xl font-semibold text-plate-charcoal">Instructions</h2>
+        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
+          <h2 className="text-xl font-semibold text-gravy-charcoal">Instructions</h2>
           {instructions.length > 0 ? (
             <ol className="mt-5 space-y-4" aria-label="Cooking steps">
               {instructions.map((instruction, index) => (
@@ -161,7 +161,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
                   <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
                     {index + 1}
                   </span>
-                  <p className="pt-2 text-sm leading-6 text-plate-charcoal">{instruction}</p>
+                  <p className="pt-2 text-sm leading-6 text-gravy-charcoal">{instruction}</p>
                 </li>
               ))}
             </ol>
@@ -206,12 +206,12 @@ type RecipeMetaProps = {
 
 function RecipeMeta({ icon: Icon, label, value }: RecipeMetaProps) {
   return (
-    <div className="rounded-xl border bg-plate-paper p-3">
+    <div className="rounded-xl border bg-gravy-paper p-3">
       <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
         <Icon className="h-4 w-4 text-primary" aria-hidden={true} />
         {label}
       </div>
-      <p className="mt-2 font-semibold text-plate-charcoal">{value}</p>
+      <p className="mt-2 font-semibold text-gravy-charcoal">{value}</p>
     </div>
   );
 }

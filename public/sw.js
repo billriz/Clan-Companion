@@ -1,6 +1,6 @@
-const CACHE_VERSION = "plateplan-static-v1";
+const CACHE_VERSION = "gravytime-static-v2";
 const STATIC_CACHE = CACHE_VERSION;
-const CACHE_PREFIX = "plateplan-static-";
+const CACHE_PREFIX = "gravytime-static-";
 
 const PRECACHE_URLS = [
   "/offline.html",
@@ -11,6 +11,9 @@ const PRECACHE_URLS = [
   "/icon-maskable-512.png",
   "/apple-touch-icon.png",
   "/favicon.ico",
+  "/favicon.png",
+  "/brand/gravytime-logo.png",
+  "/brand/gravytime-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -113,7 +116,10 @@ function isCacheableStaticAsset(request, requestUrl) {
     pathname === "/icon-512.png" ||
     pathname === "/icon-maskable-192.png" ||
     pathname === "/icon-maskable-512.png" ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname === "/favicon.png" ||
+    pathname === "/brand/gravytime-logo.png" ||
+    pathname === "/brand/gravytime-icon.png"
   ) {
     return true;
   }
@@ -127,7 +133,7 @@ function isCacheableStaticAsset(request, requestUrl) {
     return true;
   }
 
-  return /\.(?:css|js|mjs|woff2?|ttf|otf|eot|ico|webmanifest)$/i.test(pathname);
+  return /\.(?:css|js|mjs|woff2?|ttf|otf|eot|ico|png|webmanifest)$/i.test(pathname);
 }
 
 async function handleNavigationRequest(request) {

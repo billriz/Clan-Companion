@@ -1,7 +1,7 @@
 {
-  "name": "clan-companion",
+  "name": "gravytime",
   "version": "1.0.0",
-  "description": "PlatePlan: recipe planning, meal planning, and shopping list app",
+  "description": "Good meals start here. Save recipes, plan meals, and create organized shopping lists.",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/billriz/Clan-Companion.git"
+    "url": "git+https://github.com/billriz/gravytime.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/billriz/Clan-Companion/issues"
+    "url": "https://github.com/billriz/gravytime/issues"
   },
-  "homepage": "https://github.com/billriz/Clan-Companion#readme",
+  "homepage": "https://github.com/billriz/gravytime#readme",
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.0",

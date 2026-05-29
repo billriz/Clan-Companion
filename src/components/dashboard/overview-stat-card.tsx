@@ -12,8 +12,8 @@ type OverviewStatCardProps = {
 
 const toneClasses: Record<NonNullable<OverviewStatCardProps["tone"]>, string> = {
   sage: "bg-primary/10 text-primary",
-  terracotta: "bg-plate-terracotta/15 text-plate-terracotta",
-  blue: "bg-plate-blue/15 text-plate-blue",
+  terracotta: "bg-gravy-brown/15 text-gravy-brown",
+  blue: "bg-gravy-gold/15 text-gravy-brown",
 };
 
 export function OverviewStatCard({
@@ -24,11 +24,11 @@ export function OverviewStatCard({
   tone = "sage",
 }: OverviewStatCardProps) {
   return (
-    <article className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
+    <article className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
-          <p className="mt-2 text-3xl font-semibold text-plate-charcoal">{value}</p>
+          <p className="mt-2 text-3xl font-semibold text-gravy-charcoal">{value}</p>
           <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         </div>
         <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", toneClasses[tone])}>

@@ -17,7 +17,7 @@ export default function ScanRecipePage() {
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Recipe import</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Scan a Recipe
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">

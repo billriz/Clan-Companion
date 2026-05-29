@@ -20,7 +20,7 @@ export default function PantryError({
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-5 text-sm leading-6 text-plate-terracotta shadow-subtle">
+      <section className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 p-5 text-sm leading-6 text-gravy-brown shadow-subtle">
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5" aria-hidden="true" />
           <div>

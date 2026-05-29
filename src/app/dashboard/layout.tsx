@@ -21,7 +21,7 @@ export default async function DashboardLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="dashboard" userEmail={user.email ?? "PlatePlan user"} userName={fullName}>
+    <AppShell activeItem="dashboard" userEmail={user.email ?? "GravyTime user"} userName={fullName}>
       {children}
     </AppShell>
   );

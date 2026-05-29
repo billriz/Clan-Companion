@@ -142,10 +142,10 @@ export function AddMealDialog({
       panelClassName="max-h-[92vh] max-w-4xl"
       onClose={() => onOpenChange(false)}
     >
-      <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+      <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
         <div>
           <Badge variant="blue">Meal planner</Badge>
-          <h2 id="add-meal-dialog-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+          <h2 id="add-meal-dialog-title" className="mt-2 text-xl font-semibold text-gravy-charcoal">
             Add Meal
           </h2>
           <p id="add-meal-dialog-description" className="mt-1 text-sm text-muted-foreground">
@@ -167,10 +167,10 @@ export function AddMealDialog({
         <section className="grid gap-4 lg:grid-cols-[1fr_220px]">
           <div>
             <div className="mb-2 flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-plate-charcoal">Day</h3>
+              <h3 className="text-sm font-semibold text-gravy-charcoal">Day</h3>
               <Input
                 aria-label="Plan date"
-                className="h-10 w-40 rounded-xl bg-white"
+                className="h-10 w-40 rounded-xl bg-card"
                 type="date"
                 value={selectedDate}
                 onChange={(event) =>
@@ -191,7 +191,7 @@ export function AddMealDialog({
                       "min-w-20 rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isSelected
                         ? "border-primary bg-primary text-primary-foreground shadow-subtle"
-                        : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
+                        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-gravy-charcoal",
                     )}
                     type="button"
                     onClick={() => setSelectedDate(dateKey)}
@@ -205,7 +205,7 @@ export function AddMealDialog({
           </div>
 
           <div>
-            <h3 className="mb-2 text-sm font-semibold text-plate-charcoal">Meal</h3>
+            <h3 className="mb-2 text-sm font-semibold text-gravy-charcoal">Meal</h3>
             <div className="grid grid-cols-3 gap-2 lg:grid-cols-1" aria-label="Meal type">
               {MEAL_TYPES.map((mealType) => {
                 const isSelected = mealType === selectedMealType;
@@ -218,7 +218,7 @@ export function AddMealDialog({
                       "rounded-2xl border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isSelected
                         ? "border-primary bg-primary text-primary-foreground shadow-subtle"
-                        : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
+                        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-gravy-charcoal",
                     )}
                     type="button"
                     onClick={() => setSelectedMealType(mealType)}
@@ -239,7 +239,7 @@ export function AddMealDialog({
             />
             <Input
               aria-label="Search recipes"
-              className="h-12 rounded-xl bg-white pl-10"
+              className="h-12 rounded-xl bg-card pl-10"
               placeholder="Search recipes..."
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -258,8 +258,8 @@ export function AddMealDialog({
                     className={cn(
                       "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isSelected
-                        ? "border-plate-blue bg-plate-blue text-white shadow-subtle"
-                        : "border-plate-blue/25 bg-plate-blue/10 text-plate-blue hover:bg-plate-blue/15",
+                        ? "border-gravy-gold bg-gravy-gold text-white shadow-subtle"
+                        : "border-gravy-gold/25 bg-gravy-gold/10 text-gravy-brown hover:bg-gravy-gold/15",
                     )}
                     type="button"
                     onClick={() => setActiveCategory(category)}
@@ -281,7 +281,7 @@ export function AddMealDialog({
                     key={recipe.id}
                     aria-pressed={isSelected}
                     className={cn(
-                      "grid grid-cols-[76px_minmax(0,1fr)] gap-3 rounded-2xl border bg-white p-2 text-left shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "grid grid-cols-[76px_minmax(0,1fr)] gap-3 rounded-2xl border bg-card p-2 text-left shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isSelected && "border-primary bg-primary/10 ring-1 ring-primary",
                     )}
                     type="button"
@@ -302,7 +302,7 @@ export function AddMealDialog({
                     </div>
                     <div className="min-w-0 py-1">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-plate-charcoal">
+                        <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-gravy-charcoal">
                           {recipe.title}
                         </h4>
                         {isSelected ? (
@@ -327,9 +327,9 @@ export function AddMealDialog({
               })}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed bg-white p-6 text-center shadow-subtle">
+            <div className="rounded-2xl border border-dashed bg-card p-6 text-center shadow-subtle">
               <Utensils className="mx-auto h-8 w-8 text-primary" aria-hidden="true" />
-              <h3 className="mt-3 text-sm font-semibold text-plate-charcoal">No recipes found</h3>
+              <h3 className="mt-3 text-sm font-semibold text-gravy-charcoal">No recipes found</h3>
               <p className="mt-1 text-sm text-muted-foreground">Try another search or category.</p>
             </div>
           )}
@@ -337,7 +337,7 @@ export function AddMealDialog({
 
         {error ? (
           <div
-            className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+            className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown"
             role="alert"
           >
             {error}
@@ -345,7 +345,7 @@ export function AddMealDialog({
         ) : null}
       </div>
 
-      <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+      <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
         <Button className="h-11 rounded-xl" type="button" variant="secondary" onClick={() => onOpenChange(false)}>
           Cancel
         </Button>

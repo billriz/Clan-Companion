@@ -232,7 +232,7 @@ export function RecipeScanClient() {
     <div className="space-y-6">
       {savedRecipeId ? (
         <section
-          className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm text-plate-charcoal sm:p-5"
+          className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm text-gravy-charcoal sm:p-5"
           role="status"
         >
           <div className="flex items-start gap-3">
@@ -252,10 +252,10 @@ export function RecipeScanClient() {
         </section>
       ) : null}
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-plate-charcoal">Upload Recipe Image</h2>
+            <h2 className="text-xl font-semibold text-gravy-charcoal">Upload Recipe Image</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               Drag and drop an image, choose a file, or take a photo with your camera.
             </p>
@@ -272,14 +272,14 @@ export function RecipeScanClient() {
         <div
           {...getRootProps()}
           className={`mt-5 rounded-2xl border-2 border-dashed p-6 text-center transition ${
-            isDragActive ? "border-primary bg-primary/10" : "border-border bg-plate-paper"
+            isDragActive ? "border-primary bg-primary/10" : "border-border bg-gravy-paper"
           }`}
         >
           <input {...getInputProps()} aria-label="Upload recipe image" />
 
           {previewUrl ? (
             <div className="space-y-4">
-              <div className="relative mx-auto aspect-[4/3] max-w-md overflow-hidden rounded-xl border bg-white">
+              <div className="relative mx-auto aspect-[4/3] max-w-md overflow-hidden rounded-xl border bg-card">
                 <Image alt="Selected recipe preview" className="object-contain" fill src={previewUrl} />
               </div>
               {fileSummary ? <p className="text-sm text-muted-foreground">{fileSummary}</p> : null}
@@ -289,7 +289,7 @@ export function RecipeScanClient() {
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Upload className="h-6 w-6" aria-hidden="true" />
               </div>
-              <p className="text-sm font-medium text-plate-charcoal">
+              <p className="text-sm font-medium text-gravy-charcoal">
                 {isDragActive ? "Drop the image here" : "Drop a recipe image here"}
               </p>
               <p className="text-xs text-muted-foreground">JPG, PNG, or WebP up to 8MB</p>
@@ -334,7 +334,7 @@ export function RecipeScanClient() {
             <Label htmlFor="scan-source-type">Source type</Label>
             <select
               id="scan-source-type"
-              className="h-11 w-full rounded-md border border-input bg-plate-paper px-3 text-sm text-plate-charcoal shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 w-full rounded-md border border-input bg-gravy-paper px-3 text-sm text-gravy-charcoal shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               value={sourceType}
               onChange={(event) => setSourceType(event.target.value)}
             >
@@ -364,7 +364,7 @@ export function RecipeScanClient() {
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle sm:p-6">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
         <Badge variant="blue">Scanning tips</Badge>
         <ul className="mt-4 space-y-2 text-sm leading-6 text-muted-foreground">
           <li>Use good lighting.</li>
@@ -377,7 +377,7 @@ export function RecipeScanClient() {
       </section>
 
       {extractError ? (
-        <section className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 p-4 text-sm text-plate-terracotta">
+        <section className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 p-4 text-sm text-gravy-brown">
           {extractError}
         </section>
       ) : null}
@@ -387,18 +387,18 @@ export function RecipeScanClient() {
       </div>
 
       {statusMessage && !reviewValues ? (
-        <section className="rounded-2xl border border-plate-blue/30 bg-plate-blue/10 p-4 text-sm text-plate-blue">
+        <section className="rounded-2xl border border-gravy-gold/30 bg-gravy-gold/10 p-4 text-sm text-gravy-brown">
           {statusMessage}
         </section>
       ) : null}
 
       {reviewValues ? (
         <section className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start">
-          <aside className="space-y-4 rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
-            <h2 className="text-lg font-semibold text-plate-charcoal">Original Image</h2>
+          <aside className="space-y-4 rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
+            <h2 className="text-lg font-semibold text-gravy-charcoal">Original Image</h2>
 
             {scanResult?.originalImageUrl || previewUrl ? (
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-plate-paper">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-gravy-paper">
                 <Image
                   alt="Original uploaded recipe scan"
                   className="object-contain"

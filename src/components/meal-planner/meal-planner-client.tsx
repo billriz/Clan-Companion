@@ -230,10 +230,10 @@ export function MealPlannerClient({
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-subtle sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="flex flex-col gap-4 rounded-2xl border bg-card p-4 shadow-subtle sm:p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <Badge variant="blue">Weekly planner</Badge>
-          <h2 className="mt-3 text-2xl font-semibold text-plate-charcoal sm:text-3xl">
+          <h2 className="mt-3 text-2xl font-semibold text-gravy-charcoal sm:text-3xl">
             {formatWeekRange(weekStartKey)}
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -284,27 +284,27 @@ export function MealPlannerClient({
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Planned meals</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{plannedCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{plannedCount}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Open slots</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{openSlots}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{openSlots}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recipes ready</p>
-          <p className="mt-2 text-2xl font-semibold text-plate-charcoal">{recipes.length}</p>
+          <p className="mt-2 text-2xl font-semibold text-gravy-charcoal">{recipes.length}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-4 shadow-subtle">
+        <div className="rounded-2xl border bg-card p-4 shadow-subtle">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Selected day</p>
-          <p className="mt-2 text-base font-semibold text-plate-charcoal">{formatLongDay(activeDay)}</p>
+          <p className="mt-2 text-base font-semibold text-gravy-charcoal">{formatLongDay(activeDay)}</p>
         </div>
       </section>
 
       {error ? (
         <div
-          className="flex flex-col gap-3 rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta shadow-subtle sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-3 rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown shadow-subtle sm:flex-row sm:items-center sm:justify-between"
           role="alert"
         >
           <span>{error}</span>
@@ -317,7 +317,7 @@ export function MealPlannerClient({
 
       {notice ? (
         <div
-          className="rounded-2xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm text-plate-blue shadow-subtle"
+          className="rounded-2xl border border-gravy-gold/25 bg-gravy-gold/10 px-4 py-3 text-sm text-gravy-brown shadow-subtle"
           role="status"
         >
           {notice}
@@ -325,9 +325,9 @@ export function MealPlannerClient({
       ) : null}
 
       {recipes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed bg-white p-8 text-center shadow-subtle">
+        <div className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
           <Badge variant="terracotta">Recipes needed</Badge>
-          <h2 className="mt-4 text-xl font-semibold text-plate-charcoal">Add recipes before planning</h2>
+          <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Add recipes before planning</h2>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
             Your planner pulls from saved recipes so the shopping list can use the same ingredient
             data later.
@@ -340,13 +340,11 @@ export function MealPlannerClient({
       ) : null}
 
       {plans.length === 0 && !isLoadingWeek && recipes.length > 0 ? (
-        <div className="rounded-2xl border border-dashed bg-white p-6 shadow-subtle">
+        <div className="rounded-2xl border border-dashed bg-card p-6 shadow-subtle">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Badge variant="default">Fresh week</Badge>
-              <h2 className="mt-3 text-xl font-semibold text-plate-charcoal">
-                Start planning your week by adding your first meal.
-              </h2>
+              <h2 className="mt-3 text-xl font-semibold text-gravy-charcoal">Start your week with a plan.</h2>
             </div>
             <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")} href="/recipes">
               <ListChecks className="h-4 w-4" aria-hidden="true" />
@@ -359,7 +357,7 @@ export function MealPlannerClient({
       <div className={cn("space-y-4 transition", isLoadingWeek && "opacity-60")}>
         {isLoadingWeek ? (
           <div
-            className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm font-medium text-muted-foreground shadow-subtle"
+            className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-sm font-medium text-muted-foreground shadow-subtle"
             role="status"
           >
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
@@ -376,13 +374,13 @@ export function MealPlannerClient({
               <section key={dateKey} className="min-w-0 space-y-3">
                 <div
                   className={cn(
-                    "rounded-2xl border bg-white px-3 py-3 shadow-subtle",
+                    "rounded-2xl border bg-card px-3 py-3 shadow-subtle",
                     isTodayKey(dateKey) && "border-primary bg-primary/10",
                   )}
                 >
                   <p className="text-xs font-medium uppercase text-muted-foreground">{formatDayName(day)}</p>
                   <div className="mt-1 flex items-end justify-between gap-2">
-                    <h3 className="text-2xl font-semibold text-plate-charcoal">{formatDayNumber(day)}</h3>
+                    <h3 className="text-2xl font-semibold text-gravy-charcoal">{formatDayNumber(day)}</h3>
                     {isTodayKey(dateKey) ? (
                       <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
                         Today
@@ -423,7 +421,7 @@ export function MealPlannerClient({
                     "min-w-[92px] rounded-2xl border px-3 py-3 text-left shadow-subtle transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     isSelected
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-plate-charcoal",
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-gravy-charcoal",
                   )}
                   type="button"
                   onClick={() => setActiveDateKey(dateKey)}
@@ -433,7 +431,7 @@ export function MealPlannerClient({
                   <span
                     className={cn(
                       "mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold",
-                      isSelected ? "bg-white/20 text-white" : "bg-plate-blue/10 text-plate-blue",
+                      isSelected ? "bg-card/20 text-white" : "bg-gravy-gold/10 text-gravy-brown",
                     )}
                   >
                     {plannedForDay}/3 meals

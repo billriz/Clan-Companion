@@ -1,6 +1,7 @@
-# PlatePlan
+# GravyTime
 
-PlatePlan is a full-stack meal planning app built with Next.js App Router and Supabase.
+GravyTime is a full-stack meal planning app built with Next.js App Router and Supabase.
+Good meals start here.
 It focuses on a clean MVP loop:
 
 `Recipes -> Pantry -> Meal Planner -> Shopping List`
@@ -39,7 +40,7 @@ mobile refinement, and deployment preparation.
 
 ## Progressive Web App (PWA)
 
-Plate Plan now includes installable PWA support for:
+GravyTime now includes installable PWA support for:
 
 - iOS Safari (Add to Home Screen)
 - Android Chrome
@@ -98,10 +99,10 @@ Intentionally **not** cached:
 ## Design Palette
 
 - Primary Deep Sage: `#6D8B74`
-- Secondary Warm Cream: `#F6F3EE`
-- Accent Terracotta: `#D97B66`
-- Dark Text Charcoal: `#2E2E2E`
-- Optional Highlight Dusty Blue: `#7A9EBE`
+- Warm Cream Background: `#F7F2EA`
+- Rich Brown Accent: `#7A5230`
+- Warm Gold Highlight: `#D8A25E`
+- Charcoal Text: `#2B2B2B`
 
 ## Setup
 

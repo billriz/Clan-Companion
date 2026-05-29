@@ -44,12 +44,12 @@ export function GenerateShoppingListButton({
         panelClassName="max-w-lg"
         onClose={() => setIsOpen(false)}
       >
-        <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+        <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
           <div>
             <Badge variant="blue">Meal plan sync</Badge>
             <h2
               id="generate-shopping-list-title"
-              className="mt-2 text-xl font-semibold text-plate-charcoal"
+              className="mt-2 text-xl font-semibold text-gravy-charcoal"
             >
               Regenerate Shopping List
             </h2>
@@ -67,12 +67,12 @@ export function GenerateShoppingListButton({
         </header>
 
         <div className="space-y-4 px-4 py-5 sm:px-6">
-          <div className="flex gap-3 rounded-2xl border bg-white p-4 shadow-subtle">
+          <div className="flex gap-3 rounded-2xl border bg-card p-4 shadow-subtle">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <Sparkles className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <p className="font-semibold text-plate-charcoal">Replace meal-plan items only</p>
+              <p className="font-semibold text-gravy-charcoal">Replace meal-plan items only</p>
               <p
                 id="generate-shopping-list-description"
                 className="mt-1 text-sm leading-6 text-muted-foreground"
@@ -84,7 +84,7 @@ export function GenerateShoppingListButton({
           </div>
         </div>
 
-        <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
           <Button
             className="h-11 rounded-xl"
             disabled={isGenerating}

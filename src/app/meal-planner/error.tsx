@@ -14,8 +14,8 @@ type MealPlannerErrorProps = {
 export default function MealPlannerError({ error, reset }: MealPlannerErrorProps) {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-3xl items-center px-4 py-10 sm:px-6 lg:px-8">
-      <div className="w-full rounded-2xl border border-destructive/30 bg-white p-8 text-center shadow-subtle">
-        <h1 className="text-2xl font-semibold text-plate-charcoal">Meal planner unavailable</h1>
+      <div className="w-full rounded-2xl border border-destructive/30 bg-card p-8 text-center shadow-subtle">
+        <h1 className="text-2xl font-semibold text-gravy-charcoal">Meal planner unavailable</h1>
         <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
           The meal planner encountered an issue. {error.message}
         </p>

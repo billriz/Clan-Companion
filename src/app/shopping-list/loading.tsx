@@ -1,14 +1,17 @@
 import { ShoppingBasket } from "lucide-react";
 
+import { BrandLoadingState } from "@/components/brand/brand-loading-state";
 import { Badge } from "@/components/ui/badge";
 
 export default function ShoppingListLoading() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <BrandLoadingState label="Loading shopping list" />
+
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Weekly groceries</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             Shopping List
           </h1>
           <div className="mt-4 h-5 w-72 max-w-full animate-pulse rounded-full bg-muted" />
@@ -18,7 +21,7 @@ export default function ShoppingListLoading() {
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-subtle">
+      <section className="rounded-2xl border bg-card p-5 shadow-subtle">
         <div className="h-5 w-40 animate-pulse rounded-full bg-muted" />
         <div className="mt-4 h-2 rounded-full bg-muted" />
         <div className="mt-5 flex flex-wrap gap-2">
@@ -30,7 +33,7 @@ export default function ShoppingListLoading() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {[0, 1, 2, 3].map((item) => (
-          <div key={item} className="rounded-2xl border bg-white p-4 shadow-subtle">
+          <div key={item} className="rounded-2xl border bg-card p-4 shadow-subtle">
             <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] gap-3">
               <div className="h-11 w-11 animate-pulse rounded-xl bg-muted" />
               <div className="space-y-3">

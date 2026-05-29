@@ -103,10 +103,10 @@ export function AddShoppingItemForm({
       onClose={closeDialog}
     >
       <form onSubmit={handleSubmit}>
-        <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+        <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
           <div>
             <Badge variant="default">Manual item</Badge>
-            <h2 id="add-shopping-item-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+            <h2 id="add-shopping-item-title" className="mt-2 text-xl font-semibold text-gravy-charcoal">
               Add Item
             </h2>
             <p id="add-shopping-item-description" className="mt-1 text-sm text-muted-foreground">
@@ -166,7 +166,7 @@ export function AddShoppingItemForm({
             <Label htmlFor="shoppingItemCategory">Category</Label>
             <select
               id="shoppingItemCategory"
-              className="flex h-11 w-full rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-11 w-full rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               value={category}
               disabled={isSaving}
               onChange={(event) => setCategory(event.target.value as ShoppingCategory)}
@@ -181,7 +181,7 @@ export function AddShoppingItemForm({
 
           {error ? (
             <div
-              className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+              className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown"
               role="alert"
             >
               {error}
@@ -189,7 +189,7 @@ export function AddShoppingItemForm({
           ) : null}
         </div>
 
-        <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
           <Button
             className="h-11 rounded-xl"
             disabled={isSaving}

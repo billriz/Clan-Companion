@@ -14,7 +14,7 @@ export function RecipeImagePlaceholder({
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/12 via-plate-paper to-plate-terracotta/12 text-primary",
+        "flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/12 via-gravy-paper to-gravy-brown/12 text-primary",
         className,
       )}
     >

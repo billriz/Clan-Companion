@@ -232,7 +232,7 @@ export function RecipeImportBrowser() {
       showToast({
         variant: "success",
         title: "Already in your library",
-        message: "This recipe is already saved in PlatePlan.",
+        message: "This recipe is already saved in GravyTime.",
         recipeId: existingImport.recipeId,
       });
       return;
@@ -277,7 +277,7 @@ export function RecipeImportBrowser() {
           payload.message ??
           (payload.alreadyImported
             ? "This recipe was already saved to your library."
-            : "Recipe saved to your PlatePlan library."),
+            : "Recipe saved to your GravyTime library."),
         recipeId: savedRecipe.id,
       });
     } catch {
@@ -294,7 +294,7 @@ export function RecipeImportBrowser() {
   return (
     <div className="space-y-6">
       <form
-        className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5"
+        className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5"
         onSubmit={(event) => {
           event.preventDefault();
           void executeSearch();
@@ -354,7 +354,7 @@ export function RecipeImportBrowser() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium text-plate-charcoal">Intolerances</p>
+              <p className="text-sm font-medium text-gravy-charcoal">Intolerances</p>
               <p className="text-xs text-muted-foreground">
                 {intoleranceCount === 0 ? "Any" : `${intoleranceCount} selected`}
               </p>
@@ -370,8 +370,8 @@ export function RecipeImportBrowser() {
                     className={cn(
                       "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isSelected
-                        ? "border-plate-blue bg-plate-blue text-white shadow-subtle"
-                        : "border-plate-blue/25 bg-plate-blue/10 text-plate-blue hover:bg-plate-blue/15",
+                        ? "border-gravy-gold bg-gravy-gold text-white shadow-subtle"
+                        : "border-gravy-gold/25 bg-gravy-gold/10 text-gravy-brown hover:bg-gravy-gold/15",
                     )}
                     type="button"
                     onClick={() => toggleIntolerance(option.value)}
@@ -386,23 +386,23 @@ export function RecipeImportBrowser() {
       </form>
 
       {searchError ? (
-        <div className="flex items-start gap-3 rounded-2xl border border-plate-terracotta/35 bg-plate-terracotta/10 p-4 text-sm text-plate-terracotta">
+        <div className="flex items-start gap-3 rounded-2xl border border-gravy-brown/35 bg-gravy-brown/10 p-4 text-sm text-gravy-brown">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>{searchError}</p>
         </div>
       ) : null}
 
-      <div className="rounded-2xl border bg-white p-4 shadow-subtle sm:p-5">
+      <div className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-plate-charcoal">Browse results</h2>
+            <h2 className="text-lg font-semibold text-gravy-charcoal">Browse results</h2>
             <p className="text-sm text-muted-foreground">{resultCopy}</p>
           </div>
           {hasSearched ? <Badge variant="neutral">Spoonacular</Badge> : null}
         </div>
 
         {isSearching ? (
-          <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-dashed bg-plate-paper p-8 text-sm text-muted-foreground">
+          <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-dashed bg-gravy-paper p-8 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             Looking up recipes...
           </div>
@@ -424,9 +424,9 @@ export function RecipeImportBrowser() {
             })}
           </div>
         ) : (
-          <div className="mt-6 rounded-2xl border border-dashed bg-plate-paper p-8 text-center">
+          <div className="mt-6 rounded-2xl border border-dashed bg-gravy-paper p-8 text-center">
             <Badge variant="neutral">No results</Badge>
-            <h3 className="mt-3 text-xl font-semibold text-plate-charcoal">No recipes found</h3>
+            <h3 className="mt-3 text-xl font-semibold text-gravy-charcoal">No recipes found</h3>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
               Try broadening your search or removing one filter.
             </p>
@@ -466,7 +466,7 @@ function SpoonacularResultCard({
   const isImported = Boolean(importMeta);
 
   return (
-    <article className="flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border bg-white text-plate-charcoal shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
+    <article className="flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border bg-card text-gravy-charcoal shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft">
       <div className="relative aspect-video overflow-hidden rounded-t-2xl bg-secondary">
         {recipe.image ? (
           <Image
@@ -484,13 +484,13 @@ function SpoonacularResultCard({
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-2 text-lg font-semibold leading-6 text-plate-charcoal">{recipe.title}</h3>
+            <h3 className="line-clamp-2 text-lg font-semibold leading-6 text-gravy-charcoal">{recipe.title}</h3>
             <Badge className="shrink-0" variant="blue">
               {badgeLabel}
             </Badge>
           </div>
           <p className="line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">
-            {recipe.summary || "Preview and import this recipe into your PlatePlan library."}
+            {recipe.summary || "Preview and import this recipe into your GravyTime library."}
           </p>
         </div>
 
@@ -534,7 +534,7 @@ function SpoonacularResultCard({
       </div>
 
       {importMeta ? (
-        <div className="border-t border-border/60 bg-plate-paper px-4 py-3">
+        <div className="border-t border-border/60 bg-gravy-paper px-4 py-3">
           <Link className="text-sm font-medium text-primary hover:underline" href={`/recipes/${importMeta.recipeId}`}>
             View saved recipe
           </Link>
@@ -571,10 +571,10 @@ function RecipePreviewModal({
     >
       {recipe ? (
         <>
-          <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+          <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
             <div>
               <Badge variant="blue">Recipe preview</Badge>
-              <h2 id="recipe-preview-title" className="mt-2 text-2xl font-semibold text-plate-charcoal">
+              <h2 id="recipe-preview-title" className="mt-2 text-2xl font-semibold text-gravy-charcoal">
                 {recipe.title}
               </h2>
             </div>
@@ -625,7 +625,7 @@ function RecipePreviewModal({
             </div>
 
             <p id="recipe-preview-description" className="text-sm leading-6 text-muted-foreground">
-              {recipe.summary || "Import this recipe to load full ingredients and instructions into PlatePlan."}
+              {recipe.summary || "Import this recipe to load full ingredients and instructions into GravyTime."}
             </p>
 
             {recipe.sourceUrl ? (
@@ -641,7 +641,7 @@ function RecipePreviewModal({
             ) : null}
           </div>
 
-          <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6">
+          <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6">
             {importMeta ? (
               <Link className="text-sm font-medium text-primary hover:underline" href={`/recipes/${importMeta.recipeId}`}>
                 View saved recipe
@@ -687,7 +687,7 @@ function FilterSelect({ label, value, onChange, options }: FilterSelectProps) {
     <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
       {label}
       <select
-        className="h-11 rounded-md border border-input bg-plate-paper px-3 py-2 text-sm text-plate-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -708,9 +708,9 @@ type PreviewMetaProps = {
 
 function PreviewMeta({ label, value }: PreviewMetaProps) {
   return (
-    <div className="rounded-xl border bg-plate-paper p-3">
+    <div className="rounded-xl border bg-gravy-paper p-3">
       <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
-      <p className="mt-2 font-semibold text-plate-charcoal">{value}</p>
+      <p className="mt-2 font-semibold text-gravy-charcoal">{value}</p>
     </div>
   );
 }
@@ -726,12 +726,12 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
   }
 
   return (
-    <div className="fixed bottom-24 right-4 z-[70] w-[min(24rem,calc(100vw-2rem))] rounded-2xl border bg-white p-4 shadow-soft lg:bottom-6">
+    <div className="fixed bottom-24 right-4 z-[70] w-[min(24rem,calc(100vw-2rem))] rounded-2xl border bg-card p-4 shadow-soft lg:bottom-6">
       <div className="flex items-start gap-3">
         <div
           className={cn(
             "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            toast.variant === "success" ? "bg-primary/15 text-primary" : "bg-plate-terracotta/15 text-plate-terracotta",
+            toast.variant === "success" ? "bg-primary/15 text-primary" : "bg-gravy-brown/15 text-gravy-brown",
           )}
         >
           {toast.variant === "success" ? (
@@ -742,7 +742,7 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-plate-charcoal">{toast.title}</p>
+          <p className="font-semibold text-gravy-charcoal">{toast.title}</p>
           <p className="mt-1 text-sm leading-5 text-muted-foreground">{toast.message}</p>
           {toast.recipeId ? (
             <Link className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline" href={`/recipes/${toast.recipeId}`}>
@@ -754,7 +754,7 @@ function ToastMessage({ toast, onClose }: ToastMessageProps) {
 
         <button
           aria-label="Close notification"
-          className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-plate-charcoal"
+          className="rounded-md p-1 text-muted-foreground transition hover:bg-secondary hover:text-gravy-charcoal"
           type="button"
           onClick={onClose}
         >

@@ -33,10 +33,10 @@ export function RecipePantryInsights({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border bg-plate-paper p-4">
+      <div className="rounded-xl border bg-gravy-paper p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-plate-charcoal">
+            <p className="text-sm font-semibold text-gravy-charcoal">
               You have {comparison.availableCount} of {comparison.totalCount} ingredients
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -64,7 +64,7 @@ export function RecipePantryInsights({
           {comparison.ingredientMatches.map((match, index) => (
             <li
               key={`${match.ingredient.name}-${index}`}
-              className="flex flex-wrap items-start justify-between gap-3 rounded-xl bg-plate-paper px-4 py-3 text-sm text-plate-charcoal"
+              className="flex flex-wrap items-start justify-between gap-3 rounded-xl bg-gravy-paper px-4 py-3 text-sm text-gravy-charcoal"
             >
               <div className="flex min-w-0 items-start gap-3">
                 <span className="min-w-20 font-semibold text-primary">
@@ -82,7 +82,7 @@ export function RecipePantryInsights({
 
       {notice ? (
         <div
-          className="rounded-xl border border-plate-blue/25 bg-plate-blue/10 px-4 py-3 text-sm text-plate-blue"
+          className="rounded-xl border border-gravy-gold/25 bg-gravy-gold/10 px-4 py-3 text-sm text-gravy-brown"
           role="status"
         >
           {notice}

@@ -1,4 +1,4 @@
-# PlatePlan QA Checklist
+# GravyTime QA Checklist
 
 Use this checklist before production releases.
 

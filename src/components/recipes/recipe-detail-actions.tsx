@@ -82,7 +82,7 @@ export function RecipeDetailActions({ recipe, userId }: RecipeDetailActionsProps
       ) : null}
       {notice ? (
         <div
-          className="rounded-xl border border-plate-blue/25 bg-plate-blue/10 px-3 py-2 text-sm text-plate-blue"
+          className="rounded-xl border border-gravy-gold/25 bg-gravy-gold/10 px-3 py-2 text-sm text-gravy-brown"
           role="status"
         >
           {notice}

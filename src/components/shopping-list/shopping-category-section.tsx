@@ -32,14 +32,14 @@ export function ShoppingCategorySection({
     <section aria-labelledby={headingId} className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 id={headingId} className="text-lg font-semibold text-plate-charcoal">
+          <h2 id={headingId} className="text-lg font-semibold text-gravy-charcoal">
             {category}
           </h2>
           <p className="text-sm text-muted-foreground">
             {checkedCount} of {items.length} checked
           </p>
         </div>
-        <span className="rounded-full border border-plate-blue/20 bg-plate-blue/10 px-3 py-1 text-sm font-semibold text-plate-blue">
+        <span className="rounded-full border border-gravy-gold/20 bg-gravy-gold/10 px-3 py-1 text-sm font-semibold text-gravy-brown">
           {items.length}
         </span>
       </div>

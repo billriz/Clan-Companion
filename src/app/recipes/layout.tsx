@@ -21,7 +21,7 @@ export default async function RecipesLayout({
     typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : null;
 
   return (
-    <AppShell activeItem="recipes" userEmail={user.email ?? "PlatePlan user"} userName={fullName}>
+    <AppShell activeItem="recipes" userEmail={user.email ?? "GravyTime user"} userName={fullName}>
       {children}
     </AppShell>
   );

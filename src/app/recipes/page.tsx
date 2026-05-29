@@ -36,7 +36,7 @@ export default async function RecipesPage() {
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue">Recipe library</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-plate-charcoal sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
             My Recipes
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">

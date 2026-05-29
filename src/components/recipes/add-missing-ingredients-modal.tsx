@@ -132,7 +132,7 @@ export function AddMissingIngredientsModal({
     return (
       <section className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-plate-charcoal">{title}</h3>
+          <h3 className="text-sm font-semibold text-gravy-charcoal">{title}</h3>
           <Badge variant={tone}>{items.length}</Badge>
         </div>
 
@@ -148,7 +148,7 @@ export function AddMissingIngredientsModal({
               return (
                 <li
                   key={item.key}
-                  className="rounded-xl border bg-white px-3 py-2 text-sm text-plate-charcoal"
+                  className="rounded-xl border bg-card px-3 py-2 text-sm text-gravy-charcoal"
                 >
                   <button
                     aria-pressed={isSelected}
@@ -179,7 +179,7 @@ export function AddMissingIngredientsModal({
             })}
           </ul>
         ) : (
-          <p className="rounded-xl border border-dashed bg-plate-paper px-3 py-3 text-xs text-muted-foreground">
+          <p className="rounded-xl border border-dashed bg-gravy-paper px-3 py-3 text-xs text-muted-foreground">
             {emptyMessage}
           </p>
         )}
@@ -201,10 +201,10 @@ export function AddMissingIngredientsModal({
         onOpenChange(false);
       }}
     >
-      <header className="flex items-start justify-between gap-4 border-b bg-white px-4 py-4 sm:px-6">
+      <header className="flex items-start justify-between gap-4 border-b bg-card px-4 py-4 sm:px-6">
         <div>
           <Badge variant="blue">Recipe to grocery list</Badge>
-          <h2 id="add-missing-items-title" className="mt-2 text-xl font-semibold text-plate-charcoal">
+          <h2 id="add-missing-items-title" className="mt-2 text-xl font-semibold text-gravy-charcoal">
             Review Ingredients
           </h2>
           <p id="add-missing-items-description" className="mt-1 text-sm text-muted-foreground">
@@ -224,22 +224,22 @@ export function AddMissingIngredientsModal({
       </header>
 
       <div className="space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
-        <div className="grid gap-3 rounded-2xl border bg-white p-4 text-sm sm:grid-cols-3">
+        <div className="grid gap-3 rounded-2xl border bg-card p-4 text-sm sm:grid-cols-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Have</p>
-            <p className="mt-1 text-lg font-semibold text-plate-charcoal">
+            <p className="mt-1 text-lg font-semibold text-gravy-charcoal">
               {comparison.availableIngredients.length}
             </p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Missing</p>
-            <p className="mt-1 text-lg font-semibold text-plate-charcoal">
+            <p className="mt-1 text-lg font-semibold text-gravy-charcoal">
               {comparison.missingIngredients.length}
             </p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Check Quantity</p>
-            <p className="mt-1 text-lg font-semibold text-plate-charcoal">
+            <p className="mt-1 text-lg font-semibold text-gravy-charcoal">
               {comparison.partialIngredients.length}
             </p>
           </div>
@@ -271,7 +271,7 @@ export function AddMissingIngredientsModal({
 
         {error ? (
           <div
-            className="rounded-2xl border border-plate-terracotta/30 bg-plate-terracotta/10 px-4 py-3 text-sm text-plate-terracotta"
+            className="rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm text-gravy-brown"
             role="alert"
           >
             {error}
@@ -279,7 +279,7 @@ export function AddMissingIngredientsModal({
         ) : null}
       </div>
 
-      <footer className="flex flex-col gap-2 border-t bg-white px-4 py-4 sm:flex-row sm:justify-between sm:px-6">
+      <footer className="flex flex-col gap-2 border-t bg-card px-4 py-4 sm:flex-row sm:justify-between sm:px-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <ListChecks className="h-4 w-4 text-primary" aria-hidden="true" />
           {selectedCount} ingredient{selectedCount === 1 ? "" : "s"} selected
