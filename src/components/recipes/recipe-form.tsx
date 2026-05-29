@@ -12,7 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { Textarea } from "@/components/ui/textarea";
+import { TimeSelector } from "@/components/ui/time-selector";
 import {
   DIFFICULTIES,
   RECIPE_IMAGE_BUCKET,
@@ -308,30 +310,29 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <NumberField
+                <TimeSelector
                   id="prepTime"
                   label="Prep time"
                   value={values.prepTime}
-                  placeholder="15"
                   disabled={isSaving}
                   onChange={(value) => updateField("prepTime", value)}
                 />
-                <NumberField
+                <TimeSelector
                   id="cookTime"
                   label="Cook time"
                   value={values.cookTime}
-                  placeholder="30"
                   disabled={isSaving}
                   onChange={(value) => updateField("cookTime", value)}
                 />
-                <NumberField
-                  id="servings"
-                  label="Servings"
-                  value={values.servings}
-                  placeholder="4"
-                  disabled={isSaving}
-                  onChange={(value) => updateField("servings", value)}
-                />
+                <div className="rounded-xl border bg-gravy-paper p-3">
+                  <QuantityStepper
+                    label="Servings"
+                    value={Number.parseInt(values.servings || "4", 10) || 4}
+                    min={1}
+                    max={24}
+                    onChange={(value) => updateField("servings", String(value))}
+                  />
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
@@ -543,34 +544,23 @@ export function RecipeForm({ mode, recipe }: RecipeFormProps) {
           </section>
         </aside>
       </div>
+
+      <div className="sticky bottom-[calc(5.8rem+env(safe-area-inset-bottom))] z-20 lg:hidden">
+        <Button className="h-11 w-full gap-2 rounded-xl shadow-soft" type="submit" disabled={isSaving}>
+          {isSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" aria-hidden="true" />
+              Save Recipe
+            </>
+          )}
+        </Button>
+      </div>
     </form>
-  );
-}
-
-type NumberFieldProps = {
-  id: string;
-  label: string;
-  value: string;
-  placeholder: string;
-  disabled: boolean;
-  onChange: (value: string) => void;
-};
-
-function NumberField({ id, label, value, placeholder, disabled, onChange }: NumberFieldProps) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        min="0"
-        inputMode="numeric"
-        type="number"
-        value={value}
-        placeholder={placeholder}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-      />
-    </div>
   );
 }
 

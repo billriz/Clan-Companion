@@ -2,15 +2,17 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
-import { Box, Filter, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Box, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { FindRecipesFromPantry } from "@/components/pantry/find-recipes-from-pantry";
 import { AddMissingIngredientsModal } from "@/components/recipes/add-missing-ingredients-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { FilterChip } from "@/components/ui/filter-chip";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModalShell } from "@/components/ui/modal-shell";
+import { SearchBar } from "@/components/ui/search-bar";
 import { Textarea } from "@/components/ui/textarea";
 import { normalizeIngredientName } from "@/lib/ingredients";
 import {
@@ -38,7 +40,7 @@ type PantryPageProps = {
   userId: string;
 };
 
-type GroupByMode = "location" | "category";
+type StockFilterMode = "all" | "expiring" | "low";
 
 type PantryFormState = {
   name: string;
@@ -82,7 +84,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
-  const [groupBy, setGroupBy] = useState<GroupByMode>("location");
+  const [stockFilter, setStockFilter] = useState<StockFilterMode>("all");
   const [quickAddValues, setQuickAddValues] = useState(defaultQuickAddValues);
   const [isSavingQuickAdd, setIsSavingQuickAdd] = useState(false);
   const [editingItem, setEditingItem] = useState<PantryItem | null>(null);
@@ -115,27 +117,37 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
         return false;
       }
 
+      if (stockFilter === "low" && !isLowStock(item)) {
+        return false;
+      }
+
+      if (stockFilter === "expiring") {
+        const note = (item.notes ?? "").toLowerCase();
+        if (!note.includes("expir") && !note.includes("use soon")) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [categoryFilter, locationFilter, pantryItems, query]);
+  }, [categoryFilter, locationFilter, pantryItems, query, stockFilter]);
 
   const groupedItems = useMemo(() => {
     const groups = new Map<string, PantryItem[]>();
 
     for (const item of filteredItems) {
-      const rawKey = groupBy === "location" ? item.location : item.category;
-      const key = rawKey?.trim() || "Other";
+      const key = item.category?.trim() || "Other";
       const currentItems = groups.get(key) ?? [];
       groups.set(key, [...currentItems, item]);
     }
 
     return Array.from(groups.entries())
-      .sort((firstGroup, secondGroup) => sortGroupKeys(groupBy, firstGroup[0], secondGroup[0]))
+      .sort((firstGroup, secondGroup) => sortGroupKeys(firstGroup[0], secondGroup[0]))
       .map(([key, items]) => ({
         key,
         items: [...items].sort((firstItem, secondItem) => firstItem.name.localeCompare(secondItem.name)),
       }));
-  }, [filteredItems, groupBy]);
+  }, [filteredItems]);
 
   const recommendations = useMemo(() => {
     return recipes
@@ -459,19 +471,14 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
       </section>
 
       <section className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,180px))]">
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              className="pl-10"
-              placeholder="Search pantry items"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </div>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(2,minmax(0,180px))]">
+          <SearchBar
+            id="pantry-search"
+            label="Search pantry"
+            value={query}
+            placeholder="Search pantry..."
+            onChange={setQuery}
+          />
 
           <select
             className="flex h-11 rounded-md border border-input bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -498,22 +505,16 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
               </option>
             ))}
           </select>
+        </div>
 
-          <div className="flex items-center gap-2 rounded-md border border-input bg-gravy-paper px-3 py-2">
-            <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            <label className="sr-only" htmlFor="pantry-group-by">
-              Group pantry items by
-            </label>
-            <select
-              id="pantry-group-by"
-              className="w-full bg-transparent text-sm text-gravy-charcoal focus-visible:outline-none"
-              value={groupBy}
-              onChange={(event) => setGroupBy(event.target.value as GroupByMode)}
-            >
-              <option value="location">Group by location</option>
-              <option value="category">Group by category</option>
-            </select>
-          </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <FilterChip label="All" active={stockFilter === "all"} onClick={() => setStockFilter("all")} />
+          <FilterChip
+            label="Expiring Soon"
+            active={stockFilter === "expiring"}
+            onClick={() => setStockFilter("expiring")}
+          />
+          <FilterChip label="Low Stock" active={stockFilter === "low"} onClick={() => setStockFilter("low")} />
         </div>
       </section>
 
@@ -589,6 +590,7 @@ export function PantryPage({ initialPantryItems, recipes, userId }: PantryPagePr
                       <Badge variant="blue">{item.location ?? "Other"}</Badge>
                       <Badge variant="neutral">{item.category ?? "Other"}</Badge>
                       {item.is_staple ? <Badge variant="default">Staple</Badge> : null}
+                      {isLowStock(item) ? <Badge variant="terracotta">Low stock</Badge> : null}
                     </div>
 
                     {item.low_stock_threshold !== null ? (
@@ -898,6 +900,14 @@ function formatDecimal(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
 }
 
+function isLowStock(item: PantryItem) {
+  if (item.low_stock_threshold === null || item.quantity === null) {
+    return false;
+  }
+
+  return item.quantity <= item.low_stock_threshold;
+}
+
 function createTemporaryPantryItem({
   id,
   name,
@@ -953,8 +963,8 @@ function toNullableText(value: string | null | undefined) {
   return cleanValue ? cleanValue : null;
 }
 
-function sortGroupKeys(groupBy: GroupByMode, firstKey: string, secondKey: string) {
-  const order = groupBy === "location" ? PANTRY_LOCATIONS : PANTRY_CATEGORIES;
+function sortGroupKeys(firstKey: string, secondKey: string) {
+  const order = PANTRY_CATEGORIES;
   const firstIndex = order.findIndex((groupName) => groupName === firstKey);
   const secondIndex = order.findIndex((groupName) => groupName === secondKey);
 

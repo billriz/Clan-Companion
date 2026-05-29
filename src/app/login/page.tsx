@@ -20,8 +20,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <AuthShell
-      eyebrow="Welcome back"
-      title={BRAND.tagline}
+      eyebrow="Welcome back!"
+      title="Log in to your account"
       description={BRAND.heroCopy}
       footer={
         <>

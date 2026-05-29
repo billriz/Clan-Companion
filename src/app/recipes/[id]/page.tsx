@@ -2,22 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
-import {
-  ArrowLeft,
-  Clock3,
-  CookingPot,
-  ListChecks,
-  Signal,
-  Timer,
-  UsersRound,
-} from "lucide-react";
+import { ArrowLeft, Clock3, Heart, Signal, Timer, UsersRound } from "lucide-react";
 
 import { RecipeDetailActions } from "@/components/recipes/recipe-detail-actions";
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
 import { RecipeNotFound } from "@/components/recipes/recipe-not-found";
 import { RecipePantryInsights } from "@/components/recipes/recipe-pantry-insights";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   formatMinutes,
@@ -46,6 +36,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     supabase.auth.getUser(),
     supabase.from("recipes").select("*").eq("id", id).maybeSingle(),
   ]);
+
   const {
     data: { user },
   } = userResponse;
@@ -73,26 +64,36 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
 
   const ingredients = parseIngredients(recipeWithPreviewUrl.ingredients);
   const instructions = parseInstructions(recipeWithPreviewUrl.instructions);
+  const notes = parseNotes(recipeWithPreviewUrl.extraction_notes);
   const totalTime = getTotalTime(recipeWithPreviewUrl);
   const difficulty = normalizeDifficulty(recipeWithPreviewUrl.difficulty);
   const pantryItems = pantryError ? [] : ((pantryData ?? []) as PantryItem[]);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <Link className={cn(buttonVariants({ variant: "secondary" }), "mb-6 gap-2")} href="/recipes">
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        Back to recipes
-      </Link>
+    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 lg:max-w-5xl lg:px-8 lg:py-10">
+      <div className="mb-4 flex items-center justify-between">
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "h-10 gap-2 rounded-xl")} href="/recipes">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back
+        </Link>
+        <button
+          type="button"
+          aria-label="Favorite recipe"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-gravy-gold/30 bg-gravy-paper text-gravy-gold"
+        >
+          <Heart className="h-4 w-4 fill-gravy-gold" aria-hidden="true" />
+        </button>
+      </div>
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-start">
-        <div className="relative aspect-video overflow-hidden rounded-2xl border bg-secondary shadow-subtle">
+      <div className="space-y-5 rounded-3xl border bg-card p-4 shadow-subtle sm:p-5">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-secondary">
           {recipeWithPreviewUrl.image_url ? (
             <Image
               fill
               priority
               alt={recipeWithPreviewUrl.title}
               className="object-cover"
-              sizes="(min-width: 1024px) 58vw, 100vw"
+              sizes="(min-width: 1024px) 56vw, 100vw"
               src={recipeWithPreviewUrl.image_url}
             />
           ) : (
@@ -100,78 +101,96 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           )}
         </div>
 
-        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
-          <div className="flex flex-wrap gap-2">
-            {recipeWithPreviewUrl.category ? (
-              <Badge variant="blue">{recipeWithPreviewUrl.category}</Badge>
-            ) : null}
-            <Badge variant={difficulty === "Hard" ? "terracotta" : "default"}>{difficulty}</Badge>
-            {(recipeWithPreviewUrl.tags ?? []).slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="neutral">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+        <h1 className="text-3xl font-semibold leading-tight text-gravy-charcoal sm:text-4xl">
+          {recipeWithPreviewUrl.title}
+        </h1>
 
-          <h1 className="mt-5 text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
-            {recipeWithPreviewUrl.title}
-          </h1>
-          <p className="mt-3 text-base leading-7 text-muted-foreground">
-            {recipeWithPreviewUrl.description || "No description added yet."}
+        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock3 className="h-4 w-4 text-primary" aria-hidden="true" />
+            {formatMinutes(totalTime)}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Signal className="h-4 w-4 text-primary" aria-hidden="true" />
+            {difficulty}
+          </span>
+        </div>
+
+        <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Recipe sections">
+          <a className="rounded-full border bg-gravy-paper px-3 py-1.5 text-xs font-semibold text-gravy-charcoal" href="#overview">
+            Overview
+          </a>
+          <a className="rounded-full border bg-gravy-paper px-3 py-1.5 text-xs font-semibold text-gravy-charcoal" href="#ingredients">
+            Ingredients
+          </a>
+          <a className="rounded-full border bg-gravy-paper px-3 py-1.5 text-xs font-semibold text-gravy-charcoal" href="#steps">
+            Steps
+          </a>
+          <a className="rounded-full border bg-gravy-paper px-3 py-1.5 text-xs font-semibold text-gravy-charcoal" href="#notes">
+            Notes
+          </a>
+        </nav>
+
+        <section id="overview" className="space-y-3">
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Summary</h2>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {recipeWithPreviewUrl.description ||
+              "A rich and cozy recipe ready to add to your weekly meal plan."}
           </p>
-
-          <div className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-            <RecipeMeta icon={Timer} label="Prep" value={formatMinutes(recipeWithPreviewUrl.prep_time)} />
-            <RecipeMeta icon={CookingPot} label="Cook" value={formatMinutes(recipeWithPreviewUrl.cook_time)} />
-            <RecipeMeta icon={Clock3} label="Total" value={formatMinutes(totalTime)} />
-            <RecipeMeta
-              icon={UsersRound}
-              label="Servings"
-              value={recipeWithPreviewUrl.servings ? String(recipeWithPreviewUrl.servings) : "Flexible"}
-            />
-            <RecipeMeta icon={Signal} label="Difficulty" value={difficulty} />
-            <RecipeMeta icon={ListChecks} label="Steps" value={String(instructions.length || 0)} />
+          <div className="grid grid-cols-3 gap-2">
+            <MetaCard icon={UsersRound} label="Servings" value={recipeWithPreviewUrl.servings ? String(recipeWithPreviewUrl.servings) : "-"} />
+            <MetaCard icon={Timer} label="Prep Time" value={formatMinutes(recipeWithPreviewUrl.prep_time)} />
+            <MetaCard icon={Clock3} label="Cook Time" value={formatMinutes(recipeWithPreviewUrl.cook_time)} />
           </div>
+        </section>
 
-          <div className="mt-6 border-t pt-5">
-            <RecipeDetailActions recipe={recipeWithPreviewUrl} userId={user.id} />
-          </div>
-        </div>
-      </section>
+        <section id="ingredients" className="space-y-3">
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Ingredients</h2>
+          <RecipePantryInsights
+            ingredients={ingredients}
+            pantryItems={pantryItems}
+            recipeTitle={recipeWithPreviewUrl.title}
+            userId={user.id}
+          />
+        </section>
 
-      <section className="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
-          <h2 className="text-xl font-semibold text-gravy-charcoal">Ingredients</h2>
-          <div className="mt-5">
-            <RecipePantryInsights
-              ingredients={ingredients}
-              pantryItems={pantryItems}
-              recipeTitle={recipeWithPreviewUrl.title}
-              userId={user.id}
-            />
-          </div>
-        </div>
-
-        <div className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
-          <h2 className="text-xl font-semibold text-gravy-charcoal">Instructions</h2>
+        <section id="steps" className="space-y-3">
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Steps</h2>
           {instructions.length > 0 ? (
-            <ol className="mt-5 space-y-4" aria-label="Cooking steps">
+            <ol className="space-y-2.5" aria-label="Cooking steps">
               {instructions.map((instruction, index) => (
-                <li key={`${instruction}-${index}`} className="grid grid-cols-[40px_minmax(0,1fr)] gap-4">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
+                <li key={`${instruction}-${index}`} className="grid grid-cols-[34px_minmax(0,1fr)] gap-3 rounded-xl bg-gravy-paper p-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-primary-foreground">
                     {index + 1}
                   </span>
-                  <p className="pt-2 text-sm leading-6 text-gravy-charcoal">{instruction}</p>
+                  <p className="pt-1 text-sm leading-6 text-gravy-charcoal">{instruction}</p>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="mt-4 text-sm leading-6 text-muted-foreground">
-              No instructions have been added yet.
-            </p>
+            <p className="text-sm leading-6 text-muted-foreground">No steps have been added yet.</p>
           )}
-        </div>
-      </section>
+        </section>
+
+        <section id="notes" className="space-y-3">
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Notes</h2>
+          {notes.length > 0 ? (
+            <ul className="space-y-2">
+              {notes.map((note, index) => (
+                <li key={`${note}-${index}`} className="rounded-xl bg-gravy-paper px-3 py-2 text-sm text-gravy-charcoal">
+                  {note}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm leading-6 text-muted-foreground">No notes yet for this recipe.</p>
+          )}
+        </section>
+      </div>
+
+      <div className="sticky bottom-[calc(5.8rem+env(safe-area-inset-bottom))] mt-4 rounded-2xl border bg-gravy-paper p-3 shadow-soft lg:static lg:mt-5 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+        <RecipeDetailActions recipe={recipeWithPreviewUrl} userId={user.id} />
+      </div>
     </div>
   );
 }
@@ -198,20 +217,47 @@ async function addScanImagePreviewUrl(
   };
 }
 
-type RecipeMetaProps = {
-  icon: LucideIcon;
+function parseNotes(notes: Recipe["extraction_notes"]): string[] {
+  if (!notes) {
+    return [];
+  }
+
+  if (Array.isArray(notes)) {
+    return notes.map((entry) => String(entry).trim()).filter(Boolean);
+  }
+
+  if (typeof notes === "string") {
+    return notes
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof notes === "object") {
+    return Object.values(notes)
+      .map((entry) => String(entry).trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function MetaCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Clock3;
   label: string;
   value: string;
-};
-
-function RecipeMeta({ icon: Icon, label, value }: RecipeMetaProps) {
+}) {
   return (
-    <div className="rounded-xl border bg-gravy-paper p-3">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
-        <Icon className="h-4 w-4 text-primary" aria-hidden={true} />
+    <div className="rounded-xl border bg-gravy-paper p-2.5 text-center">
+      <div className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+        <Icon className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
         {label}
       </div>
-      <p className="mt-2 font-semibold text-gravy-charcoal">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-gravy-charcoal">{value}</p>
     </div>
   );
 }

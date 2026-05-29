@@ -29,16 +29,16 @@ export function ShoppingListItem({
   return (
     <article
       className={cn(
-        "rounded-2xl border bg-card p-4 shadow-subtle transition",
+        "rounded-2xl border bg-card p-3 shadow-subtle transition",
         isChecked && "bg-gravy-paper/70",
       )}
     >
-      <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-start gap-3">
+      <div className="grid grid-cols-[42px_minmax(0,1fr)_auto_40px] items-center gap-2">
         <button
           aria-checked={isChecked}
           aria-label={isChecked ? `Mark ${item.name} unchecked` : `Mark ${item.name} checked`}
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl border text-primary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "flex h-10 w-10 items-center justify-center rounded-lg border text-primary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             isChecked ? "border-primary bg-primary text-primary-foreground" : "border-primary/30 bg-primary/10",
           )}
           disabled={isBusy}
@@ -50,27 +50,32 @@ export function ShoppingListItem({
         </button>
 
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             <h3
               className={cn(
-                "text-base font-semibold leading-6 text-gravy-charcoal",
+                "text-sm font-semibold leading-5 text-gravy-charcoal",
                 isChecked && "text-muted-foreground line-through",
               )}
             >
               {item.name}
             </h3>
-            <Badge variant="blue">{category}</Badge>
+            <Badge className="text-[10px]" variant="blue">
+              {category}
+            </Badge>
             {isChecked ? <Badge variant="neutral">Checked</Badge> : null}
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {amount ? <span className={cn(isChecked && "line-through")}>{amount}</span> : null}
-            <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium">{sourceLabel}</span>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-secondary px-2 py-1 text-[10px] font-semibold">{sourceLabel}</span>
           </div>
         </div>
 
+        <p className={cn("text-xs font-semibold text-gravy-brown", isChecked && "line-through text-muted-foreground")}>
+          {amount || "-"}
+        </p>
+
         <Button
           aria-label={`Delete ${item.name}`}
-          className="h-12 w-12 rounded-xl px-0 text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
+          className="h-10 w-10 rounded-lg px-0 text-gravy-brown hover:bg-gravy-brown/10 hover:text-gravy-brown"
           disabled={isBusy}
           type="button"
           variant="ghost"

@@ -7,7 +7,6 @@ import {
   CalendarPlus,
   ChevronLeft,
   ChevronRight,
-  ListChecks,
   RefreshCcw,
 } from "lucide-react";
 
@@ -15,6 +14,7 @@ import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { MealSlot } from "@/components/meal-planner/meal-slot";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   MEAL_TYPES,
   addDays,
@@ -340,18 +340,12 @@ export function MealPlannerClient({
       ) : null}
 
       {plans.length === 0 && !isLoadingWeek && recipes.length > 0 ? (
-        <div className="rounded-2xl border border-dashed bg-card p-6 shadow-subtle">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <Badge variant="default">Fresh week</Badge>
-              <h2 className="mt-3 text-xl font-semibold text-gravy-charcoal">Start your week with a plan.</h2>
-            </div>
-            <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")} href="/recipes">
-              <ListChecks className="h-4 w-4" aria-hidden="true" />
-              Browse Recipes
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          title="Start your week with a plan."
+          description="Add recipes to build your meal plan."
+          actionLabel="Browse Recipes"
+          actionHref="/recipes"
+        />
       ) : null}
 
       <div className={cn("space-y-4 transition", isLoadingWeek && "opacity-60")}>
@@ -471,6 +465,15 @@ export function MealPlannerClient({
           }
         }}
       />
+
+      {recipes.length > 0 ? (
+        <div className="fixed inset-x-4 bottom-[calc(5.8rem+env(safe-area-inset-bottom))] z-30 lg:hidden">
+          <Button className="h-11 w-full rounded-xl" type="button" onClick={() => openAddMeal(activeDayKey, "Dinner")}>
+            <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
+            Add Meal
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

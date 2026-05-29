@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModalShell } from "@/components/ui/modal-shell";
+import { QuantityStepper } from "@/components/ui/quantity-stepper";
+import { Textarea } from "@/components/ui/textarea";
 import {
   MEAL_TYPES,
   formatDateKey,
@@ -57,6 +59,8 @@ export function AddMealDialog({
   );
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [servings, setServings] = useState(4);
+  const [note, setNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +92,7 @@ export function AddMealDialog({
       return matchesCategory && matchesQuery;
     });
   }, [activeCategory, query, recipes]);
+  const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId) ?? null;
 
   async function handleAddMeal() {
     if (!selectedRecipeId) {
@@ -164,6 +169,35 @@ export function AddMealDialog({
       </header>
 
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
+        {selectedRecipe ? (
+          <section className="grid grid-cols-[84px_minmax(0,1fr)] gap-3 rounded-2xl border bg-gravy-paper p-3">
+            <div className="relative h-20 overflow-hidden rounded-xl bg-secondary">
+              {selectedRecipe.image_url ? (
+                <Image
+                  fill
+                  alt={selectedRecipe.title}
+                  className="object-cover"
+                  sizes="80px"
+                  src={selectedRecipe.image_url}
+                />
+              ) : (
+                <RecipeImagePlaceholder iconClassName="h-6 w-6" />
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Selected recipe
+              </p>
+              <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-gravy-charcoal">
+                {selectedRecipe.title}
+              </h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {formatMinutes(selectedRecipe.prep_time)}
+              </p>
+            </div>
+          </section>
+        ) : null}
+
         <section className="grid gap-4 lg:grid-cols-[1fr_220px]">
           <div>
             <div className="mb-2 flex items-center justify-between gap-3">
@@ -228,6 +262,22 @@ export function AddMealDialog({
                 );
               })}
             </div>
+          </div>
+        </section>
+
+        <section className="grid gap-4 rounded-2xl border bg-gravy-paper p-3 sm:grid-cols-2">
+          <QuantityStepper label="Servings" value={servings} min={1} max={16} onChange={setServings} />
+          <div className="space-y-2">
+            <label htmlFor="meal-note" className="text-sm font-medium text-gravy-charcoal">
+              Add a note (optional)
+            </label>
+            <Textarea
+              id="meal-note"
+              className="min-h-[96px]"
+              placeholder="Ex. Make extra for lunch"
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+            />
           </div>
         </section>
 

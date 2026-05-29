@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Camera, Download, Plus, Search, X } from "lucide-react";
+import { Camera, Download, Plus } from "lucide-react";
 
 import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { RecipeCard } from "@/components/recipes/recipe-card";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DIFFICULTIES, normalizeDifficulty } from "@/lib/recipes";
+import { RecipeListItem } from "@/components/recipes/recipe-list-item";
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { FilterChip } from "@/components/ui/filter-chip";
+import { SearchBar } from "@/components/ui/search-bar";
 import { cn } from "@/lib/utils";
 import type { Recipe } from "@/types/recipes";
 
@@ -18,73 +19,52 @@ type RecipeLibraryProps = {
   userId: string;
 };
 
-type Filter = {
-  label: string;
-  value: string;
-  type: "all" | "difficulty" | "category";
-};
+type FilterOption = "all" | "favorites" | "dinner" | "lunch" | "desserts";
+
+const filters: { label: string; value: FilterOption }[] = [
+  { label: "All", value: "all" },
+  { label: "Favorites", value: "favorites" },
+  { label: "Dinner", value: "dinner" },
+  { label: "Lunch", value: "lunch" },
+  { label: "Desserts", value: "desserts" },
+];
 
 export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState<FilterOption>("all");
   const [planningRecipe, setPlanningRecipe] = useState<Recipe | null>(null);
-
-  const categoryFilters = useMemo(() => {
-    return Array.from(
-      new Set(
-        recipes
-          .map((recipe) => recipe.category?.trim())
-          .filter((category): category is string => Boolean(category)),
-      ),
-    ).sort((first, second) => first.localeCompare(second));
-  }, [recipes]);
-
-  const filters: Filter[] = [
-    { label: "All", value: "all", type: "all" },
-    ...DIFFICULTIES.map((difficulty) => ({
-      label: difficulty,
-      value: `difficulty:${difficulty}`,
-      type: "difficulty" as const,
-    })),
-    ...categoryFilters.map((category) => ({
-      label: category,
-      value: `category:${category}`,
-      type: "category" as const,
-    })),
-  ];
 
   const filteredRecipes = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return recipes.filter((recipe) => {
-      const matchesQuery =
+      const textMatch =
         !normalizedQuery ||
-        [
-          recipe.title,
-          recipe.description,
-          recipe.category,
-          normalizeDifficulty(recipe.difficulty),
-          ...(recipe.tags ?? []),
-        ]
+        [recipe.title, recipe.description, recipe.category, ...(recipe.tags ?? [])]
           .filter(Boolean)
           .some((value) => value?.toLowerCase().includes(normalizedQuery));
 
-      if (!matchesQuery) {
+      if (!textMatch) {
         return false;
       }
 
-      if (activeFilter === "all") {
-        return true;
+      const category = recipe.category?.toLowerCase() ?? "";
+      const tags = (recipe.tags ?? []).map((tag) => tag.toLowerCase());
+
+      if (activeFilter === "favorites") {
+        return tags.includes("favorite") || tags.includes("favorites");
       }
 
-      const [type, value] = activeFilter.split(":");
-
-      if (type === "difficulty") {
-        return normalizeDifficulty(recipe.difficulty) === value;
+      if (activeFilter === "dinner") {
+        return category.includes("dinner");
       }
 
-      if (type === "category") {
-        return recipe.category === value;
+      if (activeFilter === "lunch") {
+        return category.includes("lunch");
+      }
+
+      if (activeFilter === "desserts") {
+        return category.includes("dessert") || category.includes("sweet");
       }
 
       return true;
@@ -92,101 +72,89 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
   }, [activeFilter, query, recipes]);
 
   if (recipes.length === 0) {
-    return <RecipeEmptyState />;
+    return (
+      <EmptyState
+        title="Your recipe box is empty."
+        description="Save recipes to see them here."
+        actionLabel="Add Your First Recipe"
+        actionHref="/recipes/new"
+      />
+    );
   }
 
-  const hasActiveFilters = activeFilter !== "all" || query.trim().length > 0;
-
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-gravy-charcoal">Recipe library</h2>
-            <p className="text-sm text-muted-foreground">
-              {filteredRecipes.length} of {recipes.length} recipes shown
-            </p>
-          </div>
-          {hasActiveFilters ? (
-            <Button
-              className="h-10 gap-2"
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setQuery("");
-                setActiveFilter("all");
-              }}
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-              Clear filters
-            </Button>
-          ) : null}
-        </div>
-
-        <div className="mt-4 max-w-2xl">
-          <label className="sr-only" htmlFor="recipe-search-input">
-            Search recipes
-          </label>
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              id="recipe-search-input"
-              className="pl-10"
-              placeholder="Search recipes, tags, categories..."
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </div>
-        </div>
+    <>
+      <section className="rounded-3xl border bg-card p-4 shadow-subtle sm:p-5">
+        <SearchBar
+          id="recipe-search-input"
+          label="Search recipes"
+          value={query}
+          placeholder="Search recipes..."
+          onChange={setQuery}
+        />
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="Recipe filters">
-          {filters.map((filter) => {
-            const isActive = activeFilter === filter.value;
-
-            return (
-              <button
-                key={filter.value}
-                aria-pressed={isActive}
-                className={cn(
-                  "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  isActive
-                    ? "border-primary bg-primary text-primary-foreground shadow-subtle"
-                    : filter.type === "category"
-                      ? "border-gravy-gold/25 bg-gravy-gold/10 text-gravy-brown hover:bg-gravy-gold/15"
-                      : "border-border bg-gravy-paper text-muted-foreground hover:bg-secondary hover:text-gravy-charcoal",
-                )}
-                type="button"
-                onClick={() => setActiveFilter(filter.value)}
-              >
-                {filter.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {filteredRecipes.length > 0 ? (
-        <div className="grid auto-rows-fr grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} onAddToPlan={setPlanningRecipe} />
+          {filters.map((filter) => (
+            <FilterChip
+              key={filter.value}
+              label={filter.label}
+              active={activeFilter === filter.value}
+              onClick={() => setActiveFilter(filter.value)}
+            />
           ))}
         </div>
+      </section>
+
+      {filteredRecipes.length > 0 ? (
+        <>
+          <section className="space-y-2.5 md:hidden">
+            {filteredRecipes.map((recipe) => (
+              <RecipeListItem key={recipe.id} recipe={recipe} />
+            ))}
+          </section>
+
+          <section className="hidden grid-cols-2 gap-4 md:grid xl:grid-cols-3">
+            {filteredRecipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} onAddToPlan={setPlanningRecipe} />
+            ))}
+          </section>
+        </>
       ) : (
-        <div
-          className="rounded-2xl border border-dashed bg-gravy-paper p-8 text-center shadow-subtle"
-          role="status"
-        >
-          <Badge variant="neutral">No matches</Badge>
-          <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">No recipes found</h2>
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            Try a different search term or clear the active filter to bring more recipes back into
-            view.
-          </p>
-        </div>
+        <EmptyState
+          title="No recipes found."
+          description="Try another search."
+          actionLabel="Clear Search"
+          actionOnClick={() => {
+            setQuery("");
+            setActiveFilter("all");
+          }}
+        />
       )}
+
+      <div className="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:hidden">
+        <Link className={cn(buttonVariants(), "w-full rounded-xl")} href="/recipes/new">
+          <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+          Add Recipe
+        </Link>
+      </div>
+
+      <div className="hidden items-center gap-2 md:flex">
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")} href="/recipes/import">
+          <Download className="h-4 w-4" aria-hidden="true" />
+          Import
+        </Link>
+        <Link
+          className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")}
+          href="/recipes/import/scan"
+        >
+          <Camera className="h-4 w-4" aria-hidden="true" />
+          Scan
+        </Link>
+        <Link className={cn(buttonVariants(), "gap-2 rounded-xl")} href="/recipes/new">
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Add Recipe
+        </Link>
+      </div>
 
       <AddMealDialog
         key={planningRecipe?.id ?? "closed"}
@@ -200,32 +168,6 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
           }
         }}
       />
-    </div>
-  );
-}
-
-function RecipeEmptyState() {
-  return (
-    <div className="rounded-2xl border border-dashed bg-gravy-paper p-8 text-center shadow-subtle">
-      <Badge variant="terracotta">Recipe library</Badge>
-      <h2 className="mt-4 text-2xl font-semibold text-gravy-charcoal">Your recipe box is waiting.</h2>
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-        Add family favorites, weeknight staples, and recipes you want ready when planning begins.
-      </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import">
-          <Download className="h-4 w-4" aria-hidden="true" />
-          Import Recipes
-        </Link>
-        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/import/scan">
-          <Camera className="h-4 w-4" aria-hidden="true" />
-          Scan Recipe
-        </Link>
-        <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Create Recipe
-        </Link>
-      </div>
-    </div>
+    </>
   );
 }

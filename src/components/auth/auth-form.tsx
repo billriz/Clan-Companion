@@ -81,7 +81,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit}>
       {isSignup ? (
         <div className="space-y-2">
           <Label htmlFor="fullName">Full name</Label>
@@ -90,6 +90,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
             name="fullName"
             autoComplete="name"
             placeholder="Jamie Rivera"
+            className="h-11 rounded-xl"
             disabled={isLoading}
           />
         </div>
@@ -103,6 +104,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
           type="email"
           autoComplete="email"
           placeholder="you@example.com"
+          className="h-11 rounded-xl"
           required
           disabled={isLoading}
         />
@@ -116,6 +118,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
           type="password"
           autoComplete={isSignup ? "new-password" : "current-password"}
           minLength={6}
+          className="h-11 rounded-xl"
           required
           disabled={isLoading}
         />
@@ -139,7 +142,7 @@ export function AuthForm({ mode, redirectedFrom }: AuthFormProps) {
         </div>
       ) : null}
 
-      <Button className="w-full" type="submit" disabled={isLoading}>
+      <Button className="mt-2 h-11 w-full rounded-xl" type="submit" disabled={isLoading}>
         {isLoading ? "Please wait..." : isSignup ? "Start planning" : "Log in"}
       </Button>
     </form>

@@ -69,6 +69,7 @@ const MAX_READY_TIME_OPTIONS = [
 ] as const;
 
 const RESULT_COUNT_OPTIONS = [8, 12, 16, 24] as const;
+const POPULAR_SEARCHES = ["Chicken pasta", "Tacos", "Beef stew", "Pancakes", "Salmon"] as const;
 
 type SearchApiResponse = {
   results?: NormalizedSpoonacularSearchResult[];
@@ -99,6 +100,24 @@ export function RecipeImportBrowser() {
   const [maxReadyTime, setMaxReadyTime] = useState("");
   const [resultCount, setResultCount] = useState("12");
   const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+
+    const stored = window.localStorage.getItem("gravytime-recent-import-searches");
+
+    if (!stored) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as unknown;
+      return Array.isArray(parsed) ? parsed.map((entry) => String(entry)).slice(0, 5) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const [results, setResults] = useState<NormalizedSpoonacularSearchResult[]>([]);
   const [totalResults, setTotalResults] = useState<number | null>(null);
@@ -128,12 +147,23 @@ export function RecipeImportBrowser() {
     return `${results.length} recipes shown`;
   }, [isSearching, results.length, totalResults]);
 
-  const executeSearch = useCallback(async () => {
+  const executeSearch = useCallback(async (searchOverride?: string) => {
     setIsSearching(true);
     setSearchError(null);
 
+    const cleanQuery = (searchOverride ?? query).trim();
+    if (cleanQuery) {
+      setRecentSearches((current) => {
+        const next = [cleanQuery, ...current.filter((item) => item.toLowerCase() !== cleanQuery.toLowerCase())].slice(0, 5);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("gravytime-recent-import-searches", JSON.stringify(next));
+        }
+        return next;
+      });
+    }
+
     const params = new URLSearchParams();
-    const cleanedQuery = query.trim();
+    const cleanedQuery = cleanQuery;
 
     if (cleanedQuery) {
       params.set("query", cleanedQuery);
@@ -384,6 +414,48 @@ export function RecipeImportBrowser() {
           </div>
         </div>
       </form>
+
+      <section className="rounded-2xl border bg-card p-4 shadow-subtle sm:p-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Popular searches</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {POPULAR_SEARCHES.map((term) => (
+            <button
+              key={term}
+              type="button"
+              className="rounded-full border border-border bg-gravy-paper px-3 py-1.5 text-xs font-semibold text-gravy-charcoal transition hover:bg-secondary"
+              onClick={() => {
+                setQuery(term);
+                void executeSearch(term);
+              }}
+            >
+              {term}
+            </button>
+          ))}
+        </div>
+
+        {recentSearches.length > 0 ? (
+          <>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Recent searches
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {recentSearches.map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  className="rounded-full border border-gravy-gold/30 bg-gravy-gold/10 px-3 py-1.5 text-xs font-semibold text-gravy-brown transition hover:bg-gravy-gold/20"
+                  onClick={() => {
+                    setQuery(term);
+                    void executeSearch(term);
+                  }}
+                >
+                  {term}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : null}
+      </section>
 
       {searchError ? (
         <div className="flex items-start gap-3 rounded-2xl border border-gravy-brown/35 bg-gravy-brown/10 p-4 text-sm text-gravy-brown">

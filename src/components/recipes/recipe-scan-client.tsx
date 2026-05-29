@@ -4,7 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, CheckCircle2, FileImage, Loader2, RefreshCcw, Upload, X } from "lucide-react";
+import {
+  Camera,
+  CheckCircle2,
+  ImageIcon,
+  Loader2,
+  RefreshCcw,
+  X,
+} from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
 import { RecipeScanReviewForm } from "@/components/recipes/recipe-scan-review-form";
@@ -252,17 +259,17 @@ export function RecipeScanClient() {
         </section>
       ) : null}
 
-      <section className="rounded-2xl border bg-card p-5 shadow-subtle sm:p-6">
+      <section className="rounded-3xl border border-gravy-charcoal/50 bg-[#0F0F0F] p-4 text-gravy-cream shadow-soft sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gravy-charcoal">Upload Recipe Image</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Drag and drop an image, choose a file, or take a photo with your camera.
+            <h2 className="text-xl font-semibold text-gravy-cream">Scan Recipe</h2>
+            <p className="mt-1 text-sm leading-6 text-gravy-cream/75">
+              Position the recipe in the frame.
             </p>
           </div>
 
           {selectedFile ? (
-            <Button className="gap-2" type="button" variant="secondary" onClick={clearSelectedFile}>
+            <Button className="gap-2 border-white/25 bg-white/10 text-white hover:bg-white/20" type="button" variant="secondary" onClick={clearSelectedFile}>
               <X className="h-4 w-4" aria-hidden="true" />
               Remove image
             </Button>
@@ -271,44 +278,46 @@ export function RecipeScanClient() {
 
         <div
           {...getRootProps()}
-          className={`mt-5 rounded-2xl border-2 border-dashed p-6 text-center transition ${
-            isDragActive ? "border-primary bg-primary/10" : "border-border bg-gravy-paper"
+          className={`mt-5 rounded-3xl border-2 border-dashed p-4 text-center transition ${
+            isDragActive ? "border-gravy-gold bg-white/5" : "border-white/30 bg-black/35"
           }`}
         >
           <input {...getInputProps()} aria-label="Upload recipe image" />
 
           {previewUrl ? (
             <div className="space-y-4">
-              <div className="relative mx-auto aspect-[4/3] max-w-md overflow-hidden rounded-xl border bg-card">
+              <div className="relative mx-auto aspect-[4/3] max-w-md overflow-hidden rounded-2xl border border-white/40 bg-black">
                 <Image alt="Selected recipe preview" className="object-contain" fill src={previewUrl} />
+                <div className="pointer-events-none absolute inset-4 rounded-xl border-2 border-white/80" />
               </div>
-              {fileSummary ? <p className="text-sm text-muted-foreground">{fileSummary}</p> : null}
+              {fileSummary ? <p className="text-sm text-gravy-cream/70">{fileSummary}</p> : null}
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Upload className="h-6 w-6" aria-hidden="true" />
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-gravy-cream">
+                <Camera className="h-6 w-6" aria-hidden="true" />
               </div>
-              <p className="text-sm font-medium text-gravy-charcoal">
+              <p className="text-sm font-medium text-gravy-cream">
                 {isDragActive ? "Drop the image here" : "Drop a recipe image here"}
               </p>
-              <p className="text-xs text-muted-foreground">JPG, PNG, or WebP up to 8MB</p>
+              <p className="text-xs text-gravy-cream/70">JPG, PNG, or WebP up to 8MB</p>
+              <div className="mx-auto mt-1 max-w-[280px] rounded-xl border border-white/35 px-3 py-2 text-xs text-gravy-cream/80">
+                Position the recipe in the frame
+              </div>
             </div>
           )}
 
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <Button className="gap-2" type="button" variant="secondary" onClick={open}>
-              <FileImage className="h-4 w-4" aria-hidden="true" />
-              Choose File
+            <Button className="h-11 w-11 rounded-full border-white/35 bg-white/10 px-0 text-white hover:bg-white/20" type="button" variant="secondary" onClick={() => cameraInputRef.current?.click()}>
+              <Camera className="h-5 w-5" aria-hidden="true" />
             </Button>
             <Button
-              className="gap-2"
+              className="h-11 w-11 rounded-full border-white/35 bg-white/10 px-0 text-white hover:bg-white/20"
               type="button"
               variant="secondary"
-              onClick={() => cameraInputRef.current?.click()}
+              onClick={open}
             >
-              <Camera className="h-4 w-4" aria-hidden="true" />
-              Take Photo
+              <ImageIcon className="h-4 w-4" aria-hidden="true" />
             </Button>
             <input
               ref={cameraInputRef}
@@ -331,10 +340,12 @@ export function RecipeScanClient() {
 
         <div className="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-end">
           <div className="space-y-2">
-            <Label htmlFor="scan-source-type">Source type</Label>
+            <Label className="text-gravy-cream" htmlFor="scan-source-type">
+              Source type
+            </Label>
             <select
               id="scan-source-type"
-              className="h-11 w-full rounded-md border border-input bg-gravy-paper px-3 text-sm text-gravy-charcoal shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 w-full rounded-xl border border-white/30 bg-white/10 px-3 text-sm text-gravy-cream shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gravy-gold"
               value={sourceType}
               onChange={(event) => setSourceType(event.target.value)}
             >
@@ -347,7 +358,7 @@ export function RecipeScanClient() {
           </div>
 
           <Button
-            className="h-11 w-full"
+            className="h-11 w-full rounded-xl bg-primary text-primary-foreground"
             disabled={isExtracting || isSaving || !selectedFile}
             type="button"
             onClick={handleExtract}

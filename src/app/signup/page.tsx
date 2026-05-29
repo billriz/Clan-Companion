@@ -13,7 +13,7 @@ export default function SignupPage() {
   return (
     <AuthShell
       eyebrow="Get started"
-      title="Create your meal plan."
+      title="Good meals start here."
       description={BRAND.heroCopy}
       footer={
         <>

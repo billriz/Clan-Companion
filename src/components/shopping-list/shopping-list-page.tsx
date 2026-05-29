@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -16,8 +15,11 @@ import {
 import { AddShoppingItemForm } from "@/components/shopping-list/add-shopping-item-form";
 import { GenerateShoppingListButton } from "@/components/shopping-list/generate-shopping-list-button";
 import { ShoppingCategorySection } from "@/components/shopping-list/shopping-category-section";
+import { ShoppingListItem as ShoppingListItemCard } from "@/components/shopping-list/shopping-list-item";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { CategorySection } from "@/components/ui/category-section";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   addDays,
   formatDateKey,
@@ -73,6 +75,7 @@ export function ShoppingListPage({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"aisle" | "recipe">("aisle");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const inFlightWeeks = useRef(new Set<string>());
@@ -87,6 +90,13 @@ export function ShoppingListPage({
   const visibleCategories = SHOPPING_CATEGORIES.filter(
     (category) => groupedItems[category].length > 0,
   );
+  const groupedBySource = useMemo(() => {
+    return items.reduce<Record<string, ShoppingListItem[]>>((groups, item) => {
+      const key = item.source === "meal_plan" ? "Meal Plan" : "Manual";
+      groups[key] = [...(groups[key] ?? []), item];
+      return groups;
+    }, {});
+  }, [items]);
 
   useEffect(() => {
     if (weekDataByWeek[weekStartKey] || inFlightWeeks.current.has(weekStartKey)) {
@@ -499,6 +509,37 @@ export function ShoppingListPage({
         </div>
       </section>
 
+      <section className="rounded-2xl border bg-card p-2 shadow-subtle">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            aria-pressed={viewMode === "aisle"}
+            className={cn(
+              "h-10 rounded-xl text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              viewMode === "aisle"
+                ? "bg-primary text-primary-foreground"
+                : "bg-gravy-paper text-muted-foreground",
+            )}
+            onClick={() => setViewMode("aisle")}
+          >
+            By Aisle
+          </button>
+          <button
+            type="button"
+            aria-pressed={viewMode === "recipe"}
+            className={cn(
+              "h-10 rounded-xl text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              viewMode === "recipe"
+                ? "bg-primary text-primary-foreground"
+                : "bg-gravy-paper text-muted-foreground",
+            )}
+            onClick={() => setViewMode("recipe")}
+          >
+            By Recipe
+          </button>
+        </div>
+      </section>
+
       {error ? (
         <div
           className="flex flex-col gap-3 rounded-2xl border border-gravy-brown/30 bg-gravy-brown/10 px-4 py-3 text-sm leading-6 text-gravy-brown shadow-subtle sm:flex-row sm:items-center sm:justify-between"
@@ -533,16 +574,44 @@ export function ShoppingListPage({
         />
       ) : (
         <div className={cn("space-y-7 transition", isBusy && "opacity-75")}>
-          {visibleCategories.map((category) => (
-            <ShoppingCategorySection
-              key={category}
-              category={category}
-              items={groupedItems[category]}
-              busyItemIds={busyItemIds}
-              onCheckedChange={handleCheckedChange}
-              onDelete={handleDeleteItem}
-            />
-          ))}
+          {viewMode === "aisle"
+            ? visibleCategories.map((category) => (
+                <ShoppingCategorySection
+                  key={category}
+                  category={category}
+                  items={groupedItems[category]}
+                  busyItemIds={busyItemIds}
+                  onCheckedChange={handleCheckedChange}
+                  onDelete={handleDeleteItem}
+                />
+              ))
+            : Object.entries(groupedBySource).map(([source, sourceItems]) => (
+                <CategorySection key={source} title={source} count={sourceItems.length}>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {sourceItems.map((item) => (
+                      <ShoppingListItemCard
+                        key={item.id}
+                        item={item}
+                        isBusy={busyItemIds.has(item.id)}
+                        onCheckedChange={handleCheckedChange}
+                        onDelete={handleDeleteItem}
+                      />
+                    ))}
+                  </div>
+                </CategorySection>
+              ))}
+
+          <section className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 shadow-subtle">
+            <p className="text-sm font-semibold text-gravy-charcoal">{totalCount} items</p>
+            <div className="flex items-center gap-2">
+              <Link className={cn(buttonVariants({ variant: "secondary" }), "h-9 rounded-lg")} href="/recipes">
+                View Recipes
+              </Link>
+              <Button className="h-9 rounded-lg" type="button" onClick={() => setIsAddItemOpen(true)}>
+                Add Item
+              </Button>
+            </div>
+          </section>
         </div>
       )}
 
@@ -608,28 +677,20 @@ function EmptyShoppingList({
 }) {
   if (mealPlanCount === 0) {
     return (
-      <section className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
-        <Badge variant="terracotta">No meals planned</Badge>
-        <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Add meals to build your shopping list.</h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-          Add recipes to the meal planner first, then come back to turn those ingredients into a
-          grocery run.
-        </p>
-        <Link className={cn(buttonVariants(), "mt-6 gap-2 rounded-xl")} href="/meal-planner">
-          Go to Meal Planner
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
-      </section>
+      <EmptyState
+        title="Your shopping list is empty."
+        description="Add meals to generate your list."
+        actionLabel="Go to Meal Planner"
+        actionHref="/meal-planner"
+      />
     );
   }
 
   return (
     <section className="rounded-2xl border border-dashed bg-card p-8 text-center shadow-subtle">
-      <Badge variant="default">Ready to build</Badge>
-      <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Add meals to build your shopping list.</h2>
+      <h2 className="text-xl font-semibold text-gravy-charcoal">Your shopping list is empty.</h2>
       <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-        Generate a list from planned recipes for the current week, then add any household extras by
-        hand.
+        Add meals to generate your list.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         <GenerateShoppingListButton
@@ -639,7 +700,7 @@ function EmptyShoppingList({
         />
         <Button className="h-11 gap-2 rounded-xl" disabled={isBusy} type="button" variant="secondary" onClick={onAddManual}>
           <Plus className="h-4 w-4" aria-hidden="true" />
-          Add Manual Item
+          Add Item
         </Button>
       </div>
     </section>

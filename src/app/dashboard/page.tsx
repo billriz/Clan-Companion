@@ -1,63 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ArrowRight,
-  BookOpen,
-  CalendarDays,
-  ChefHat,
-  ClipboardCheck,
-  Package,
-  ShoppingBasket,
-} from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, ShoppingBasket } from "lucide-react";
 
-import { FeatureCard } from "@/components/dashboard/feature-card";
-import { OverviewStatCard } from "@/components/dashboard/overview-stat-card";
-import { InstallPrompt } from "@/components/pwa/install-prompt";
-import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { MealPlanCard } from "@/components/meal-planner/meal-plan-card";
 import { buttonVariants } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
+import { StatCard } from "@/components/ui/stat-card";
 import { getWeekEndKey, getWeekStartKey } from "@/lib/meal-plans";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import type { MealPlanWithRecipe } from "@/types/meal-plans";
 
 export const metadata: Metadata = {
   title: "Dashboard",
 };
-
-const dashboardCards = [
-  {
-    title: "Recipes",
-    description: "Save favorites and weeknight go-tos in one organized place.",
-    icon: BookOpen,
-    tone: "sage",
-    href: "/recipes",
-    actionLabel: "Open recipes",
-  },
-  {
-    title: "Meal Planner",
-    description: "Map breakfast, lunch, and dinner across the week.",
-    icon: CalendarDays,
-    tone: "terracotta",
-    href: "/meal-planner",
-    actionLabel: "Plan week",
-  },
-  {
-    title: "Pantry",
-    description: "Track what you have on hand before building your grocery list.",
-    icon: Package,
-    tone: "blue",
-    href: "/pantry",
-    actionLabel: "Open pantry",
-  },
-  {
-    title: "Shopping List",
-    description: "Generate and check off groceries from planned meals.",
-    icon: ShoppingBasket,
-    tone: "blue",
-    href: "/shopping-list",
-    actionLabel: "Open list",
-  },
-] as const;
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -72,7 +30,7 @@ export default async function DashboardPage() {
   const weekStartKey = getWeekStartKey(new Date());
   const weekEndKey = getWeekEndKey(weekStartKey);
 
-  const [recipesCountResult, mealsCountResult, shoppingCountResult, checkedCountResult] =
+  const [recipesCountResult, mealsCountResult, shoppingCountResult, weekPlanResult] =
     await Promise.all([
       supabase
         .from("recipes")
@@ -90,61 +48,40 @@ export default async function DashboardPage() {
         .eq("user_id", user.id)
         .eq("week_start", weekStartKey),
       supabase
-        .from("shopping_list_items")
-        .select("id", { count: "exact", head: true })
+        .from("meal_plans")
+        .select("*, recipe:recipes(*)")
         .eq("user_id", user.id)
-        .eq("week_start", weekStartKey)
-        .eq("checked", true),
+        .gte("planned_date", weekStartKey)
+        .lte("planned_date", weekEndKey)
+        .order("planned_date", { ascending: true })
+        .order("meal_type", { ascending: true }),
     ]);
 
   const loadError =
-    recipesCountResult.error ??
-    mealsCountResult.error ??
-    shoppingCountResult.error ??
-    checkedCountResult.error;
+    recipesCountResult.error ?? mealsCountResult.error ?? shoppingCountResult.error ?? weekPlanResult.error;
 
   const recipesTotal = recipesCountResult.count ?? 0;
   const mealsThisWeek = mealsCountResult.count ?? 0;
   const shoppingTotal = shoppingCountResult.count ?? 0;
-  const shoppingChecked = checkedCountResult.count ?? 0;
-  const shoppingProgress =
-    shoppingTotal > 0 ? Math.round((shoppingChecked / shoppingTotal) * 100) : 0;
+  const plans = ((weekPlanResult.data ?? []) as MealPlanWithRecipe[]).slice(0, 7);
 
   const userName =
     typeof user.user_metadata?.full_name === "string" && user.user_metadata.full_name.trim().length > 0
-      ? user.user_metadata.full_name.trim()
+      ? user.user_metadata.full_name.trim().split(" ")[0]
       : "there";
 
-  const hasAnyData = recipesTotal > 0 || mealsThisWeek > 0 || shoppingTotal > 0;
-
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <section className="grid gap-6 rounded-2xl border bg-card p-5 shadow-subtle lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end sm:p-6">
-        <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-gravy-paper px-3 py-1 text-sm font-medium text-gravy-brown shadow-subtle">
-            <ChefHat className="h-4 w-4" aria-hidden="true" />
-            Welcome to GravyTime
-          </div>
-          <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-gravy-charcoal sm:text-4xl">
-            Hello, {userName}. Your planning workspace is ready.
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-            Keep the flow simple: save recipes, plan this week, and generate groceries.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          <Link className={cn(buttonVariants(), "gap-2")} href="/meal-planner">
-            Continue Planning
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 lg:max-w-5xl lg:px-8 lg:py-10">
+      <PageHeader
+        title={`Good morning, ${userName}!`}
+        description="What's cooking this week?"
+        actions={
+          <Link className={cn(buttonVariants(), "gap-2 rounded-xl")} href="/meal-planner">
+            Plan a Meal
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/recipes/new">
-            Add Recipe
-          </Link>
-        </div>
-      </section>
-
-      <InstallPrompt />
+        }
+      />
 
       {loadError ? (
         <section className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm leading-6 text-destructive shadow-subtle">
@@ -152,71 +89,43 @@ export default async function DashboardPage() {
         </section>
       ) : (
         <>
-          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <OverviewStatCard
-              title="Total Recipes"
-              value={String(recipesTotal)}
-              description={recipesTotal > 0 ? "Recipes saved in your library" : "Add your first recipe to start"}
-              icon={BookOpen}
-              tone="sage"
-            />
-            <OverviewStatCard
-              title="Meals Planned This Week"
-              value={String(mealsThisWeek)}
-              description={mealsThisWeek > 0 ? `${Math.max(21 - mealsThisWeek, 0)} slots still open` : "No meals planned yet"}
-              icon={CalendarDays}
-              tone="terracotta"
-            />
-            <OverviewStatCard
-              title="Shopping List Progress"
-              value={`${shoppingProgress}%`}
-              description={shoppingTotal > 0 ? `${shoppingChecked} of ${shoppingTotal} checked` : "No items for this week yet"}
-              icon={ClipboardCheck}
-              tone="blue"
-            />
-            <OverviewStatCard
-              title="Shopping Items"
-              value={String(shoppingTotal)}
-              description="Items currently on this week's list"
-              icon={ShoppingBasket}
-              tone="sage"
-            />
+          <section className="grid gap-3 sm:grid-cols-3">
+            <StatCard title="Recipes" value={recipesTotal} icon={BookOpen} tone="sage" />
+            <StatCard title="Meal Plans" value={mealsThisWeek} icon={CalendarDays} tone="gold" />
+            <StatCard title="On List" value={shoppingTotal} icon={ShoppingBasket} tone="brown" />
           </section>
 
-          <section className="grid gap-4 md:grid-cols-3">
-            {dashboardCards.map((card) => (
-              <FeatureCard
-                key={card.title}
-                title={card.title}
-                description={card.description}
-                icon={card.icon}
-                tone={card.tone}
-                href={"href" in card ? card.href : undefined}
-                actionLabel={"actionLabel" in card ? card.actionLabel : undefined}
+          <section className="rounded-3xl border bg-card p-4 shadow-subtle sm:p-5">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-gravy-charcoal">{"This Week's Plan"}</h2>
+              <Link className="text-sm font-semibold text-primary" href="/meal-planner">
+                View all
+              </Link>
+            </div>
+
+            {plans.length === 0 ? (
+              <EmptyState
+                title="Start your week with a plan."
+                description="Add recipes to build your meal plan."
+                actionLabel="Plan a Meal"
+                actionHref="/meal-planner"
+                className="border-0 bg-gravy-cream p-6 shadow-none"
               />
-            ))}
-          </section>
-
-          {!hasAnyData ? (
-            <section className="rounded-2xl border border-dashed bg-gravy-paper/70 p-6 shadow-subtle">
-              <Badge variant="terracotta">Get started</Badge>
-              <h2 className="mt-4 text-xl font-semibold text-gravy-charcoal">Set up your first planning cycle</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                Start by creating a few recipes. Then add meals to this week and generate your
-                shopping list from those ingredients.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Link className={cn(buttonVariants(), "gap-2")} href="/recipes/new">
-                  Create Recipe
-                </Link>
-                <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2")} href="/meal-planner">
-                  Open Planner
-                </Link>
+            ) : (
+              <div className="space-y-2.5">
+                {plans.map((plan) => (
+                  <MealPlanCard key={plan.id} dayLabel={formatWeekday(plan.planned_date)} plan={plan} />
+                ))}
               </div>
-            </section>
-          ) : null}
+            )}
+          </section>
         </>
       )}
     </div>
   );
+}
+
+function formatWeekday(dateKey: string) {
+  const date = new Date(`${dateKey}T00:00:00`);
+  return date.toLocaleDateString(undefined, { weekday: "short" });
 }

@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
+
 import { ShoppingListItem } from "@/components/shopping-list/shopping-list-item";
+import { CategorySection } from "@/components/ui/category-section";
 import type {
   ShoppingCategory,
   ShoppingListItem as ShoppingListItemType,
@@ -21,29 +24,25 @@ export function ShoppingCategorySection({
   onCheckedChange,
   onDelete,
 }: ShoppingCategorySectionProps) {
+  const [expanded, setExpanded] = useState(true);
+
   if (items.length === 0) {
     return null;
   }
 
   const checkedCount = items.filter((item) => item.checked).length;
-  const headingId = `shopping-category-${category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
   return (
-    <section aria-labelledby={headingId} className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 id={headingId} className="text-lg font-semibold text-gravy-charcoal">
-            {category}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {checkedCount} of {items.length} checked
-          </p>
-        </div>
-        <span className="rounded-full border border-gravy-gold/20 bg-gravy-gold/10 px-3 py-1 text-sm font-semibold text-gravy-brown">
-          {items.length}
-        </span>
-      </div>
-
+    <CategorySection
+      title={category}
+      count={items.length}
+      collapsible
+      expanded={expanded}
+      onToggle={() => setExpanded((current) => !current)}
+    >
+      <p className="mb-3 text-xs text-muted-foreground">
+        {checkedCount} of {items.length} checked
+      </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {items.map((item) => (
           <ShoppingListItem
@@ -55,6 +54,6 @@ export function ShoppingCategorySection({
           />
         ))}
       </div>
-    </section>
+    </CategorySection>
   );
 }
