@@ -15,6 +15,7 @@ mobile refinement, and deployment preparation.
 - Protected app routes
 - Recipe CRUD
 - Spoonacular recipe browse + import into your recipe library
+- Import Recipe from URL (Spoonacular URL extraction -> JSON-LD fallback -> review/edit -> save)
 - Scan Recipe import (upload/take photo -> OpenAI Vision extraction -> review/edit -> save)
 - Recipe image uploads
 - Weekly meal planner
@@ -166,6 +167,15 @@ Saved scan recipes behave like regular recipes:
 - can be added to meal planner
 - ingredients flow into shopping list generation
 
+## Import Recipe from URL Flow
+
+1. Go to `Recipes -> Import Recipes -> Import from URL`.
+2. Paste a recipe page URL and click `Import Recipe`.
+3. Server validates URL safety and tries Spoonacular URL extraction first.
+4. If needed, server falls back to schema.org Recipe JSON-LD parsing.
+5. Review/edit imported fields before saving.
+6. Save to your recipe library and open the recipe detail page.
+
 ## Local Commands
 
 ```bash
@@ -208,6 +218,7 @@ PWA installability requires HTTPS in production. Vercel production deployments p
    - `recipes.sql`
    - `recipes_spoonacular_import.sql`
    - `recipes_vision_scan.sql`
+   - `recipes_url_import.sql`
    - `meal_plans.sql`
    - `pantry_items.sql`
    - `shopping_list_items.sql`

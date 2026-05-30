@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Camera, ChefHat, PenSquare, Sparkles } from "lucide-react";
+import { ArrowLeft, Camera, ChefHat, Link2, PenSquare, Sparkles } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { RecipeImportBrowser } from "@/components/recipes/recipe-import-browser";
@@ -25,7 +25,17 @@ export default function ImportRecipesPage() {
         }
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <Link
+          className="rounded-2xl border bg-card p-4 shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft"
+          href="/recipes/import/url"
+        >
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Link2 className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <h2 className="text-lg font-semibold text-gravy-charcoal">Import from URL</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Paste a recipe page and review before saving.</p>
+        </Link>
         <Link
           className="rounded-2xl border bg-card p-4 shadow-subtle transition hover:-translate-y-0.5 hover:shadow-soft"
           href="/recipes/import/spoonacular"

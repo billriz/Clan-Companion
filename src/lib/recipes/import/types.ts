@@ -1,5 +1,3 @@
-export type ImportMethod = "spoonacular" | "jsonld";
-
 export type ImportedRecipeDraft = {
   title: string;
   description?: string | null;
@@ -15,25 +13,16 @@ export type ImportedRecipeDraft = {
   author?: string | null;
   cuisine?: string | null;
   category?: string | null;
-  tags: string[];
-  importMethod: ImportMethod;
+  tags?: string[];
+  notes?: string[];
+  importMethod: "spoonacular" | "jsonld";
 };
 
-export type SaveImportedRecipeInput = {
-  draft: ImportedRecipeDraft;
-};
+export type ImportCompletionStatus = "complete" | "partial";
 
-export type ImportErrorCode =
-  | "INVALID_URL"
-  | "UNSAFE_URL"
-  | "URL_TOO_LONG"
-  | "UNSUPPORTED_PROTOCOL"
-  | "AUTH_REQUIRED"
-  | "PREMIUM_REQUIRED"
-  | "RATE_LIMIT"
-  | "TIMEOUT"
-  | "NETWORK"
-  | "EXTRACTION_FAILED"
-  | "SAVE_FAILED"
-  | "INVALID_DRAFT"
-  | "UNKNOWN";
+export type ImportUrlApiResponse = {
+  recipe: ImportedRecipeDraft;
+  status: ImportCompletionStatus;
+  missingFields?: string[];
+  message?: string;
+};

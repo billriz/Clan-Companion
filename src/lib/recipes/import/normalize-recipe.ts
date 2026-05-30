@@ -1,244 +1,151 @@
-import type { ImportMethod, ImportedRecipeDraft } from "@/lib/recipes/import/types";
-import { importedRecipeDraftSchema } from "@/lib/recipes/import/validation";
+import { dedupeStrings } from "@/lib/recipes/import/schemas";
+import type { ImportedRecipeDraft } from "@/lib/recipes/import/types";
 
-type NormalizeDraftInput = Partial<Omit<ImportedRecipeDraft, "sourceUrl" | "importMethod">> & {
-  sourceUrl: string;
-  importMethod: ImportMethod;
-};
+const MAX_TITLE_LENGTH = 200;
+const MAX_DESCRIPTION_LENGTH = 1200;
+const MAX_LINE_LENGTH = 280;
+const MAX_TAG_LENGTH = 48;
+const MAX_SOURCE_NAME_LENGTH = 80;
+const MAX_AUTHOR_LENGTH = 120;
+const MAX_NOTES = 12;
+const MAX_ITEMS = 80;
 
-export function normalizeImportedRecipeDraft(input: NormalizeDraftInput): ImportedRecipeDraft {
-  const title = sanitizeText(input.title, 200) ?? "";
-  const description = sanitizeText(input.description, 5000);
-  const sourceUrl = sanitizeUrl(input.sourceUrl) ?? input.sourceUrl;
+export function normalizeImportedRecipeDraft(
+  input: Partial<ImportedRecipeDraft> & Pick<ImportedRecipeDraft, "sourceUrl" | "importMethod">,
+): ImportedRecipeDraft {
+  const ingredients = normalizeLineArray(input.ingredients, MAX_ITEMS);
+  const instructions = normalizeLineArray(input.instructions, MAX_ITEMS);
+  const notes = normalizeLineArray(input.notes, MAX_NOTES);
 
-  const normalized: ImportedRecipeDraft = {
-    title,
-    description: description ?? undefined,
-    ingredients: normalizeIngredients(input.ingredients),
-    instructions: normalizeInstructions(input.instructions),
-    prepTimeMinutes: toPositiveInteger(input.prepTimeMinutes),
-    cookTimeMinutes: toPositiveInteger(input.cookTimeMinutes),
-    totalTimeMinutes: toPositiveInteger(input.totalTimeMinutes),
-    servings: toPositiveInteger(input.servings),
-    imageUrl: sanitizeUrl(input.imageUrl),
-    sourceUrl,
-    sourceName: sanitizeText(input.sourceName, 160) ?? inferSourceNameFromUrl(sourceUrl),
-    author: sanitizeText(input.author, 160),
-    cuisine: sanitizeText(input.cuisine, 120),
-    category: sanitizeText(input.category, 120),
-    tags: normalizeTags(input.tags),
+  const prepTimeMinutes = normalizeNonNegativeInteger(input.prepTimeMinutes);
+  const cookTimeMinutes = normalizeNonNegativeInteger(input.cookTimeMinutes);
+  const explicitTotalTime = normalizeNonNegativeInteger(input.totalTimeMinutes);
+  const inferredTotalTime =
+    explicitTotalTime ??
+    (prepTimeMinutes !== null || cookTimeMinutes !== null
+      ? (prepTimeMinutes ?? 0) + (cookTimeMinutes ?? 0)
+      : null);
+
+  const tags = dedupeStrings((input.tags ?? []).map((tag) => cleanText(tag, MAX_TAG_LENGTH) ?? ""));
+
+  const normalizedSourceUrl = normalizeHttpUrl(input.sourceUrl) ?? input.sourceUrl.trim();
+
+  return {
+    title: cleanText(input.title, MAX_TITLE_LENGTH) ?? "",
+    description: cleanText(input.description, MAX_DESCRIPTION_LENGTH),
+    ingredients,
+    instructions,
+    prepTimeMinutes,
+    cookTimeMinutes,
+    totalTimeMinutes: inferredTotalTime,
+    servings: normalizePositiveInteger(input.servings),
+    imageUrl: normalizeHttpUrl(input.imageUrl),
+    sourceUrl: normalizedSourceUrl,
+    sourceName:
+      cleanText(input.sourceName, MAX_SOURCE_NAME_LENGTH) ?? inferSourceNameFromUrl(normalizedSourceUrl),
+    author: cleanText(input.author, MAX_AUTHOR_LENGTH),
+    cuisine: cleanText(input.cuisine, MAX_TAG_LENGTH),
+    category: cleanText(input.category, MAX_TAG_LENGTH),
+    tags,
+    notes,
     importMethod: input.importMethod,
   };
-
-  return importedRecipeDraftSchema.parse(normalized);
 }
 
-export function hasRequiredRecipeFields(draft: ImportedRecipeDraft) {
-  return Boolean(draft.title.trim()) && draft.ingredients.length > 0 && draft.instructions.length > 0;
-}
-
-export function getMissingRequiredFieldLabels(draft: ImportedRecipeDraft): string[] {
+export function collectMissingRequiredFields(recipe: Pick<ImportedRecipeDraft, "title" | "ingredients" | "instructions">) {
   const missing: string[] = [];
+  const nonEmptyIngredients = normalizeLineArray(recipe.ingredients);
+  const nonEmptyInstructions = normalizeLineArray(recipe.instructions);
 
-  if (!draft.title.trim()) {
+  if (!recipe.title.trim()) {
     missing.push("title");
   }
 
-  if (draft.ingredients.length === 0) {
+  if (nonEmptyIngredients.length === 0) {
     missing.push("ingredients");
   }
 
-  if (draft.instructions.length === 0) {
+  if (nonEmptyInstructions.length === 0) {
     missing.push("instructions");
   }
 
   return missing;
 }
 
-export function durationToMinutes(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return toPositiveInteger(value);
+export function getDraftCompletenessScore(recipe: Partial<ImportedRecipeDraft>) {
+  let score = 0;
+
+  if (cleanText(recipe.title)) {
+    score += 5;
   }
 
-  if (typeof value !== "string") {
-    return null;
+  const ingredients = normalizeLineArray(recipe.ingredients);
+  const instructions = normalizeLineArray(recipe.instructions);
+
+  score += Math.min(ingredients.length, 15) * 2;
+  score += Math.min(instructions.length, 15) * 2;
+
+  if (normalizeNonNegativeInteger(recipe.prepTimeMinutes) !== null) {
+    score += 1;
   }
 
-  const trimmed = value.trim();
-
-  if (!trimmed) {
-    return null;
+  if (normalizeNonNegativeInteger(recipe.cookTimeMinutes) !== null) {
+    score += 1;
   }
 
-  if (/^\d+$/.test(trimmed)) {
-    return toPositiveInteger(Number.parseInt(trimmed, 10));
+  if (normalizePositiveInteger(recipe.servings) !== null) {
+    score += 1;
   }
 
-  const durationMatch = trimmed.match(
-    /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/i,
-  );
-
-  if (!durationMatch) {
-    return null;
+  if (cleanText(recipe.description)) {
+    score += 1;
   }
 
-  const days = Number.parseInt(durationMatch[1] ?? "0", 10) || 0;
-  const hours = Number.parseInt(durationMatch[2] ?? "0", 10) || 0;
-  const minutes = Number.parseInt(durationMatch[3] ?? "0", 10) || 0;
-  const seconds = Number.parseInt(durationMatch[4] ?? "0", 10) || 0;
-
-  const totalMinutes = days * 24 * 60 + hours * 60 + minutes + (seconds >= 30 ? 1 : 0);
-  return toPositiveInteger(totalMinutes);
+  return score;
 }
 
-export function normalizeInstructions(value: unknown): string[] {
-  if (!value) {
+export function normalizeLineArray(input: unknown, maxItems = MAX_ITEMS) {
+  if (!Array.isArray(input)) {
     return [];
   }
 
-  if (typeof value === "string") {
-    return splitInstructionText(value);
-  }
+  const cleaned = input
+    .map((item) => cleanText(item, MAX_LINE_LENGTH))
+    .filter((value): value is string => Boolean(value));
 
-  if (!Array.isArray(value)) {
+  return cleaned.slice(0, maxItems);
+}
+
+export function normalizeInstructionText(value: unknown): string[] {
+  const cleaned = cleanText(value, 16000);
+
+  if (!cleaned) {
     return [];
   }
 
-  const steps: string[] = [];
+  const normalizedLines = cleaned
+    .replace(/\r/g, "\n")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
 
-  value.forEach((item) => {
-    if (!item) {
-      return;
-    }
+  if (normalizedLines.length > 1) {
+    return normalizedLines.map((line) => trimLinePrefix(line)).filter(Boolean);
+  }
 
-    if (typeof item === "string") {
-      steps.push(...splitInstructionText(item));
-      return;
-    }
-
-    if (typeof item !== "object" || Array.isArray(item)) {
-      return;
-    }
-
-    const record = item as Record<string, unknown>;
-    const textCandidate =
-      sanitizeText(record.text, 4000) ??
-      sanitizeText(record.name, 4000) ??
-      sanitizeText(record.step, 4000) ??
-      sanitizeText(record.item, 4000);
-
-    if (textCandidate) {
-      steps.push(...splitInstructionText(textCandidate));
-    }
-  });
-
-  return dedupeAndClean(steps);
+  return cleaned
+    .split(/\s*(?:\d+\.|\d+\)|\u2022|•|-)\s+/)
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 2)
+    .map((segment) => trimLinePrefix(segment));
 }
 
-export function normalizeIngredients(value: unknown): string[] {
-  if (!value) {
-    return [];
-  }
-
-  if (typeof value === "string") {
-    return dedupeAndClean([sanitizeText(value, 500) ?? ""]);
-  }
-
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  const items: string[] = [];
-
-  value.forEach((item) => {
-    if (!item) {
-      return;
-    }
-
-    if (typeof item === "string") {
-      const cleaned = sanitizeText(item, 500);
-
-      if (cleaned) {
-        items.push(cleaned);
-      }
-
-      return;
-    }
-
-    if (typeof item !== "object" || Array.isArray(item)) {
-      return;
-    }
-
-    const record = item as Record<string, unknown>;
-
-    const textValue =
-      sanitizeText(record.text, 500) ??
-      sanitizeText(record.original, 500) ??
-      sanitizeText(record.name, 300);
-
-    if (textValue) {
-      items.push(textValue);
-      return;
-    }
-
-    const quantity = sanitizeText(record.quantity, 40) ?? sanitizeText(record.amount, 40) ?? "";
-    const unit = sanitizeText(record.unit, 40) ?? "";
-    const name = sanitizeText(record.ingredient, 300) ?? sanitizeText(record.nameClean, 300) ?? "";
-
-    const merged = [quantity, unit, name].filter(Boolean).join(" ").trim();
-
-    if (merged) {
-      items.push(merged);
-    }
-  });
-
-  return dedupeAndClean(items);
-}
-
-export function sanitizeText(value: unknown, maxLength = 2000): string | null {
-  if (typeof value !== "string") {
+export function normalizeHttpUrl(input: unknown): string | null {
+  if (typeof input !== "string") {
     return null;
   }
 
-  const withoutTags = value.replace(/<[^>]*>/g, " ");
-  const decoded = decodeHtmlEntities(withoutTags);
-  const collapsed = decoded.replace(/\s+/g, " ").trim();
-
-  if (!collapsed) {
-    return null;
-  }
-
-  if (collapsed.length <= maxLength) {
-    return collapsed;
-  }
-
-  return `${collapsed.slice(0, maxLength - 3).trimEnd()}...`;
-}
-
-export function decodeHtmlEntities(value: string): string {
-  return value
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&#(\d+);/g, (_, decimal: string) => {
-      const code = Number.parseInt(decimal, 10);
-      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
-    })
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => {
-      const code = Number.parseInt(hex, 16);
-      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
-    });
-}
-
-export function sanitizeUrl(value: unknown): string | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
+  const trimmed = input.trim();
 
   if (!trimmed) {
     return null;
@@ -257,101 +164,151 @@ export function sanitizeUrl(value: unknown): string | null {
   }
 }
 
+export function cleanText(input: unknown, maxLength = MAX_LINE_LENGTH): string | null {
+  if (typeof input !== "string") {
+    return null;
+  }
+
+  const withoutTags = input.replace(/<[^>]*>/g, " ");
+  const decoded = decodeHtmlEntities(withoutTags);
+  const squashed = decoded.replace(/\s+/g, " ").trim();
+
+  if (!squashed) {
+    return null;
+  }
+
+  if (squashed.length <= maxLength) {
+    return squashed;
+  }
+
+  return `${squashed.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
+export function decodeHtmlEntities(value: string) {
+  return value
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
 export function inferSourceNameFromUrl(url: string): string | null {
   try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.replace(/^www\./i, "").trim();
-    return host || null;
+    const hostname = new URL(url).hostname.toLowerCase();
+    const parts = hostname.split(".").filter(Boolean);
+
+    const base =
+      parts.length >= 2 && parts[parts.length - 1].length <= 3
+        ? parts[parts.length - 2]
+        : parts.length > 0
+          ? parts[parts.length - 2] ?? parts[0]
+          : "";
+
+    if (!base) {
+      return null;
+    }
+
+    return base
+      .split(/[-_]/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
   } catch {
     return null;
   }
 }
 
-function normalizeTags(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
+export function parseIsoDurationToMinutes(value: unknown): number | null {
+  if (typeof value !== "string") {
+    return null;
   }
 
-  const seen = new Set<string>();
-  const tags: string[] = [];
+  const trimmed = value.trim();
 
-  value.forEach((item) => {
-    const cleaned = sanitizeText(item, 120);
+  if (!trimmed) {
+    return null;
+  }
 
-    if (!cleaned) {
-      return;
-    }
+  const match = trimmed.match(
+    /^P(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?)?$/i,
+  );
 
-    const key = cleaned.toLowerCase();
+  if (!match) {
+    return null;
+  }
 
-    if (seen.has(key)) {
-      return;
-    }
+  const days = Number.parseInt(match[1] ?? "0", 10);
+  const hours = Number.parseInt(match[2] ?? "0", 10);
+  const minutes = Number.parseInt(match[3] ?? "0", 10);
+  const seconds = Number.parseInt(match[4] ?? "0", 10);
 
-    seen.add(key);
-    tags.push(cleaned);
-  });
+  if (![days, hours, minutes, seconds].every((value) => Number.isFinite(value) && value >= 0)) {
+    return null;
+  }
 
-  return tags.slice(0, 60);
+  const total = days * 24 * 60 + hours * 60 + minutes + Math.round(seconds / 60);
+  return total >= 0 ? total : null;
 }
 
-function splitInstructionText(value: string): string[] {
-  const cleaned = sanitizeText(value, 6000);
-
-  if (!cleaned) {
-    return [];
+export function parseServings(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const rounded = Math.round(value);
+    return rounded > 0 ? rounded : null;
   }
 
-  const splitByNewLine = cleaned
-    .split(/\r?\n+/)
-    .map((item) => item.replace(/^\d+[.)]\s*/, "").trim())
-    .filter(Boolean);
-
-  if (splitByNewLine.length > 1) {
-    return dedupeAndClean(splitByNewLine);
+  if (typeof value !== "string") {
+    return null;
   }
 
-  const splitByNumbering = cleaned
-    .split(/\s(?=\d+[.)]\s)/)
-    .map((item) => item.replace(/^\d+[.)]\s*/, "").trim())
-    .filter(Boolean);
+  const numericMatch = value.match(/\d+/);
 
-  if (splitByNumbering.length > 1) {
-    return dedupeAndClean(splitByNumbering);
+  if (!numericMatch) {
+    return null;
   }
 
-  return [cleaned];
+  const parsed = Number.parseInt(numericMatch[0], 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-function dedupeAndClean(values: string[]): string[] {
-  const seen = new Set<string>();
-  const output: string[] = [];
+export function normalizeTagInputs(values: unknown[]): string[] {
+  return dedupeStrings(
+    values
+      .flatMap((value) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
 
-  values.forEach((value) => {
-    const cleaned = value.trim();
+        if (typeof value === "string" && value.includes(",")) {
+          return value.split(",");
+        }
 
-    if (!cleaned) {
-      return;
-    }
-
-    const key = cleaned.toLowerCase();
-
-    if (seen.has(key)) {
-      return;
-    }
-
-    seen.add(key);
-    output.push(cleaned);
-  });
-
-  return output;
+        return [value];
+      })
+      .map((value) => cleanText(value, MAX_TAG_LENGTH) ?? "")
+      .filter(Boolean),
+  );
 }
 
-function toPositiveInteger(value: unknown): number | null {
+function normalizeNonNegativeInteger(value: unknown): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return null;
+  }
+
+  const rounded = Math.round(value);
+  return rounded >= 0 ? rounded : null;
+}
+
+function normalizePositiveInteger(value: unknown): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return null;
   }
 
   const rounded = Math.round(value);
   return rounded > 0 ? rounded : null;
+}
+
+function trimLinePrefix(value: string) {
+  return value.replace(/^(?:step\s*)?\d+[\).:-]?\s*/i, "").trim();
 }

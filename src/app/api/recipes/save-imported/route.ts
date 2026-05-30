@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
-import { ZodError } from "zod";
+import type { PostgrestError } from "@supabase/supabase-js";
 
-import type { ImportedRecipeDraft } from "@/lib/recipes/import/types";
-import { normalizeAndAssertSafeHttpUrl, UrlSafetyError } from "@/lib/recipes/import/url-safety";
-import { saveImportedRecipeRequestSchema } from "@/lib/recipes/import/validation";
+import { saveImportedRecipeRequestSchema } from "@/lib/recipes/import/schemas";
 import { createClient } from "@/lib/supabase/server";
-import type { Json } from "@/types/supabase";
-
-export const runtime = "nodejs";
+import type { Database, Json } from "@/types/supabase";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -16,10 +12,8 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Please sign in to save imported recipes." }, { status: 401 });
+    return NextResponse.json({ error: "You’ll need to sign in before importing recipes." }, { status: 401 });
   }
-
-  // TODO: Enforce premium access when premium billing is enabled.
 
   let requestBody: unknown;
 
@@ -29,140 +23,115 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  try {
-    const { draft } = saveImportedRecipeRequestSchema.parse(requestBody);
-    const sourceUrl = await normalizeAndAssertSafeHttpUrl(draft.sourceUrl);
-    const payload = mapDraftToRecipeInsertPayload(user.id, {
-      ...draft,
-      sourceUrl,
-    });
+  const parsedPayload = saveImportedRecipeRequestSchema.safeParse(requestBody);
 
-    const { data: insertedRecipe, error: insertError } = await supabase
-      .from("recipes")
-      .insert(payload)
-      .select("id")
-      .single();
-
-    if (insertError || !insertedRecipe) {
-      return NextResponse.json({ error: "Recipe could not be saved. Please try again." }, { status: 500 });
-    }
-
+  if (!parsedPayload.success) {
     return NextResponse.json(
       {
-        recipeId: insertedRecipe.id,
-        redirectTo: `/recipes/${insertedRecipe.id}`,
+        error:
+          parsedPayload.error.issues[0]?.message ??
+          "Recipe details are incomplete. Please review and try again.",
       },
-      { status: 201 },
-    );
-  } catch (error) {
-    return mapSaveRouteError(error);
-  }
-}
-
-function mapDraftToRecipeInsertPayload(userId: string, draft: ImportedRecipeDraft) {
-  const totalTime =
-    draft.totalTimeMinutes ??
-    sumPositiveNumbers(draft.prepTimeMinutes ?? null, draft.cookTimeMinutes ?? null);
-
-  const tags = dedupeStrings([
-    ...draft.tags,
-    draft.cuisine ?? "",
-    draft.importMethod === "spoonacular" ? "Spoonacular" : "JSON-LD",
-  ]);
-
-  return {
-    user_id: userId,
-    title: draft.title.trim(),
-    description: draft.description?.trim() || null,
-    image_url: draft.imageUrl ?? null,
-    external_image_url: draft.imageUrl ?? null,
-    source_url: draft.sourceUrl,
-    source_name: draft.sourceName ?? null,
-    imported_from: draft.importMethod,
-    imported_at: new Date().toISOString(),
-    prep_time: draft.prepTimeMinutes ?? (draft.cookTimeMinutes ? null : totalTime),
-    cook_time: draft.cookTimeMinutes ?? null,
-    servings: draft.servings ?? null,
-    difficulty: mapDifficultyFromTime(totalTime),
-    category: draft.category ?? "Imported",
-    tags,
-    ingredients: draft.ingredients.map((ingredient) => ({ quantity: "", unit: "", name: ingredient })) as unknown as Json,
-    instructions: draft.instructions as unknown as Json,
-    nutrition: {
-      importMetadata: {
-        author: draft.author ?? null,
-        cuisine: draft.cuisine ?? null,
-        sourceName: draft.sourceName ?? null,
-        sourceUrl: draft.sourceUrl,
-      },
-    } as unknown as Json,
-  };
-}
-
-function mapSaveRouteError(error: unknown) {
-  if (error instanceof UrlSafetyError) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  if (error instanceof ZodError) {
-    const firstIssue = error.issues[0];
-
-    return NextResponse.json(
-      { error: firstIssue?.message ?? "Please review recipe details before saving." },
       { status: 400 },
     );
   }
 
-  return NextResponse.json(
-    { error: "Recipe could not be saved. Please try again." },
-    { status: 500 },
+  const payload = parsedPayload.data;
+
+  const cleanedIngredients = payload.ingredients.map((ingredient) => ({
+    quantity: "",
+    unit: "",
+    name: ingredient,
+  }));
+
+  const insertPayload: Database["public"]["Tables"]["recipes"]["Insert"] = {
+    user_id: user.id,
+    title: payload.title,
+    description: payload.description,
+    image_url: payload.imageUrl,
+    external_image_url: payload.imageUrl,
+    prep_time: payload.prepTimeMinutes,
+    cook_time: payload.cookTimeMinutes,
+    servings: payload.servings,
+    difficulty: "Easy",
+    category: payload.category ?? payload.cuisine,
+    tags: payload.tags,
+    ingredients: cleanedIngredients as unknown as Json,
+    instructions: payload.instructions as unknown as Json,
+    source_url: payload.sourceUrl,
+    source_name: payload.sourceName,
+    import_source: "url_import",
+    imported_from: payload.importMethod,
+    imported_at: new Date().toISOString(),
+    extraction_notes: {
+      importMethod: payload.importMethod,
+      author: payload.author,
+      cuisine: payload.cuisine,
+      notes: payload.notes,
+      savedAt: new Date().toISOString(),
+    } as unknown as Json,
+  };
+
+  const { data: savedRecipe, error: insertError } = await insertRecipeWithFallbackColumns(
+    supabase,
+    insertPayload,
   );
-}
 
-function sumPositiveNumbers(first: number | null, second: number | null) {
-  const validFirst = typeof first === "number" && Number.isFinite(first) && first > 0 ? first : 0;
-  const validSecond = typeof second === "number" && Number.isFinite(second) && second > 0 ? second : 0;
-
-  const total = validFirst + validSecond;
-  return total > 0 ? total : null;
-}
-
-function mapDifficultyFromTime(totalTimeMinutes: number | null) {
-  if (typeof totalTimeMinutes !== "number" || !Number.isFinite(totalTimeMinutes)) {
-    return "Easy";
+  if (insertError || !savedRecipe) {
+    return NextResponse.json(
+      {
+        error: insertError?.message ?? "Recipe could not be saved. Please try again.",
+      },
+      { status: 500 },
+    );
   }
 
-  if (totalTimeMinutes <= 30) {
-    return "Easy";
-  }
-
-  if (totalTimeMinutes <= 60) {
-    return "Medium";
-  }
-
-  return "Hard";
+  return NextResponse.json({ recipe: savedRecipe }, { status: 201 });
 }
 
-function dedupeStrings(values: string[]) {
-  const seen = new Set<string>();
-  const output: string[] = [];
+const FALLBACK_COLUMN_NAMES = ["external_image_url", "source_name", "imported_at"] as const;
 
-  values.forEach((value) => {
-    const cleaned = value.trim();
+async function insertRecipeWithFallbackColumns(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  payload: Database["public"]["Tables"]["recipes"]["Insert"],
+) {
+  const candidatePayload: Record<string, unknown> = { ...payload };
+  let lastError: PostgrestError | null = null;
 
-    if (!cleaned) {
-      return;
+  for (let attempt = 0; attempt <= FALLBACK_COLUMN_NAMES.length; attempt += 1) {
+    const { data, error } = await supabase
+      .from("recipes")
+      .insert(candidatePayload as Database["public"]["Tables"]["recipes"]["Insert"])
+      .select("id")
+      .single();
+
+    if (!error) {
+      return { data, error: null };
     }
 
-    const key = cleaned.toLowerCase();
+    lastError = error;
 
-    if (seen.has(key)) {
-      return;
+    const unsupportedColumn = readUnsupportedColumnName(error.message);
+
+    if (!unsupportedColumn || !FALLBACK_COLUMN_NAMES.includes(unsupportedColumn as (typeof FALLBACK_COLUMN_NAMES)[number])) {
+      break;
     }
 
-    seen.add(key);
-    output.push(cleaned);
-  });
+    if (!(unsupportedColumn in candidatePayload)) {
+      break;
+    }
 
-  return output;
+    delete candidatePayload[unsupportedColumn];
+  }
+
+  return { data: null, error: lastError };
+}
+
+function readUnsupportedColumnName(message: string | undefined) {
+  if (!message) {
+    return null;
+  }
+
+  const match = message.match(/Could not find the '([^']+)' column of '[^']+' in the schema cache/i);
+  return match?.[1] ?? null;
 }

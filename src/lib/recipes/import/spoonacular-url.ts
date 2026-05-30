@@ -1,69 +1,36 @@
-import "server-only";
-
 import {
-  durationToMinutes,
+  cleanText,
+  inferSourceNameFromUrl,
   normalizeImportedRecipeDraft,
-  sanitizeText,
-  sanitizeUrl,
+  normalizeInstructionText,
+  normalizeTagInputs,
+  parseServings,
 } from "@/lib/recipes/import/normalize-recipe";
 import type { ImportedRecipeDraft } from "@/lib/recipes/import/types";
 
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
-const REQUEST_TIMEOUT_MS = 10_000;
-
-export class SpoonacularUrlExtractionError extends Error {
-  code: "RATE_LIMIT" | "AUTH" | "TIMEOUT" | "NETWORK" | "BAD_RESPONSE";
-
-  constructor(
-    message: string,
-    code: "RATE_LIMIT" | "AUTH" | "TIMEOUT" | "NETWORK" | "BAD_RESPONSE",
-  ) {
-    super(message);
-    this.name = "SpoonacularUrlExtractionError";
-    this.code = code;
-  }
-}
-
-type SpoonacularExtractIngredient = {
-  original?: string | null;
-  originalString?: string | null;
-  name?: string | null;
-  nameClean?: string | null;
-  amount?: number | null;
-  unit?: string | null;
-};
-
-type SpoonacularExtractStep = {
-  step?: string | null;
-  number?: number;
-};
-
-type SpoonacularExtractInstructionBlock = {
-  steps?: SpoonacularExtractStep[];
-};
+const REQUEST_TIMEOUT_MS = 10000;
 
 type SpoonacularExtractResponse = {
-  title?: string | null;
-  summary?: string | null;
-  image?: string | null;
-  sourceUrl?: string | null;
-  sourceName?: string | null;
-  author?: string | null;
-  creditsText?: string | null;
-  cuisines?: string[];
-  dishTypes?: string[];
-  diets?: string[];
-  servings?: number | null;
-  preparationMinutes?: number | null;
-  cookingMinutes?: number | null;
-  readyInMinutes?: number | null;
-  totalTime?: string | number | null;
-  instructions?: string | null;
-  analyzedInstructions?: SpoonacularExtractInstructionBlock[];
-  extendedIngredients?: SpoonacularExtractIngredient[];
+  title?: unknown;
+  summary?: unknown;
+  extendedIngredients?: unknown;
+  analyzedInstructions?: unknown;
+  instructions?: unknown;
+  readyInMinutes?: unknown;
+  preparationMinutes?: unknown;
+  cookingMinutes?: unknown;
+  servings?: unknown;
+  image?: unknown;
+  sourceUrl?: unknown;
+  sourceName?: unknown;
+  creditsText?: unknown;
+  cuisines?: unknown;
+  dishTypes?: unknown;
+  diets?: unknown;
 };
 
-export async function extractRecipeWithSpoonacularUrl(url: string): Promise<ImportedRecipeDraft | null> {
+export async function extractRecipeWithSpoonacular(url: string): Promise<ImportedRecipeDraft | null> {
   const apiKey = process.env.SPOONACULAR_API_KEY?.trim();
 
   if (!apiKey) {
@@ -75,13 +42,14 @@ export async function extractRecipeWithSpoonacularUrl(url: string): Promise<Impo
     url,
   });
 
+  const endpoint = `${SPOONACULAR_BASE_URL}/recipes/extract?${query.toString()}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   let response: Response;
 
   try {
-    response = await fetch(`${SPOONACULAR_BASE_URL}/recipes/extract?${query.toString()}`, {
+    response = await fetch(endpoint, {
       method: "GET",
       cache: "no-store",
       signal: controller.signal,
@@ -89,42 +57,18 @@ export async function extractRecipeWithSpoonacularUrl(url: string): Promise<Impo
         Accept: "application/json",
       },
     });
-  } catch (error) {
-    clearTimeout(timeout);
-    if (error instanceof Error && error.name === "AbortError") {
-      throw new SpoonacularUrlExtractionError(
-        "Recipe import is taking too long right now. Please try again.",
-        "TIMEOUT",
-      );
-    }
-
-    throw new SpoonacularUrlExtractionError(
-      "Could not reach Spoonacular right now.",
-      "NETWORK",
-    );
+  } catch {
+    return null;
   } finally {
     clearTimeout(timeout);
   }
 
   if (!response.ok) {
-    if (response.status === 429) {
-      throw new SpoonacularUrlExtractionError(
-        "Spoonacular import is temporarily busy. Please try again in a minute.",
-        "RATE_LIMIT",
-      );
+    if ([401, 402, 403, 404, 408, 409, 429, 500, 502, 503, 504].includes(response.status)) {
+      return null;
     }
 
-    if (response.status === 401 || response.status === 402 || response.status === 403) {
-      throw new SpoonacularUrlExtractionError(
-        "Recipe import service is unavailable right now.",
-        "AUTH",
-      );
-    }
-
-    throw new SpoonacularUrlExtractionError(
-      "Spoonacular could not extract this recipe URL.",
-      "BAD_RESPONSE",
-    );
+    return null;
   }
 
   let payload: SpoonacularExtractResponse;
@@ -132,151 +76,137 @@ export async function extractRecipeWithSpoonacularUrl(url: string): Promise<Impo
   try {
     payload = (await response.json()) as SpoonacularExtractResponse;
   } catch {
-    throw new SpoonacularUrlExtractionError(
-      "Spoonacular returned malformed data.",
-      "BAD_RESPONSE",
-    );
+    return null;
   }
 
-  return normalizeSpoonacularExtractPayload(payload, url);
-}
+  const sourceUrl = normalizeSourceUrl(payload.sourceUrl, url);
+  const ingredients = extractIngredientLines(payload.extendedIngredients);
+  const instructions = extractInstructionLines(payload.analyzedInstructions, payload.instructions);
 
-function normalizeSpoonacularExtractPayload(
-  payload: SpoonacularExtractResponse,
-  fallbackSourceUrl: string,
-): ImportedRecipeDraft {
-  const sourceUrl = sanitizeUrl(payload.sourceUrl) ?? fallbackSourceUrl;
-  const prepTimeMinutes = toPositiveInteger(payload.preparationMinutes);
-  const cookTimeMinutes = toPositiveInteger(payload.cookingMinutes);
-  const totalTimeMinutes =
-    durationToMinutes(payload.totalTime) ?? toPositiveInteger(payload.readyInMinutes) ?? null;
-
-  const ingredients = Array.isArray(payload.extendedIngredients)
-    ? payload.extendedIngredients
-        .map((ingredient) =>
-          sanitizeText(ingredient.original, 500) ??
-          sanitizeText(ingredient.originalString, 500) ??
-          mergeIngredientParts(ingredient),
-        )
-        .filter((item): item is string => Boolean(item))
-    : [];
-
-  const instructions = extractInstructionSteps(payload);
-
-  return normalizeImportedRecipeDraft({
-    title: sanitizeText(payload.title, 200) ?? "",
-    description: sanitizeText(payload.summary, 5000) ?? undefined,
+  const draft = normalizeImportedRecipeDraft({
+    title: cleanText(payload.title, 200) ?? "",
+    description: cleanText(payload.summary, 1200),
     ingredients,
     instructions,
-    prepTimeMinutes,
-    cookTimeMinutes,
-    totalTimeMinutes,
-    servings: toPositiveInteger(payload.servings),
-    imageUrl: sanitizeUrl(payload.image),
+    prepTimeMinutes: toNonNegativeInteger(payload.preparationMinutes),
+    cookTimeMinutes: toNonNegativeInteger(payload.cookingMinutes),
+    totalTimeMinutes: toNonNegativeInteger(payload.readyInMinutes),
+    servings: parseServings(payload.servings),
+    imageUrl: typeof payload.image === "string" ? payload.image : null,
     sourceUrl,
-    sourceName: sanitizeText(payload.sourceName, 160) ?? undefined,
-    author:
-      sanitizeText(payload.author, 160) ?? sanitizeText(payload.creditsText, 160) ?? undefined,
-    cuisine: firstCleanString(payload.cuisines),
-    category: firstCleanString(payload.dishTypes),
-    tags: normalizeTagList([...safeArray(payload.diets), ...safeArray(payload.dishTypes)]),
+    sourceName:
+      cleanText(payload.sourceName, 80) ??
+      inferSourceNameFromUrl(sourceUrl) ??
+      cleanText(payload.creditsText, 80),
+    author: cleanText(payload.creditsText, 120),
+    cuisine: firstString(payload.cuisines),
+    category: firstString(payload.dishTypes),
+    tags: normalizeTagInputs([payload.cuisines, payload.dishTypes, payload.diets]),
     importMethod: "spoonacular",
   });
-}
 
-function extractInstructionSteps(payload: SpoonacularExtractResponse): string[] {
-  const analyzedInstructions = Array.isArray(payload.analyzedInstructions)
-    ? payload.analyzedInstructions
-    : [];
-
-  const steps = analyzedInstructions
-    .flatMap((instructionBlock) =>
-      Array.isArray(instructionBlock.steps)
-        ? instructionBlock.steps
-            .map((step) => sanitizeText(step.step, 4000))
-            .filter((step): step is string => Boolean(step))
-        : [],
-    )
-    .filter(Boolean);
-
-  if (steps.length > 0) {
-    return steps;
+  if (!hasUsefulContent(draft)) {
+    return null;
   }
 
-  return sanitizeText(payload.instructions, 6000)
-    ?.split(/\r?\n+/)
-    .map((step) => step.trim())
-    .filter(Boolean) ?? [];
+  return draft;
 }
 
-function mergeIngredientParts(ingredient: SpoonacularExtractIngredient) {
-  const amount = toPositiveNumberString(ingredient.amount);
-  const unit = sanitizeText(ingredient.unit, 40) ?? "";
-  const name =
-    sanitizeText(ingredient.nameClean, 300) ?? sanitizeText(ingredient.name, 300) ?? "";
-
-  const merged = [amount, unit, name].filter(Boolean).join(" ").trim();
-  return merged || null;
-}
-
-function safeArray(values: string[] | undefined): string[] {
-  return Array.isArray(values) ? values : [];
-}
-
-function normalizeTagList(values: string[]) {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-
-  values.forEach((value) => {
-    const cleaned = sanitizeText(value, 120);
-
-    if (!cleaned) {
-      return;
-    }
-
-    const key = cleaned.toLowerCase();
-
-    if (seen.has(key)) {
-      return;
-    }
-
-    seen.add(key);
-    tags.push(cleaned);
-  });
-
-  return tags.slice(0, 30);
-}
-
-function firstCleanString(values: string[] | undefined): string | undefined {
-  if (!Array.isArray(values)) {
-    return undefined;
+function extractIngredientLines(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
   }
 
-  for (const value of values) {
-    const cleaned = sanitizeText(value, 120);
+  return value
+    .map((entry) => {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+        return null;
+      }
 
-    if (cleaned) {
-      return cleaned;
+      const ingredient = entry as Record<string, unknown>;
+      return (
+        cleanText(ingredient.original, 280) ??
+        cleanText(ingredient.originalString, 280) ??
+        cleanText(ingredient.nameClean, 280) ??
+        cleanText(ingredient.name, 280)
+      );
+    })
+    .filter((entry): entry is string => Boolean(entry));
+}
+
+function extractInstructionLines(analyzed: unknown, instructions: unknown) {
+  if (Array.isArray(analyzed)) {
+    const steps = analyzed
+      .flatMap((block) => {
+        if (!block || typeof block !== "object" || Array.isArray(block)) {
+          return [];
+        }
+
+        const candidateSteps = (block as { steps?: unknown }).steps;
+
+        if (!Array.isArray(candidateSteps)) {
+          return [];
+        }
+
+        return candidateSteps
+          .map((step) => {
+            if (!step || typeof step !== "object" || Array.isArray(step)) {
+              return null;
+            }
+
+            const stepRecord = step as Record<string, unknown>;
+            return {
+              number:
+                typeof stepRecord.number === "number" && Number.isFinite(stepRecord.number)
+                  ? stepRecord.number
+                  : Number.MAX_SAFE_INTEGER,
+              text: cleanText(stepRecord.step, 280),
+            };
+          })
+          .filter((step): step is { number: number; text: string } => Boolean(step?.text));
+      })
+      .sort((first, second) => first.number - second.number)
+      .map((step) => step.text);
+
+    if (steps.length > 0) {
+      return steps;
     }
   }
 
-  return undefined;
+  return normalizeInstructionText(instructions);
 }
 
-function toPositiveInteger(value: unknown): number | null {
+function normalizeSourceUrl(payloadSourceUrl: unknown, fallback: string) {
+  if (typeof payloadSourceUrl === "string" && payloadSourceUrl.trim().length > 0) {
+    return payloadSourceUrl.trim();
+  }
+
+  return fallback;
+}
+
+function toNonNegativeInteger(value: unknown) {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return null;
   }
 
   const rounded = Math.round(value);
-  return rounded > 0 ? rounded : null;
+  return rounded >= 0 ? rounded : null;
 }
 
-function toPositiveNumberString(value: unknown): string {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    return "";
+function firstString(value: unknown) {
+  if (Array.isArray(value)) {
+    for (const candidate of value) {
+      const cleaned = cleanText(candidate, 48);
+
+      if (cleaned) {
+        return cleaned;
+      }
+    }
   }
 
-  const rounded = Number(value.toFixed(2));
-  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+  return cleanText(value, 48);
+}
+
+function hasUsefulContent(recipe: ImportedRecipeDraft) {
+  return Boolean(recipe.title || recipe.ingredients.length > 0 || recipe.instructions.length > 0);
 }
