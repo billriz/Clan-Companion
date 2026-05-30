@@ -25,6 +25,11 @@ export function ModalShell({
   children,
 }: ModalShellProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -49,7 +54,7 @@ export function ModalShell({
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -93,7 +98,7 @@ export function ModalShell({
       document.removeEventListener("keydown", handleKeyDown);
       previouslyFocusedElement?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;

@@ -548,7 +548,7 @@ export function ImportRecipeFromUrl() {
 
             <div className="space-y-2">
               {values.ingredients.map((ingredient, index) => (
-                <div key={`${index}-${ingredient}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_40px]">
+                <div key={`ingredient-${index}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_40px]">
                   <Input
                     aria-label={`Ingredient ${index + 1}`}
                     value={ingredient}
@@ -579,7 +579,7 @@ export function ImportRecipeFromUrl() {
 
             <div className="space-y-2">
               {values.instructions.map((instruction, index) => (
-                <div key={`${index}-${instruction}`} className="grid gap-2 sm:grid-cols-[40px_minmax(0,1fr)_40px]">
+                <div key={`instruction-${index}`} className="grid gap-2 sm:grid-cols-[40px_minmax(0,1fr)_40px]">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                     {index + 1}
                   </div>
