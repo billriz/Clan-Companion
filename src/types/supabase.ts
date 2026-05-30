@@ -33,8 +33,11 @@ export type Database = {
           image_url: string | null;
           spoonacular_id: number | null;
           source_url: string | null;
+          source_name: string | null;
           imported_from: string | null;
+          imported_at: string | null;
           import_source: string | null;
+          external_image_url: string | null;
           original_image_url: string | null;
           original_image_path: string | null;
           extraction_confidence: number | null;
@@ -62,8 +65,11 @@ export type Database = {
           image_url?: string | null;
           spoonacular_id?: number | null;
           source_url?: string | null;
+          source_name?: string | null;
           imported_from?: string | null;
+          imported_at?: string | null;
           import_source?: string | null;
+          external_image_url?: string | null;
           original_image_url?: string | null;
           original_image_path?: string | null;
           extraction_confidence?: number | null;
@@ -91,8 +97,11 @@ export type Database = {
           image_url?: string | null;
           spoonacular_id?: number | null;
           source_url?: string | null;
+          source_name?: string | null;
           imported_from?: string | null;
+          imported_at?: string | null;
           import_source?: string | null;
+          external_image_url?: string | null;
           original_image_url?: string | null;
           original_image_path?: string | null;
           extraction_confidence?: number | null;

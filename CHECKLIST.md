@@ -17,6 +17,10 @@ Use this checklist before production releases.
 - [ ] Upload recipe image
 - [ ] Recipe list/search/filter behaves correctly
 - [ ] Add recipe to meal planner from recipe card/detail
+- [ ] Import from URL succeeds for a valid recipe page
+- [ ] Invalid/unsafe URL is blocked with a friendly message
+- [ ] URL import review/edit screen appears before save
+- [ ] URL import saves source attribution on recipe detail
 
 ## Meal Planner
 

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Camera, ChefHat, Download, Plus } from "lucide-react";
+import { Camera, ChefHat, Download, Link2, Plus } from "lucide-react";
 
 import { AddMealDialog } from "@/components/meal-planner/add-meal-dialog";
 import { RecipeCard } from "@/components/recipes/recipe-card";
@@ -132,29 +132,40 @@ export function RecipeLibrary({ recipes, userId }: RecipeLibraryProps) {
       )}
 
       <div className="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:hidden">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <Link
-            className={cn(buttonVariants({ variant: "secondary" }), "h-11 justify-center rounded-xl px-3 text-xs")}
+            className={cn(buttonVariants({ variant: "secondary" }), "h-11 justify-center rounded-xl px-2 text-[11px]")}
+            href="/recipes/import/url"
+          >
+            <Link2 className="mr-1 h-4 w-4" aria-hidden="true" />
+            URL
+          </Link>
+          <Link
+            className={cn(buttonVariants({ variant: "secondary" }), "h-11 justify-center rounded-xl px-2 text-[11px]")}
             href="/recipes/import/spoonacular"
           >
-            <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <Download className="mr-1 h-4 w-4" aria-hidden="true" />
             Browse
           </Link>
           <Link
-            className={cn(buttonVariants({ variant: "secondary" }), "h-11 justify-center rounded-xl px-3 text-xs")}
+            className={cn(buttonVariants({ variant: "secondary" }), "h-11 justify-center rounded-xl px-2 text-[11px]")}
             href="/recipes/import/scan"
           >
-            <Camera className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <Camera className="mr-1 h-4 w-4" aria-hidden="true" />
             Picture
           </Link>
-          <Link className={cn(buttonVariants(), "h-11 justify-center rounded-xl px-3 text-xs")} href="/recipes/new">
-            <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
+          <Link className={cn(buttonVariants(), "h-11 justify-center rounded-xl px-2 text-[11px]")} href="/recipes/new">
+            <Plus className="mr-1 h-4 w-4" aria-hidden="true" />
             Add
           </Link>
         </div>
       </div>
 
       <div className="hidden items-center gap-2 md:flex">
+        <Link className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")} href="/recipes/import/url">
+          <Link2 className="h-4 w-4" aria-hidden="true" />
+          Import from URL
+        </Link>
         <Link
           className={cn(buttonVariants({ variant: "secondary" }), "gap-2 rounded-xl")}
           href="/recipes/import/spoonacular"

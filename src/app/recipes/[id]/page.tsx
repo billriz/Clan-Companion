@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Clock3, Heart, Signal, Timer, UsersRound } from "lucide-react";
+import { ArrowLeft, Clock3, ExternalLink, Heart, Signal, Timer, UsersRound } from "lucide-react";
 
 import { RecipeDetailActions } from "@/components/recipes/recipe-detail-actions";
 import { RecipeImagePlaceholder } from "@/components/recipes/recipe-image-placeholder";
@@ -137,6 +137,20 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
             {recipeWithPreviewUrl.description ||
               "A rich and cozy recipe ready to add to your weekly meal plan."}
           </p>
+          {recipeWithPreviewUrl.source_url ? (
+            <p className="text-sm text-muted-foreground">
+              Source:{" "}
+              <a
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                href={recipeWithPreviewUrl.source_url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {recipeWithPreviewUrl.source_name ?? "Original recipe"}
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            </p>
+          ) : null}
           <div className="grid grid-cols-3 gap-2">
             <MetaCard icon={UsersRound} label="Servings" value={recipeWithPreviewUrl.servings ? String(recipeWithPreviewUrl.servings) : "-"} />
             <MetaCard icon={Timer} label="Prep Time" value={formatMinutes(recipeWithPreviewUrl.prep_time)} />
